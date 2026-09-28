@@ -116,7 +116,7 @@ Não pertence ao MVP. Para eventual implementação futura, preservam-se estes i
 
 Stack aprovada: Game Web e Admin Web separados na Vercel; Supabase Auth, PostgreSQL, Edge Functions e Storage no backend/servidor, Realtime se necessário. O cliente envia intenções, nunca determina dano, cooldown, loot, XP, saldo, consumo ou propriedade. RLS, roles, segredo de serviço e APIs administrativas seguem `TECH_ARCHITECTURE.md` e `ADMIN_PANEL_SPEC.md`.
 
-Jogadores não podem ver/acessar o Admin Web nem suas APIs. O CMS no-code cria e publica, sem editar código, os tipos de conteúdo MVP suportados; ainda não foi implementado. A migration-base de schema e RLS passou smoke tests limitados via PGlite, mas não foi aplicada no Supabase CLI nem testada contra Data API/Auth reais. Versionamento, APIs, transações, Admin, backup/restore, limites, MFA, custos e segurança continuam pendentes de G2; ver evidências/limitações em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) e [`THREAT_MODEL.md`](THREAT_MODEL.md).
+Jogadores não podem ver/acessar o Admin Web nem suas APIs. O CMS no-code cria e publica, sem editar código, os tipos de conteúdo MVP suportados; ainda não foi implementado. A migration-base de schema e RLS passou smoke tests limitados via PGlite, mas não foi aplicada a um projeto Supabase hospedado nem testada contra Data API/Auth reais. O onboarding escolhido é browser-first: Dashboard Supabase + GitHub Integration/Preview Branches, sem exigir instalação local de CLI/Docker. Versionamento, APIs, transações, Admin, backup/restore, limites, MFA, custos e segurança continuam pendentes de G2; ver evidências/limitações em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) e [`THREAT_MODEL.md`](THREAT_MODEL.md).
 
 ## 9. HUD e autoridade
 

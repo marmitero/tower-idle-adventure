@@ -2,26 +2,13 @@
 
 This directory is a **partial technical proof**, not a running backend. It contains one initial SQL migration, a disabled/empty seed file, Supabase CLI configuration and a PostgreSQL smoke-test harness. No Edge Function, Game API, Admin API, Auth workflow, Storage bucket/policy or gameplay transaction is included.
 
-## Run the local SQL harness
+## Current browser-first validation path
 
-```sh
-npm install --prefix supabase
-npm test --prefix supabase
-npm audit --prefix supabase
-```
+Per the current project direction, do not install Supabase CLI, Docker, or Node.js on the user's computer to configure the hosted platforms. Connect a dev-only Supabase project to GitHub through **Project Settings → Integrations → GitHub Integration**, with `.` as Working Directory. If the plan supports Automatic Branching, a GitHub PR creates a Supabase Preview Branch and its migrations are applied from `supabase/migrations/`. Inspect branch status and schema in the GitHub/Supabase browser dashboards; use synthetic data only. Keep the project's real production database disconnected until G2/security gates.
 
-The tests use PGlite 0.5.8, which bundles PostgreSQL 18.3, and create simulated `auth.users`, `auth.uid()` and Supabase roles. The proposed Supabase CLI config targets PostgreSQL 15. The harness checks migration syntax and selected PostgreSQL constraints/RLS/grants, but it does **not** prove compatibility with Supabase Auth, PostgREST/Data API, Edge Functions, Storage, the configured Postgres major version, production concurrency, rate limits, backups or costs.
+The 9 PGlite smoke tests were previously run in the agent environment; they use PGlite 0.5.8/PostgreSQL 18.3 and simulate `auth.users`, `auth.uid()` and Supabase roles. The proposed Supabase config targets PostgreSQL 15. These tests check migration syntax and selected PostgreSQL constraints/RLS/grants, but do **not** prove Supabase Auth, PostgREST/Data API, Edge Functions, Storage, provider-specific grants/config, production concurrency, rate limits, backups, or costs. A GitHub Actions workflow could run PGlite tests in a hosted runner later, without installing dependencies on the user's device; no such workflow is configured yet.
 
-## Supabase local proof still required
-
-When Supabase CLI and Docker are available, start a disposable local stack and apply migrations from zero:
-
-```sh
-supabase start
-supabase db reset
-```
-
-`db reset` is destructive to the local Supabase database; do not point it at staging or production. Then add tests against real Supabase Auth/Data API roles and verify the view/grants, invite flow, release flow and transactional APIs. Do not mark G2 complete from PGlite results alone.
+Do not mark G2 complete from PGlite alone. The hosted Preview Branch must also be checked for migration status, RLS/grants and the Auth/Data API behaviors required by the app.
 
 `seed.sql` is disabled and intentionally contains no accounts or production content. The migration is a starting foundation for review; it has not been applied to a provisioned Supabase project and is not an authorization to deploy it.
 

@@ -1,7 +1,7 @@
 # G2 — blueprint técnico do MVP
 
-**Versão:** 0.4 — onboarding Supabase/Vercel solicitado; evidência PGlite parcial
-**Status:** baseline técnico proposto pelo agente. A migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` passou 9 smoke tests PostgreSQL via PGlite, mas não foi aplicada/validada pelo Supabase CLI: esta sandbox não tem CLI nem runtime Docker. O usuário pediu iniciar o processo Supabase + Vercel; nenhum serviço/projeto externo foi criado/conectado neste checkout. O pack de arte em `sprites/` foi inventariado, mas não está integrado ao app. G2 continua aberta.
+**Versão:** 0.5 — fluxo browser-first Supabase/GitHub registrado; evidência PGlite parcial
+**Status:** baseline técnico proposto pelo agente. A migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` passou 9 smoke tests PostgreSQL via PGlite, mas ainda não foi aplicada/testada contra Supabase hospedado. Por escolha do usuário, onboarding e provas externas serão feitos pelo navegador com Supabase Dashboard/GitHub Integration; não exigir CLI/Docker local. Nenhum serviço/projeto externo foi criado/conectado neste checkout. O pack de arte em `sprites/` foi inventariado, mas não está integrado ao app. G2 continua aberta.
 
 Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md) para o MVP de [`MVP_DECISIONS.md`](MVP_DECISIONS.md). Regras de produto do MVP não são reabertas aqui. Decisões técnicas dependentes de plano, custo e uma prova técnica ainda precisam de verificação antes de G2 ser encerrada.
 
@@ -18,14 +18,14 @@ Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`]
 
 ## 2. Projetos e ambientes
 
-| Camada | Desenvolvimento local | Staging | Produção |
+| Camada | Dev/browser (sem instalação local) | Staging | Produção |
 |---|---|---|---|
-| Game Web | Next.js local + Supabase CLI local; dados sintéticos | projeto Vercel + projeto Supabase isolados | projeto Vercel + projeto Supabase exclusivos |
-| Admin Web | execução local com usuário/roles seed não produtivos | deployment protegido; sem conteúdo/segredo de produção | projeto Vercel/domínio separados; middleware exige sessão admin válida |
-| Conteúdo | fixtures versionadas e sem dados pessoais | cópia sintética do release aprovado | release imutável publicado pelo Admin autorizado |
+| Game Web | Supabase Dashboard + GitHub Preview Branch; dados sintéticos (o app ainda não existe) | projeto Vercel + projeto Supabase isolados | projeto Vercel + projeto Supabase exclusivos |
+| Admin Web | não há app local/browser implementado; validar dados sintéticos/roles no Preview quando existir | deployment protegido; sem conteúdo/segredo de produção | projeto Vercel/domínio separados; middleware exige sessão admin válida |
+| Conteúdo | migrations/fixtures versionadas e sem dados pessoais | cópia sintética do release aprovado | release imutável publicado pelo Admin autorizado |
 
 - Os projetos/aplicações `apps/game-web/` e `apps/admin-web/` continuam futuras. `supabase/` contém `config.toml`, a migration-base de schema e um harness PGlite somente de desenvolvimento; não há app, endpoint ou Edge Function. O pack `sprites/` é a fonte de arte inicial já presente; servir o subset aprovado como assets estáticos da aplicação/Vercel é a proposta inicial, não uma integração concluída.
-- `supabase/migrations/` contém SQL versionado. O seed está intencionalmente desabilitado e não há catálogo/contas de produção. Mudanças futuras passam por review, Supabase local e staging antes de production; ainda não ocorreu `supabase start`/`db reset`.
+- `supabase/migrations/` contém SQL versionado. O seed está intencionalmente desabilitado e não há catálogo/contas de produção. O fluxo escolhido passa por review e Supabase Preview Branch hospedado via GitHub antes do projeto-base dev/staging; CLI/Docker local não são requisito no onboarding. Nenhuma migration foi aplicada a Supabase real ainda.
 - Vercel Preview nunca recebe segredo de produção. Por padrão, preview do Game Web usa ambiente dev/sintético; Preview do Admin Web deve ter Vercel Deployment Protection e não consegue publicar no banco de produção.
 - Produção usa variáveis separadas por projeto/environment. Segredos do Supabase ficam apenas em funções/servidor; nenhuma chave secreta ou `service_role`/`sb_secret` pode aparecer em bundle `NEXT_PUBLIC_*`, source map ou log.
 - Habilitar verificação de migration status e backup antes de qualquer release de schema; não executar reset destrutivo contra staging/production.
@@ -177,8 +177,8 @@ Roles finais recomendadas para MVP:
 
 ## 9. Critérios de saída G2 (abertos; evidência parcial abaixo)
 
-- Prova no Supabase CLI/local que aplica migrations do zero, carrega seeds sintéticas e restaura banco sem ação manual fora do roteiro. **Pendente:** CLI e Docker indisponíveis nesta sandbox.
-- Testes de RLS/grants executados contra Supabase local e Data API para anon, jogador A/B e roles Admin. **Parcial:** smoke tests PGlite exercitam PostgreSQL, grants, RLS e constraints sob roles simulados; não validam stack Supabase.
+- Prova em Supabase Preview Branch hospedada, criada pelo GitHub Integration, que aplica migrations e seed sintética de forma reprodutível. **Pendente:** nenhuma Preview Branch/projeto externo foi configurado. CLI/Docker locais não serão exigidos no fluxo escolhido pelo usuário.
+- Testes de RLS/grants executados contra Preview Branch Supabase e Data API para anon, jogador A/B e roles Admin. **Parcial:** smoke tests PGlite exercitam PostgreSQL, grants, RLS e constraints sob roles simulados; não validam stack Supabase real.
 - Rate limits compartilham contador entre instâncias, retornam `429/retry_after`, resistem a `X-Forwarded-For` forjado e têm custo/latência medidos. **Pendente.**
 - Compra/lote concorrente e repetido com mesmo `request_id` não duplica saldo/itens/XP/consumível/cursor; body diferente gera conflito. **Parcial:** unicidade de request key está modelada; não há transações de comando nem teste de concorrência.
 - Reconexão não gera catch-up; função não confia em tempo/client state. **Pendente:** nenhuma Edge Function/simulação criada.
@@ -198,7 +198,8 @@ Roles finais recomendadas para MVP:
 
 - [Supabase — Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security)
 - [Supabase — Securing your API (grants + RLS)](https://supabase.com/docs/guides/api/securing-your-api)
-- [Supabase — Local development workflow](https://supabase.com/docs/guides/local-development/cli-workflows)
+- [Supabase — Local development workflow (not required by browser-only onboarding)](https://supabase.com/docs/guides/local-development/cli-workflows)
+- [Supabase — GitHub integration and Preview Branches](https://supabase.com/docs/guides/deployment/branching/github-integration)
 - [Supabase — Inviting users](https://supabase.com/docs/guides/auth/users)
 - [Supabase — Edge Function secrets](https://supabase.com/docs/guides/functions/secrets)
 - [Vercel — Deployment Protection](https://vercel.com/docs/deployment-protection)

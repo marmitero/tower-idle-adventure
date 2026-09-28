@@ -15,7 +15,7 @@
 - [Guia de deploy GitHub → Vercel + Supabase](docs/DEPLOYMENT_GUIDE.md) — fluxo planejado e onboarding inicial solicitado; nenhum serviço externo está conectado.
 - [Estrutura proposta do projeto](docs/PROJECT_STRUCTURE.md) — separação planejada de apps, contratos, backend e protótipos; não são pastas/apps prontos.
 - [Blueprint técnico detalhado do G2](docs/G2_TECHNICAL_BLUEPRINT.md)
-- [Migration-base e smoke tests PostgreSQL/PGlite](supabase/migrations/20260928000000_g2_core_schema.sql) — 9 testes locais; não equivale a validar Supabase CLI/Data API. Veja também [`supabase/README.md`](supabase/README.md) para escopo e comandos.
+- [Migration-base e smoke tests PostgreSQL/PGlite](supabase/migrations/20260928000000_g2_core_schema.sql) — 9 smoke tests PGlite; não equivale à validação em Supabase hospedado. Veja também [`supabase/README.md`](supabase/README.md) para limites e procedimento browser-first.
 - [Threat model do MVP](docs/THREAT_MODEL.md)
 - [Blueprint UX e plano de usabilidade G2](docs/G2_UX_BLUEPRINT.md)
 - [Manifesto do pack de sprites e créditos/licença](sprites/ASSET_MANIFEST.md)
@@ -36,4 +36,4 @@
 
 ## Próximos passos
 
-G2 segue em andamento: a migration-base passou somente no harness PGlite; falta executá-la pelo Supabase CLI e validar Data API/Auth, transações, rate limits, reconexão, segurança/Admin, backup e usabilidade com testers. A sandbox não tem Supabase CLI, runtime Docker ou Vercel CLI. Próximo passo do onboarding: provar localmente e configurar primeiro um Supabase dev sintético; autorizar GitHub/Vercel, mas a importação Vercel aguarda `apps/game-web/` e `apps/admin-web/`. Não há serviço ou interface de produção. A vertical slice (G3) começa somente após o gate G2 do [Roadmap](docs/ROADMAP.md).
+G2 segue em andamento: a migration-base passou somente no harness PGlite; falta validá-la via Supabase GitHub Integration/Preview Branch e testar Data API/Auth, transações, rate limits, reconexão, segurança/Admin, backup e usabilidade com testers. O usuário decidiu evitar instalações e fazer onboarding pelos navegadores das plataformas; não requerer CLI/Docker locais. Próximo passo: criar Supabase dev sintético pelo Dashboard e conectar o repositório via GitHub Integration. Vercel pode ser autorizada pelo navegador, mas a importação aguarda `apps/game-web/` e `apps/admin-web/`. Não há serviço ou interface de produção. A vertical slice (G3) começa somente após o gate G2 do [Roadmap](docs/ROADMAP.md).
