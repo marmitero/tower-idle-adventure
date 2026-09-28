@@ -57,9 +57,15 @@ Combates curtos, leitura visual imediata e encadeamento automático entre encont
 - O jogador seleciona manualmente o andar. Conta VIP pode ativar opção de subir para o próximo andar após cumprir as condições de progressão; é desligada por padrão e não remove a escolha manual do jogador.
 - No andar, encontros repetidos contêm equipes de 1 a 3 inimigos. Ao encerrar um encontro com vitória, outro começa automaticamente enquanto a hunt continuar.
 - Ordem de ação é determinada por velocidade efetiva, considerando personagem, equipamento e efeitos. Regras de empate, cooldown, alvo e efeitos de status precisam ser especificadas no balanceamento.
-- Bot configurável pelo jogador: usar poção quando HP atingir limite percentual; usar revive automaticamente se houver item elegível; controles podem ser ligados/desligados e ajustados. A automação consome inventário; itens são adquiridos no lobby/market (e o atalho de loja na batalha apenas abre o acesso à loja, sem parar a luta).
-- Se a equipe for derrotada, retorna ao lobby. O lobby recupera HP gratuitamente. Revive pode evitar o fim da luta se houver item e a automação estiver ativa, conforme regra final de alvo/tempo de uso.
-- Classes e inimigos podem ter afinidades, resistências e status, mas não estão definidos nesta revisão.
+- Bot configurável pelo jogador: usar poção abaixo de um limite percentual de HP, escolher poções/revives elegíveis e ligar/desligar regras; cada skill equipada também pode ser ativada/desativada para uso automático. Uma prioridade de skills pode ser adicionada futuramente, ainda sem regra definida. Automação também prevê uma opção solicitada de retorno após derrota; comportamento exato está pendente. Itens são adquiridos no lobby/market e há atalho para loja rápida durante a batalha.
+- Se a equipe for derrotada, a hunt termina e retorna ao lobby; o lobby recupera HP gratuitamente. A opção de retornar automaticamente depois da derrota pode reiniciar o mesmo andar após cura, mas essa regra precisa ser aprovada; não deve subir de andar automaticamente. Revive pode evitar o fim da luta se houver item e a automação estiver ativa, conforme regra de alvo/tempo ainda a definir.
+- Classes e inimigos podem ter resistências/status; roster e balanceamento estão pendentes.
+
+### Armas e afinidades
+
+Além dos nove slots de equipamento, todo personagem possui um slot **Arma**. Tipos: Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas e Garras. Qualquer personagem pode equipar qualquer tipo; certos personagens terão afinidades, cujos efeitos ainda serão definidos. Cada tipo possui um traço próprio: Adaga pode envenenar; Machado causa dano aumentado; Maça aumenta chance crítica; Besta aumenta velocidade de ataque; Cajado ataca todos os inimigos; Livro Arcano recupera vida por ataque conforme Ataque Especial; Luvas podem atordoar temporariamente; Garras atacam duas vezes. **A característica da Espada permanece pendente e não deve ser inventada.** Valores, chances, duração, alvos e fórmulas dos traços ainda precisam de balanceamento.
+
+A característica intrínseca do tipo de arma é separada da característica aleatória adicional de itens Lendários/Celestiais; um efeito não substitui o outro. O subtipo de arma também é distinto do slot de armadura Luva.
 
 ### Apresentação visual do combate
 
@@ -67,9 +73,9 @@ Sprites estáticos estilo card, com balanço/avanço ao agir, piscar ao receber 
 
 ## 6. Equipamentos, loot e progressão
 
-Slots definidos: **Peitoral, Elmo, Calça, Bota, Luva, Colar, Aura, Asa e Pet**. Cada equipamento pode carregar os atributos descritos na especificação de sistemas; composição por slot/arquétipo e bases por nível serão tabeladas antes da implementação.
+Slots definidos: **Arma, Peitoral, Elmo, Calça, Bota, Luva, Colar, Aura, Asa e Pet**. Todo equipamento possui os oito atributos descritos na especificação de sistemas; bases por slot/tipo/nível serão tabeladas antes da implementação. O slot Arma tem nove tipos definidos nesta revisão.
 
-Raridades: **Comum, Incomum, Raro, Épico, Lendário, Celestial**, com multiplicadores de atributos-base de 1,0; 1,2; 1,5; 2,0; 2,5; 3,0. O item recebe também uma rolagem x de 1 a 50, equivalente a 0,1x–5,0x após a raridade.
+Raridades: **Comum, Incomum, Raro, Épico, Lendário, Celestial**, com multiplicadores de atributos-base de 1,0; 1,2; 1,5; 2,0; 2,5; 3,0. Cada atributo do item possui seu próprio x, gerado aleatoriamente de forma independente. Regra-base previamente informada: x inteiro entre 1 e 50, que representa 0,1x–5,0x em passos de 0,1. Um exemplo recente mostra x=4,72, incompatível com esses passos; precisão contínua versus discreta fica pendente de confirmação.
 
 Equipamentos Lendários e Celestiais recebem uma característica única escolhida de uma lista aprovada (ex.: roubo de vida, quebra de armadura, chance crítica, redução de cooldown). Essa característica não é escalada pela raridade ou por x; o balanceamento definirá sua força e limites.
 
@@ -119,7 +125,9 @@ Estes recursos são serviços/sessões compartilhados, sem exploração em mapa 
 
 Chat e mercado exigem denúncia, bloqueio, filtros, limites contra spam, moderação e trilhas de auditoria. O boss global precisa ter regra transparente contra last-hit farming, desconexão e disputa de autoria.
 
-## 10. UX e telas previstas
+## 10. UX e HUD
+
+A organização espacial e arquitetura propostas para a HUD principal estão em [HUD / UX — arquitetura visual](HUD_UX_SPEC.md). A tela mantém perfil no topo esquerdo, equipe logo abaixo, navegação central no topo, automação no topo direito, batalha/HUB no centro, log embaixo e chat compacto no canto inferior direito. A HUD deve comunicar rapidamente HP/equipe, andar, encontro, automação e loot sem expor permanentemente todos os detalhes.
 
 1. Entrada, conta e seleção/criação inicial.
 2. Lobby: equipe, status, cura grátis, equipamentos, fortalecimento, skills, inventário, loja, VIP e acesso às atividades.
@@ -149,15 +157,17 @@ O MVP deve provar primeiro: seleção inicial simples, lobby, equipe, slots, atr
 
 1. Nome e quantidade de classes/personagens iniciais, skills e papéis.
 2. Progressão de nível, XP, materiais, custos, bases por slot/nível e fórmulas de ataque/defesa.
-3. Forma da rolagem x: única por item ou individual por atributo; o pedido lista atributo por atributo e isso precisa ser formalizado.
-4. Definição numérica e pesos para nota/poder total; tratamento de percentuais e limites.
-5. Regras de morte/revive para equipe de três e valor de recuperação (máximo vs. perdido).
-6. Duração e multiplicadores de poções; preço, chance e pool das dez caixas; odds exibidas.
-7. Arena ao vivo ou assíncrona; regras de guildas e matchmaking.
-8. Escopo e momento da simulação offline, persistência quando desconectado e limite de farm.
-9. Plataforma de contas/pagamentos, classificação etária, regiões, privacidade, retenção e política contra abuso.
-10. Limites de VIP/buffs, taxa do mercado, diamantes negociáveis e impacto no PvP.
-11. Dispositivos/navegadores suportados, acessibilidade e idiomas de lançamento.
-12. Stack técnica, servidor autoritativo, banco de dados e orçamento/cronograma.
+3. x por atributo já está confirmado; resolver apenas a precisão: inteiro 1–50 (passos de 0,1) ou decimais como 4,72 no exemplo de tooltip.
+4. Característica da Espada; valores, gatilhos e limites dos traços das outras armas; efeitos das afinidades.
+5. Definição numérica e pesos para nota/poder total; tratamento de percentuais e limites.
+6. Regras de morte/revive para equipe de três e valor de recuperação (máximo vs. perdido).
+7. Auto-retorno após derrota (default, cura e reinício do mesmo andar) e se abrir a loja pausa o combate.
+8. Duração e multiplicadores de poções; preço, chance e pool das dez caixas; odds exibidas.
+9. Arena ao vivo ou assíncrona; regras de guildas e matchmaking.
+10. Escopo e momento da simulação offline, persistência quando desconectado e limite de farm.
+11. Plataforma de contas/pagamentos, classificação etária, regiões, privacidade, retenção e política contra abuso.
+12. Limites de VIP/buffs, taxa do mercado, diamantes negociáveis e impacto no PvP.
+13. Breakpoints/layout responsivo final, navegação e arte visual da HUD; dispositivos/navegadores e idiomas de lançamento.
+14. Stack técnica, servidor autoritativo, banco de dados e orçamento/cronograma.
 
 Nenhuma dessas lacunas deve ser preenchida silenciosamente em código: cada decisão precisa ser registrada nesta documentação e no AI_State antes do desenvolvimento do sistema correspondente.

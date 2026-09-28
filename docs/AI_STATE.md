@@ -2,7 +2,7 @@
 
 ## Para que serve
 
-Este arquivo é a passagem de contexto do projeto **Tower Idle Adventure**. Deve permitir que uma pessoa ou agente retome o trabalho sem inventar decisões nem contradizer etapas anteriores. É um resumo vivo — não substitui o [GDD](GDD.md), a [especificação](SYSTEMS_SPEC.md) nem o [roadmap](ROADMAP.md).
+Este arquivo é a passagem de contexto do projeto **Tower Idle Adventure**. Deve permitir que uma pessoa ou agente retome o trabalho sem inventar decisões nem contradizer etapas anteriores. É um resumo vivo — não substitui o [GDD](GDD.md), a [especificação](SYSTEMS_SPEC.md), a [arquitetura de HUD/UX](HUD_UX_SPEC.md) nem o [roadmap](ROADMAP.md).
 
 ### Protocolo obrigatório por etapa
 
@@ -17,42 +17,65 @@ Este arquivo é a passagem de contexto do projeto **Tower Idle Adventure**. Deve
 
 - **Data:** 2026-09-28.
 - **Branch obrigatória da sessão:** `arena/01a0e5e1-tower-idle-adventure`.
-- **Fase:** Etapa 0 — descoberta e documentação inicial, concluída nesta entrega.
-- **Marco atual:** documentação-base em rascunho entregue para revisão; projeto de software ainda não implementado. Etapa 1/G1 depende do fechamento das decisões de design.
-- **Estado do repositório ao início:** somente `README.md` inicial; sem código de jogo e sem AI_State prévio.
-- **Estado do repositório após este trabalho:** README com entrada para docs e quatro documentos em `docs/` (GDD, especificação de sistemas, este AI_State e roadmap).
-- **Testes:** nenhum teste de jogo executado, porque ainda não existe implementação. Revisão feita por consistência documental; não confundir com validação por usuários/balanceamento.
+- **Fase:** Etapa 0 — descoberta e documentação inicial, com complementos de escopo registrados nesta revisão.
+- **Marco atual:** documentação conceitual e proposta de HUD; G1 ainda depende de fechar decisões críticas. Nenhuma implementação do jogo foi iniciada.
+- **Estado inicial do repositório:** somente `README.md` inicial; sem código de jogo e sem AI_State prévio.
+- **Documentação atual:** README e cinco arquivos em `docs/`: GDD, especificação de sistemas, arquitetura HUD/UX, roadmap e este AI_State.
+- **Validação:** nenhum teste de jogo aplicável ainda; revisão de consistência documental, links Markdown locais e `git diff --check` concluídos. Isso não substitui playtest ou aprovação de design.
 
-## Resumo confiável do pedido
+## Resumo confiável do projeto
 
-RPG idle 2D de navegador chamado **Tower Idle Adventure**. Jogador seleciona classe/personagem, prepara até três personagens no lobby, equipa itens em nove slots, fortalece skills/personagens, compra recursos e caça em um andar selecionado. Combates automáticos encadeiam encontros com 1–3 inimigos; turno depende de velocidade. Nível mínimo e melhores recompensas por andar. Caçada permanece no mesmo andar, exceto avanço automático opcional VIP; derrota devolve ao lobby e cura no lobby é gratuita. Bot usa poções por limite de HP e revive se houver itens; loja acessível no lobby e por ícone no canto superior durante batalha.
+RPG idle 2D para navegador, **Tower Idle Adventure**. Jogador prepara até três personagens no lobby, escolhe manualmente um andar e deixa a equipe lutar automaticamente contra encontros de 1–3 inimigos. Vitórias encadeiam novas lutas e dão XP/moedas/loot. Derrota retorna ao lobby, onde a equipe cura gratuitamente. Autoavançar andares é um recurso VIP opcional. Conta VIP também tem passe/recompensas diárias, +30% XP e +15% farm. Social e atividades compartilhadas (chat, guilda, amigos, PvP, market e bosses) não colocam jogadores no espaço pessoal de hunt.
 
-Equipamentos usam Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, chance crítica, velocidade de ataque e velocidade; raridades Comum a Celestial multiplicam a base por 1,0 / 1,2 / 1,5 / 2,0 / 2,5 / 3,0; x de 1–50 representa 0,1–5,0x. Lendário/Celestial têm característica única não afetada por x/raridade. Devem mostrar detalhes, nota e poder. Lojas incluem seis raridades de poções, revive 30/50/100, cinco caixas de equipamento e cinco de personagem. Personagens têm 1–5 estrelas, slots 2/3/4/5/5 e bônus 20% em dano de skills a 5★; duplicatas da mesma estrela evoluem. VIP mantém acesso Free, tem passe diário, +30% XP, +15% farm e auto-andar. Requisitos sociais: chats, amizades, guilda, PvP, guerras de guilda, market comunitário, moedas/diamantes, quatro categorias de bosses. Jogadores não compartilham o espaço da hunt. Assets serão PNGs autorais em pacotes de dez; efeitos de animação em código. Todo o design/documentação precede implementação.
+A equipe usa dez slots: **Arma, Peitoral, Elmo, Calça, Bota, Luva (armadura), Colar, Aura, Asa e Pet**. Todo item possui Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, Chance Crítica, Velocidade de Ataque e Velocidade. Multiplicadores de raridade: Comum 1,0; Incomum 1,2; Raro 1,5; Épico 2,0; Lendário 2,5; Celestial 3,0. Fórmula base: `valorFinal = base × multiplicadorRaridade × (x/10)`. **Confirmado pelo usuário nesta revisão: x é rolado aleatoriamente e independentemente para cada atributo do equipamento.** Regra anterior define x inteiro de 1–50, ou fator 0,1–5,0 em passos de 0,1. Exemplo de HUD `x=4,72` contradiz a resolução dessa regra; frações contínuas permanecem pendentes. Lendário/Celestial podem ter uma característica aleatória extra independente da raridade/x.
 
-## Decisões registradas / propostas ainda não aprovadas
+Armas podem ser equipadas por qualquer personagem; afinidades futuras não restringirão o uso. Tipos/traços: Espada (característica **não definida**, não inventar), Adaga (veneno), Machado (dano aumentado), Maça (crítico aumentado), Besta (velocidade de ataque aumentada), Cajado (atinge todos os inimigos), Livro Arcano (cura por ataque com base no Ataque Especial), Luvas (chance de atordoar) e Garras (dois ataques). Valores, chances, durações e afinidades continuam pendentes. O traço fixo do subtipo de arma é separado da característica adicional aleatória Lendária/Celestial. Arma `Luvas` não é a armadura do slot `Luva`.
 
-- Fórmula explícita sugerida: `valorFinal = base × multiplicadorRaridade × (x/10)`; com x=10, exemplo de base 30 é 30 Comum / 45 Raro / 90 Celestial.
-- **x individual por atributo ou único por item ainda pendente.** O pedido permite leitura por atributo, mas não fecha isso.
-- Nota e poder têm propostas distintas no SYSTEMS_SPEC; pesos ainda não aprovados.
-- “Espada Draco” é apenas exemplo de fórmula: não existe slot de arma na lista fornecida. Não inventar slot de arma.
-- Fusão 2 unidades idênticas em identidade/estrela como proposta; validar antes de desenvolvimento.
-- Sem decisão de stack, simulação offline, combate PvP, preços/odds, conteúdo inicial ou pagamentos.
-- Escopo social/econômico demanda segurança autoritativa de servidor, moderação e revisão jurídica antes de produção.
+A HUD desktop proposta mantém perfil no topo esquerdo, equipe abaixo, navegação superior central, automação no topo direito, gameplay no centro, log inferior, chat compacto embaixo à direita e overlays/painéis secundários. O documento `docs/HUD_UX_SPEC.md` descreve componentes, fluxo de dados, estados e dependências. O jogador configura poções/revives e pode ligar/desligar cada skill equipada na automação; prioridade de skills pode vir depois. A HUD também pede opção de retorno após derrota; regra exata (curar no lobby e reiniciar mesmo andar?) segue pendente. Loja rápida mantém contexto de batalha; pausa/continuação da batalha ao abrir a loja requer confirmação. Não assumir recompensas offline.
 
-## Próximos passos imediatos
+## Decisões registradas e pendências
 
-1. Solicitar/recolher decisões dos itens prioritários listados em `GDD.md` e reduzir ambiguidade da especificação.
-2. Revisar escopo do MVP e capacidade/orçamento; confirmar se o primeiro protótipo é somente local ou já requer backend.
-3. Atualizar GDD, SYSTEMS_SPEC, ROADMAP e este arquivo com decisões aprovadas e critérios de aceite.
-4. Só após o gate do Roadmap escolher arquitetura e iniciar implementação.
+### Confirmadas
+
+- x independente para cada status/atributo do item.
+- Slot Arma oficial, com os nove tipos acima; qualquer personagem equipa qualquer tipo.
+- Característica de Espada ainda não definida; não propor uma regra definitiva sem aprovação.
+- Organização/elementos centrais da HUD registrados em `HUD_UX_SPEC.md`; arquitetura antes de qualquer implementação.
+- Ao fim de toda etapa, mesmo incompleta, atualizar documentos, fazer commit e push para a branch fixa e verificar o resultado.
+
+### A resolver antes de G1/implementação dos sistemas correspondentes
+
+1. Resolução de x: inteiro 1–50 em passos de 0,1 ou permitir casas decimais, como x=4,72 no mock de tooltip.
+2. Característica de Espada; números/limites dos demais traços de arma; regras de afinidade.
+3. Nota e poder do item/equipe: escala, pesos, normalização de percentuais e influência das características.
+4. Fórmulas de combate, turno/velocidade, cooldown, alvos, status, cura do Livro Arcano e parâmetros de cada arma.
+5. Default e regra do toggle “voltar após derrota”, incluindo cura automática/reentrada; comportamento da batalha quando loja rápida estiver aberta.
+6. Prioridade/ordem de automação das skills; roster inicial, skills, slots e demais regras de progressão/personagem.
+7. Base por slot/nível, materiais, poções/revives, preços, pools/odds das caixas e buffs de farm.
+8. Simulação offline, resumo da sessão e retenção de eventos para responder “o que ocorreu enquanto eu estava ausente?”.
+9. Wireframes/arte final da HUD, breakpoints, suporte mobile, navegação e política de efeitos reduzidos.
+10. MVP/stack/backend, arena, market, monetização, segurança, moderação e privacidade.
+
+Não preencher essas lacunas silenciosamente no código; registrar decisão, motivo e impacto nos documentos relevantes.
+
+## Próximos passos
+
+1. Revisar o complemento do GDD, `SYSTEMS_SPEC.md` e `HUD_UX_SPEC.md`; resolver divergências explícitas, começando por x decimal/discreto e auto-retorno.
+2. Fechar escopo do MVP e as decisões críticas para G1 conforme o Roadmap.
+3. Depois da aprovação de design, definir arquitetura/stack e implementar por fatias; antes da HUD, apresentar a arquitetura proposta e validar estados/dependências documentados.
+4. Em cada checkpoint, atualizar este estado, rodar validações aplicáveis e fazer commit + push mesmo se a etapa estiver parcial.
 
 ## Histórico de etapas
 
 ### 2026-09-28 — Etapa 0: primeira documentação
 
-- **Entregue:** README reorganizado; GDD de visão e regras; especificação matemática/propostas de equipamentos, loot, combate, VIP e market; Roadmap do conceito ao lançamento; AI_State e protocolo de continuidade.
-- **Regra processual adicionada a pedido do usuário:** ao final de toda etapa, atualizar AI_State e documentação e fazer commit + push para a branch fixa, mesmo que o trabalho esteja incompleto; verificar o push e informar o hash.
-- **Incorporação:** requisitos do pedido mantidos e ambiguidades marcadas como pendentes; nenhuma feature implementada.
-- **Validação:** leitura do README original e inspeção do repositório; verificação manual de fórmulas e consistência dos documentos. Nenhum teste automatizado aplicável.
-- **Pendências:** decisões de design enumeradas no GDD; aprovação formal de escopo ainda não recebida.
-- **Próxima etapa sugerida:** Etapa 1 do Roadmap — fechamento de design/MVP, após revisão das perguntas pendentes.
+- **Entregue:** README, GDD, especificação de sistemas, Roadmap e protocolo AI_State; sem features de jogo implementadas.
+- **Regra processual solicitada pelo usuário:** commit e push obrigatórios no fim de todas as etapas, mesmo incompletas.
+- **Checkpoint anterior:** commit `315e75f2b64bd3a28df6dd85ad7eaab440683b6a` na branch obrigatória.
+
+### 2026-09-28 — Etapa 0: complemento de equipamentos e HUD
+
+- **Entregue nesta atualização documental:** x individual por atributo confirmado; slot Arma e nove tipos adicionados; traços conhecidos listados com a característica da Espada pendente; arquitetura visual proposta da HUD, árvore de componentes, modelo de dados/intenções, dependências, modos/overlays, responsividade e questões pendentes.
+- **Documentos afetados:** README, GDD, SYSTEMS_SPEC, novo HUD_UX_SPEC e AI_State.
+- **Implementação/testes:** nenhuma implementação de gameplay ou HUD; validação documental, links internos e `git diff --check` verificados.
+- **Pendências:** precisão de x=4,72; valores dos traços/afinidade; comportamento de auto-retorno e loja em combate; prioridade de skills; aprovação do G1.

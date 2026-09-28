@@ -22,13 +22,13 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 
 - Consolidar o briefing e registrar visão, pilares, regras fornecidas, fórmulas e ambiguidades.
 - Criar AI_State, documentação principal e caminho de produção.
-- **Saída:** GDD v0.1, especificação de sistemas v0.1, roadmap v0.1, AI_State atualizado.
+- **Saída:** GDD v0.1, especificação de sistemas v0.1, arquitetura proposta da HUD/UX v0.1, roadmap v0.1, AI_State atualizado.
 - **Critério:** requisitos rastreáveis; nenhum código apresentado como jogo pronto.
 - **Situação:** concluída nesta entrega como primeira versão, aguardando revisão/decisões para fechar G0.
 
 ### Etapa 1 — Fechamento de escopo e design (G1)
 
-- Resolver decisões prioritárias: roster/classe, x, fórmula de combate, atributos-base por slot/nível, nota/poder, loot odds e preços, regras de revive/estrelas, VIP, offline, market e PvP.
+- Resolver decisões prioritárias: roster/classe, precisão decimal/discreta do x (x individual por atributo já confirmado), traços e afinidades das armas (traço de Espada ainda pendente), fórmula de combate, atributos-base por slot/nível, nota/poder, loot odds e preços, regras de revive/retorno após derrota/estrelas, VIP, offline, market e PvP.
 - Definir experiência de onboarding, wireframes, condições de vitória/derrota e instrumentação de testes.
 - Priorizar MVP, itens fora do lançamento inicial e critérios de sucesso; criar registro de decisões.
 - **Entregáveis:** GDD aprovado, especificações de conteúdo/economia, backlog e critérios de aceite.
@@ -38,7 +38,7 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 
 - Escolher arquitetura e stack após requisitos de conta, estado persistente, mercado e escalabilidade.
 - Definir domínio autoritativo do servidor, modelo de dados, contratos API/eventos, autenticação, rate limits, logs, backup, restauração e proteção de economia.
-- Definir UX responsiva, acessibilidade, protótipos navegáveis e teste de usabilidade.
+- Revisar e aprovar a arquitetura, os componentes, os estados e as dependências da HUD documentados em `HUD_UX_SPEC.md` antes de implementar a interface; definir UX responsiva, acessibilidade, protótipos navegáveis e teste de usabilidade.
 - Definir plano de privacidade, retenção, moderação, suporte e revisão legal/plataformas para pagamentos, VIP e caixas.
 - **Entregáveis:** arquitetura aprovada, threat model, protótipos, plano de QA/observabilidade, pipeline de assets/documentação técnica.
 - **Gate:** revisão técnica/segurança e aceite de experiência antes de produção em escala.

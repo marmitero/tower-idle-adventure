@@ -9,13 +9,13 @@ Esta especificação traduz as regras fornecidas para fórmulas e invariantes te
 
 ### Slots
 
-Peitoral, Elmo, Calça, Bota, Luva, Colar, Aura, Asa e Pet.
+**Arma**, Peitoral, Elmo, Calça, Bota, Luva (armadura), Colar, Aura, Asa e Pet. Arma é um slot oficial. Seus subtipos são Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas e Garras. “Luvas” como arma não é o mesmo que o slot de armadura “Luva”. Qualquer personagem pode equipar qualquer arma; afinidades são bônus/eficiências futuras, ainda sem fórmula e sem restrição de uso.
 
 ### Atributos da ficha de equipamento
 
-Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, Chance Crítica, Velocidade de Ataque e Velocidade. Os atributos percentuais devem ser armazenados e apresentados sem misturar pontos percentuais e frações (ex.: 10% = 0,10 internamente, se essa for a convenção escolhida).
+Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, Chance Crítica, Velocidade de Ataque e Velocidade. Todo equipamento, inclusive qualquer arma, possui todos esses oito atributos e uma rolagem `x_i` independente para cada atributo. Os atributos percentuais devem ser armazenados e apresentados sem misturar pontos percentuais e frações (ex.: 10% = 0,10 internamente, se essa for a convenção escolhida).
 
-**Observação de conteúdo:** a descrição usa “Espada Draco” como exemplo, mas espada não consta nos slots equipáveis pedidos. Até a decisão de design, a espada é apenas exemplo de cálculo; o catálogo não deve criar um slot de arma implicitamente.
+**Observação:** espada é um subtipo de arma oficial. O exemplo “Espada Draco” não define por si só uma característica intrínseca da Espada; essa característica continua pendente.
 
 ### Multiplicadores
 
@@ -31,17 +31,35 @@ Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, Chance Crítica, Velocid
 Para cada atributo `i`:
 
 - `Base_i`: valor-base tabulado para aquele item/slot/nível.
-- `x_i`: inteiro rolado entre 1 e 50 (inclusive), salvo decisão por x único.
-- `MultiplicadorX_i = x_i / 10`, intervalo 0,1–5,0.
+- `x_i`: rolagem gerada aleatoriamente **e independentemente para cada atributo** do equipamento; nunca há obrigação de um único x compartilhado pelo item.
+- Regra numérica previamente definida: x inteiro de 1 a 50 (inclusive); `MultiplicadorX_i = x_i / 10`, intervalo 0,1–5,0 em passos de 0,1.
 - `ValorFinal_i = Base_i × R × MultiplicadorX_i`.
 
 Exemplo do pedido, sem x (ou com x=10, portanto multiplicador x = 1): Base de Ataque 30 resulta em 30 Comum, 45 Raro e 90 Celestial. Para Ataque Especial base 22: 22, 33 e 66. Cálculos devem manter precisão decimal internamente e arredondar apenas na apresentação, segundo regra ainda a aprovar.
 
-**PENDENTE — modelo do x:** sugestão para atender “status gerados aleatoriamente” é rolar x independentemente para cada atributo aplicável. Isso cria perfis de item variados (ex.: ataque baixo e defesa alta), mas multiplica os dados exibidos e o espaço de armazenamento. Alternativa: um único x por item, mais simples e mais correlacionado. Decidir antes do gerador de loot.
+**PENDENTE — precisão do x:** um exemplo de HUD fornecido depois mostra `x=4,72`, que não é representável pelos inteiros 1–50 em passos de 0,1 (nesse modelo, o valor mais próximo seria 4,7). Até confirmação, manter como regra registrada a geração inteira individual de 1–50 e não implementar precisão contínua; atualizar a regra se o exemplo 4,72 for intencional.
 
-### Característica única
+### Característica única de raridade
 
-Somente Lendário e Celestial recebem uma característica, sorteada da lista configurada. É independente de x e do multiplicador de raridade. A raridade pode determinar o pool elegível, mas não amplifica diretamente o valor da característica. Exemplo de estrutura: `id`, descrição, gatilho, efeito e parâmetros. Lista e magnitudes permanecem pendentes; evitar efeitos vagos como “+chance crítica” sem limite e unidade definidos.
+Somente Lendário e Celestial recebem uma característica adicional sorteada da lista configurada. É independente de x e do multiplicador de raridade. A raridade pode determinar o pool elegível, mas não amplifica diretamente o valor da característica. Exemplo de estrutura: `id`, descrição, gatilho, efeito e parâmetros. Lista e magnitudes permanecem pendentes; evitar efeitos vagos como “+chance crítica” sem limite e unidade definidos.
+
+### Traço intrínseco do tipo de arma
+
+Todo subtipo de arma possui seu traço de tipo, independentemente de o item ser Comum ou Celestial. Este traço não é a característica aleatória adicional de raridade; os dois efeitos podem coexistir em Lendário/Celestial.
+
+| Tipo | Traço definido no conceito | Parâmetros pendentes |
+|---|---|---|
+| Espada | Ainda não definido; não inventar. | Todo o efeito permanece pendente. |
+| Adaga | Pode causar envenenamento. | Chance, duração, acúmulo, dano e resistência. |
+| Machado | Dano aumentado. | Multiplicador, condição e categoria de dano. |
+| Maça | Chance crítica aumentada. | Valor, soma/multiplicação e limite. |
+| Besta | Velocidade de ataque aumentada. | Valor e interação com limites de velocidade. |
+| Cajado | Ataca todos os inimigos do encontro. | Dano por alvo, custo/targeting e mitigação AoE. |
+| Livro Arcano | Recupera vida a cada ataque baseado em Ataque Especial. | Coeficiente, alvo curado, limites e interações. |
+| Luvas (arma) | Chance de atordoar; alvo fica temporariamente sem atacar. | Chance, duração, imunidade/recorrência e resistência. |
+| Garras | Ataca o alvo duas vezes. | Divisão do dano, eventos críticos, procs e efeitos por golpe. |
+
+Qualquer personagem pode equipar qualquer tipo; afinidades de personagem com armas específicas podem alterar atributo/eficiência futuramente, mas a fórmula e o elenco compatível ainda não foram definidos. Afinidade não pode bloquear o uso da arma. A luva do slot de armadura e o tipo de arma Luvas devem ser IDs distintos.
 
 ## 2. Nota e poder do item
 
@@ -81,16 +99,18 @@ Toda caixa deve declarar chances completas (soma = 100%), itens possíveis, nív
 
 Cada unidade (aliada ou inimiga) tem velocidade efetiva. Uma proposta simples é ordenar ações por maior velocidade e resolver desempates via regra estável (atributo secundário/seed de combate), mas **a semântica de velocidade ainda deve ser escolhida**: iniciativa por rodada ou intervalo entre ações contínuo.
 
-Cada ação seleciona alvo automaticamente, executa skill/ataque elegível, calcula acerto, crítico, dano, mitigação e efeitos, aplica HP/cooldowns e emite evento visual/log. A lista de prioridade de alvos, chance de acerto, fórmula de dano, limites e ordem de efeitos serão formalizados no balanceamento.
+Cada ação seleciona alvo automaticamente, executa skill/ataque elegível, calcula acerto, crítico, dano, mitigação e efeitos, aplica HP/cooldowns e emite evento visual/log. A lista de prioridade de alvos, chance de acerto, fórmula de dano, limites e ordem de efeitos serão formalizados no balanceamento. O subtipo de arma aplica seu traço intrínseco (ver tabela acima): veneno, dano aumentado, crítico, velocidade, ataque a todos, cura por Ataque Especial, stun ou golpe duplo. Os parâmetros exatos pendentes não devem ser inventados; Espada permanece sem traço definido. Afinidade pode mudar eficiência após regra aprovada, sem restringir quem equipa a arma.
 
-Encontros têm 1–3 inimigos. Vitória encerra o encontro, recompensa a run e inicia o próximo encontro no andar enquanto hunt estiver ativa. Derrota total encerra hunt e retorna ao lobby. Reinício não ocorre após derrota sem intervenção do jogador.
+Encontros têm 1–3 inimigos. Vitória encerra o encontro, recompensa a run e inicia o próximo encontro no andar enquanto hunt estiver ativa. Derrota total encerra hunt e retorna ao lobby. A HUD solicita uma opção de retorno após derrota; regra candidata é curar gratuitamente no lobby e reiniciar o mesmo andar se o jogador tiver ativado a opção. Isso ainda requer confirmação, e não autoriza autoavanço de andar (exclusivo VIP). Sem automação aprovada/ativa, reinício não ocorre após derrota.
 
 ### Bot e consumíveis
 
-- Configuração mínima: ativar/desativar uso de poção; limite de HP percentual; ativar/desativar revive automático.
-- Poção é consumida quando a condição for verdadeira e houver item no inventário. Proposta: consumir no máximo um consumível por evento de decisão e respeitar cooldown; regras exatas pendentes.
+- Configuração proposta: ativar/desativar poções; limiar de HP; escolher raridades elegíveis; ativar/desativar revive e tipos elegíveis (30%/50%/total); ligar/desligar cada skill equipada na automação; toggle de retorno após derrota solicitado; auto subir andar VIP.
+- Prioridade/ordem de skills pode ser acrescentada futuramente (ex.: buff, ofensiva, controle, ultimate), mas a ordem, cooldowns e critérios de uso ainda não estão definidos.
+- Poção é consumida quando a condição for verdadeira e houver item no inventário. Proposta: consumir no máximo um consumível por evento de decisão e respeitar cooldown; regras exatas pendentes. Se o estoque elegível acabar, HUD informa que a regra não pode operar e oferece loja.
 - Revive consome item elegível e restaura a percentagem configurada ao alvo derrotado, ou pode levantar o grupo conforme regra final. Momento e ordem do revive devem evitar consumir vários itens no mesmo tick.
-- Loja acessada na tela de batalha é uma camada de UI; qualquer compra atualiza inventário com resposta de servidor e não pausa o combate por padrão (decisão de UX pendente).
+- A automação de retorno após derrota é solicitada, mas default, condição e relação com cura grátis/reinício do mesmo andar precisam ser aprovados; não presume subida de andar.
+- Loja acessada na tela de batalha é uma camada modal/painel da HUD, mantendo o contexto e mostrando a batalha. Proposta é o combate continuar ao fundo; comportamento de pausa precisa ser aprovado.
 
 ## 6. Progressão e recursos
 
@@ -112,11 +132,17 @@ Invariantes propostos para backend:
 
 Como o jogo inclui moeda negociável, VIP, PvP, chat e drops, resultados e inventários que têm valor devem ser autoritativos no servidor. O cliente é apresentação e envia intenções; não define dano, loot, cooldown, moeda nem transação. Detalhes de autenticação, persistência, privacidade, moderação e recuperação são pré-requisitos de arquitetura, não decisões de stack desta revisão.
 
-## 9. Contratos de teste futuros
+## 9. Interface e autoridade dos dados
+
+A composição da HUD e seus estados/dependências estão em [HUD_UX_SPEC.md](HUD_UX_SPEC.md). A HUD apresenta um snapshot/view-model de estado confirmado e emite intenções; ela não decide combate, loot, consumo, preços ou propriedade de itens. Ex.: configurar uma skill automática deve persistir/receber confirmação da camada de domínio; abrir um painel não deve reiniciar nem abandonar a hunt.
+
+## 10. Contratos de teste futuros
 
 - Raridade aplica-se antes de x; com x=10, exemplos da tabela calculam exatamente.
-- x só assume inteiros de 1 a 50; cada valor final corresponde a `Base × R × x/10`.
-- Apenas Lendário/Celestial podem receber característica conforme pool configurado.
+- Cada atributo recebe sua própria rolagem x, independente das demais; x só assume inteiros de 1 a 50 sob a regra atual, cada valor final corresponde a `Base × R × x/10`.
+- Personagem pode equipar qualquer subtipo de arma; afinidade não bloqueia equipar.
+- Cada subtipo ativa o traço de arma documentado; característica da Espada não pode ser gerada até ser definida.
+- Apenas Lendário/Celestial podem receber característica adicional de raridade conforme pool configurado, além do traço de tipo da arma.
 - Nota/poder são reproduzíveis para mesmo item e mesma versão de pesos.
 - Chances de cada loot table totalizam 100% e não incluem resultados não configurados.
 - Fusão nunca supera 5★ e nunca consome sem confirmação/validação do servidor.
@@ -125,6 +151,6 @@ Como o jogo inclui moeda negociável, VIP, PvP, chat e drops, resultados e inven
 - VIP não é aplicado em duplicidade e expirado não concede buff.
 - Desconexão/retorno não duplica recompensas ou revive/consumíveis.
 
-## 10. Registro de decisões
+## 11. Registro de decisões
 
 Decisões aprovadas devem ser adicionadas a este documento com data, motivo, versão e impacto em dados/testes. Revisar este arquivo e [AI_State](AI_STATE.md) no início e no fim de cada etapa.
