@@ -1,9 +1,8 @@
 # Guia de deploy — GitHub + Vercel + Supabase
 
-**Status: onboarding browser-first parcial; estado informado pelo usuário em 28/09/2026.** O usuário criou o Supabase `tower-idle-adventure-dev` e relata que o conectou a um repositório GitHub na branch `main`; não verificamos o Dashboard nesta sessão nem confirmamos aplicação de migration. Preview Branch/Automatic Branching do Supabase não está disponível no plano atual e ficará desabilitado. Vercel ainda não foi configurada.
+**Status: onboarding browser-first parcial; estado informado pelo usuário em 28/09/2026.** O usuário informa que criou `tower-idle-adventure-dev`, conectou o repo `marmitero/tower-idle-adventure` com Working Directory `.`, ativou **Deploy to production** e escolheu Production branch `Main`. O agente não verificou o Dashboard autenticado nem a aplicação da migration. `Main` precisa corresponder à ref GitHub `main` (nomes de branch diferenciam maiúsculas/minúsculas). Automatic Preview/Branching do Supabase ficará desligado, conforme escolha do usuário/plano atual. Vercel não foi integrada e nenhum projeto Vercel foi criado.
 **Restrição confirmada:** evitar instalações. Configurar e operar Supabase, Vercel e GitHub pelo navegador; não exigir Docker, Supabase CLI ou Vercel CLI na máquina do usuário. As orientações anteriores de CLI/Docker e Preview Branch automático foram superadas.
-**Atenção ao nome do repositório:** o checkout desta sessão usa `marmitero/tower-idle-adventure`; o usuário descreveu a conexão como `idle-tower-adventure`. Confirmar o nome completo owner/repo no Dashboard Supabase antes de permitir que migrations sejam aplicadas.
-**Requisito confirmado:** merge em `main` deve iniciar deploy de produção Vercel após build/checks, mas isso não está configurado e os apps `apps/game-web/`/`apps/admin-web/` ainda não existem.
+**Requisito confirmado:** merge em `main` deverá iniciar deploy de produção Vercel após build/checks, mas isso não está configurado e os apps `apps/game-web/`/`apps/admin-web/` ainda não existem.
 **Requisito confirmado:** depois que um PR for integrado à branch `main` do GitHub, a Vercel deve publicar automaticamente a nova versão em produção, após build e verificações (não instantaneamente no merge).
 
 Este guia separa claramente as ações que podem começar agora das que dependem de aplicações/gates. Não significa que o jogo, painel, serviços ou deploys já estejam prontos.
@@ -22,7 +21,7 @@ PR aprovado + merge em main
                     └── Supabase dev: aplicar migrations se Deploy to production estiver ativo
 ```
 
-A integração Supabase/branch e o toggle de deploy ainda precisam de confirmação no Dashboard; não declarar migration aplicada antes de ver o histórico.
+O usuário reporta que a integração Supabase está ligada ao repo correto, com deploy habilitado e branch configurada como `Main`; como essa forma difere de `main`, conferir a ref selecionada se houver dúvida. A migration aplicada ainda precisa ser confirmada pelo histórico/status do Dashboard.
 
 **“Em tempo real”** aqui significa “automaticamente, sem alguém apertar um botão de publicar depois do merge”. Primeiro ainda há build e verificações, então normalmente existe um intervalo de minutos. Se o build falhar, a nova versão não deve ser considerada publicada; o deployment anterior continua sendo a referência de produção.
 
@@ -39,26 +38,26 @@ A Vercel e o Supabase observam o mesmo merge, mas são dois deploys independente
 Até 28/09/2026, segundo o estado do repositório e o relato do usuário:
 
 - `apps/game-web/` e `apps/admin-web/` ainda não existem; não há app web para importar na Vercel. O pack de sprites estático fica em `sprites/`; um subset final poderá ser servido pelo app/Vercel, sem exigir upload imediato para Supabase Storage.
-- O usuário relata ter criado `tower-idle-adventure-dev` e ligado a uma branch `main` de um repositório GitHub. A migration-base existe em `supabase/migrations/`, mas **não há confirmação de que tenha sido aplicada**. Os 9 testes existentes usam PGlite e não substituem validação Supabase.
-- O nome que o usuário informou (`idle-tower-adventure`) não coincide literalmente com o remoto desta sessão (`marmitero/tower-idle-adventure`); validar owner/repo no Dashboard antes de aplicar migrations.
-- Supabase Automatic Branching/Preview Branches está desligado por indisponibilidade no plano atual, conforme usuário. Vercel ainda não foi configurada; não há projetos Vercel, domínio ou deploy.
+- O usuário relata projeto Supabase `tower-idle-adventure-dev` ligado a `marmitero/tower-idle-adventure`, Working Directory `.`, **Deploy to production ON** e Production branch `Main`. A migration-base existe em `supabase/migrations/`, mas a aplicação ainda não foi confirmada. Os 9 testes PGlite não substituem validação Supabase.
+- O usuário prefere Automatic Branching/Preview Branch desligado, pois exige Pro; não há banco isolado por PR. O merge correto para o projeto dev deve mirar a branch GitHub `main`; verificar que o valor reportado `Main` representa essa ref.
+- Vercel não foi integrada nem teve projeto criado; não há domínio ou deployment. `apps/game-web/` e `apps/admin-web/` ainda não existem.
 - A G2 continua aberta. O projeto dev informado não fecha o gate nem inicia implementação de gameplay/Admin.
 
-O usuário já iniciou o onboarding ao criar o projeto Supabase dev e conectá-lo à branch `main`. Próxima verificação é o nome completo do repositório e a opção que aplica migrations ao projeto-base. A Vercel continua sem configuração; deploy de app aguarda aplicações buildáveis e os gates de segurança.
+O onboarding Supabase já foi iniciado segundo o usuário; os dados informados são repo `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ativado e Production branch `Main`. Próxima verificação é confirmar que essa branch coincide com a ref GitHub `main` e conferir o status da migration-base. A Vercel continua sem integração/projeto; deploy de app aguarda aplicações buildáveis e os gates de segurança.
 
 ### Sequência atual confirmada — tudo pelo navegador, sem instalações
 
 O usuário definiu que não quer instalar ferramentas para usar Vercel, Supabase ou GitHub. O caminho é operar nos Dashboards e na integração GitHub do Supabase; não instalar Docker/Supabase CLI/Vercel CLI.
 
-1. **Confirmar o vínculo informado:** no Dashboard do projeto `tower-idle-adventure-dev`, conferir o owner/nome completo do repositório, a branch `main` e Working Directory `.`. O remoto desta sessão é `marmitero/tower-idle-adventure`; o usuário descreveu o nome como `idle-tower-adventure`. Se o slug completo não for o esperado, pausar antes de habilitar aplicação automática de migrations.
+1. **Vínculo reportado:** usuário informa projeto `tower-idle-adventure-dev`, repo `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ligado e Production branch `Main`. Agente não acessou o Dashboard autenticado. Verificar apenas que `Main` corresponde à ref GitHub `main`; repo/Working Directory já foram informados.
 2. **Preview branches:** manter Automatic Branching/Auto Preview desabilitado, conforme a restrição do plano atual. Não haverá uma base de banco isolada para cada PR; os valores/revisões do PR devem ser verificados no GitHub antes do merge.
-3. **Aplicação ao projeto dev:** confirmar no Dashboard se **Deploy to production** está ativo para a integração. Esse toggle, se habilitado, só pode apontar para `tower-idle-adventure-dev` nesta fase; no Supabase ele publica as migrations da branch conectada no projeto-base. Se estiver desligado, o vínculo ao repositório não basta para presumir que migrations serão aplicadas após merge. Não ativar em um projeto Supabase de produção.
+3. **Aplicação ao projeto dev:** o usuário relata **Deploy to production** já ativado na integração desse projeto. Nesse contexto, o destino é o projeto-base conectado `tower-idle-adventure-dev`, não um banco público de produção do jogo. Confirmar que o branch selecionado corresponde ao GitHub `main`; não alterar toggle/projeto sem motivo. Nunca ligar esse fluxo em eventual banco de produção nesta etapa.
 4. **Após merge em `main`:** verificar no Dashboard Supabase o histórico/status das migrations e o schema esperado. Isso valida a aplicação no banco dev, mas não oferece teste pré-merge isolado nem substitui a revisão de RLS/Auth/Data API. O seed atual está desabilitado; usar somente dados sintéticos.
 5. **Sem instalação local:** os 9 smoke tests PGlite já foram executados pelo agente anteriormente, mas não estão configurados como GitHub Actions. Se desejado, podemos acrescentar um workflow hospedado que os execute a cada PR; nenhuma dependência seria instalada no computador do usuário. Isso não substitui a prova do banco Supabase.
 6. **Vercel:** ainda não foi configurada. Pode-se autorizar a integração GitHub pelo navegador, mas não importar como Game Web/Admin enquanto `apps/game-web/` e `apps/admin-web/` não existirem. Quando houver apps seguros/buildáveis, importar cada raiz e configurar Previews/Production no Dashboard.
 7. **Produção:** manter o projeto/banco Supabase de produção, secrets e domínio separados até testes de Auth, RLS, Admin, backups, migrations e rollback. O merge em `main` só deve aplicar automaticamente à produção depois dos gates de segurança e de um projeto Vercel válido.
 
-**Resumo atual:** Supabase dev existe segundo o usuário e está ligado a `main`; o Auto Preview de Supabase fica desligado por limitação do plano. Falta confirmar o slug exato e o estado do toggle Deploy to production. Vercel segue sem configuração e sem apps para importar.
+**Resumo atual:** segundo o usuário, Supabase dev está ligado ao repo `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ativado e Production branch `Main`; Automatic Preview fica desligado. Ainda falta confirmar que `Main` é a ref `main` e verificar no Dashboard se a migration foi aplicada. Vercel não foi integrada, não tem projeto e ainda não há apps para importar.
 
 ## 4. Configuração browser-first, passo a passo
 
@@ -70,22 +69,22 @@ O usuário definiu que não quer instalar ferramentas para usar Vercel, Supabase
 
 ### Etapa B — revisar o projeto Supabase dev já criado
 
-**O usuário informa que `tower-idle-adventure-dev` já existe e está conectado à branch `main`; não criar outro projeto agora.**
+**O usuário informa que `tower-idle-adventure-dev` já existe e que a GitHub Integration está configurada; não criar outro projeto agora. Repo `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ON e Production branch `Main` foram informados por ele; o Dashboard não foi verificado pelo agente.
 
 1. No Dashboard, conferir o nome e `project-ref` do projeto, região, plano e limites; confirmar que este é o projeto de desenvolvimento, não produção.
 2. Confirmar que os dados são sintéticos e que a senha do banco está guardada em um gerenciador de senhas. Não pedir nem colar a senha em chat, issue, commit ou variável pública.
-3. Conferir o nome completo do repositório conectado e a branch `main`; `supabase/` está na raiz do repo esperado desta sessão, portanto o Working Directory deve ser `.`. Há uma diferença aparente entre o nome informado pelo usuário (`idle-tower-adventure`) e o remoto do checkout (`marmitero/tower-idle-adventure`); corrigir o vínculo antes de ativar deploy se forem projetos distintos.
+3. O usuário informa que o repo conectado é `marmitero/tower-idle-adventure` e Working Directory `.`, que corresponde à localização de `supabase/` nesta raiz. Conferir apenas que a ref Production branch `Main` corresponde à branch real `main`; se a seleção diferir, pausar e corrigir pelo Dashboard antes de depender do deploy.
 4. Automatic Branching/Preview Branch está indisponível no plano atual e permanece desligado, conforme usuário. Não pagar upgrade nem habilitar uma Preview Branch automática nesta etapa.
-5. Conferir o estado do toggle **Deploy to production**. Se o objetivo é aplicar migrations da `main` ao projeto dev após merge, habilitar somente após confirmar o projeto/ref e o repositório corretos. Não ligar esse toggle em eventual banco de produção.
+5. O usuário informa o toggle **Deploy to production** ativado no projeto dev. Não é necessário reativá-lo; conferir sua aplicação no próximo merge revisado e garantir que ele continue apontando só a `tower-idle-adventure-dev`, não a um futuro projeto de produção.
 6. Staging e production continuam separados e podem ser criados posteriormente, depois de definir custos, backups/PITR, Auth/RLS, integração e gates de segurança.
 
 ### Etapa C — validar e publicar migrations pelo navegador
 
 O repositório contém `supabase/config.toml` e a migration-base `supabase/migrations/20260928000000_g2_core_schema.sql`. Não é necessário instalar Supabase CLI, Docker ou Node.js na máquina do usuário. Automatic Branching está desligado por indisponibilidade no plano atual, conforme relato do usuário.
 
-1. No Dashboard do Supabase `tower-idle-adventure-dev`, conferir o nome completo do repo conectado. O remote deste checkout é `marmitero/tower-idle-adventure`; se o nome exibido como `idle-tower-adventure` apontar para outro repo, interromper antes de aplicar migrations.
+1. Configuração reportada: projeto `tower-idle-adventure-dev` conectado ao repo `marmitero/tower-idle-adventure`, Working Directory `.`. Agente não acessou o Dashboard autenticado; não pedir/compartilhar credenciais. Confirmar apenas os estados pendentes descritos abaixo.
 2. Confirmar Working directory `.` e branch conectada `main`. O objetivo relatado pelo usuário é que o banco dev receba mudanças apenas após merge em `main`.
-3. Conferir **Deploy to production** no GitHub Integration. Para que migrations sejam aplicadas ao projeto-base dev após merge, o toggle deve estar habilitado nesse projeto dev; confirmar nome/project-ref antes. Se desligado, não presumir que só conectar o repo aplica migrations automaticamente.
+3. O usuário informa **Deploy to production** ativado e Production branch `Main`. Confirmar que essa branch corresponde exatamente à ref GitHub `main`; a aplicação real da migration só se confirma no histórico/status do Dashboard. Nesse setup, `production` da integração refere-se à branch/projeto-base Supabase dev, não à Vercel nem ao ambiente público do jogo.
 4. Como não há Preview Branch isolada, revisar o arquivo SQL pelo diff/PR no GitHub antes do merge. Não existe prova hospedada pré-merge neste plano; os smoke tests PGlite (9/9 em execução anterior do agente) são evidência auxiliar, não substituto para o Supabase.
 5. Depois de um merge em `main`, abrir o Supabase Dashboard e confirmar a migração no histórico/status e o schema esperado em **Database**. Essa é uma mudança no ambiente compartilhado dev, não uma aprovação de produção. Usar somente dados sintéticos; a migration não foi confirmada como aplicada até esse teste.
 6. O fluxo Git pode executar migrations e itens suportados declarados. Configurações de Auth/API (URLs, providers, redirects, flags) precisam ser ajustadas/verificadas pelo Dashboard; não presumir que `config.toml` atualiza tudo automaticamente.
@@ -94,11 +93,11 @@ O repositório contém `supabase/config.toml` e a migration-base `supabase/migra
 
 **Limite atual:** projeto e integração foram reportados pelo usuário, mas não foram verificados pelo agente; migration aplicada ainda não confirmada. Automatic Branching/Preview Branch por PR está desabilitado.
 
-### Etapa D — autorizar Vercel agora; importar os apps quando existirem
+### Etapa D — Vercel: integração e projetos ainda pendentes
 
-**A autorização pode começar agora; criar projetos Vercel ainda não é possível**, pois `apps/game-web/` e `apps/admin-web/` não existem e não há aplicação buildável.
+**O usuário informa que ainda não integrou o GitHub à Vercel e não criou projeto Vercel.** Como `apps/game-web/` e `apps/admin-web/` não existem, não importar a raiz nem criar deploys vazios agora. O agente pode preparar os apps/configs após os gates; qualquer login/OAuth e criação do projeto exige ação browser do usuário.
 
-1. Crie/acesse uma conta Vercel, ative MFA e autorize a integração GitHub para o repositório `marmitero/tower-idle-adventure`. Confirme acesso apenas ao repo necessário.
+1. Quando houver um app seguro e buildável e o usuário autorizar a etapa, autenticar no Dashboard Vercel, ativar MFA e autorizar o GitHub para `marmitero/tower-idle-adventure`, limitado ao repo necessário.
 2. **Não importe a raiz do repo como se fosse o jogo.** Aguarde a criação e validação dos shells pelos gates de arquitetura/segurança; atualmente o repo tem docs, `sprites/`, protótipo estático e `supabase/`, não apps web.
 3. Quando os diretórios estiverem implementados, no Dashboard selecione **Add New → Project**, importe o mesmo repositório duas vezes e configure:
    - projeto **Game Web** → Root Directory `apps/game-web/`;

@@ -1,199 +1,135 @@
-# AI_State — estado vivo do projeto
+# AI_State — handoff vivo do Tower Idle Adventure
 
-## Para que serve
+**Objetivo:** este documento é a passagem de contexto para qualquer pessoa/agente que continue o projeto sem acesso a conversas anteriores. Leia-o primeiro em cada etapa; depois consulte os documentos-fonte indicados abaixo. As afirmações sobre plataformas externas são identificadas como relato do usuário quando não foram verificadas diretamente no Dashboard.
 
-Este arquivo é a passagem de contexto do projeto **Tower Idle Adventure**. Deve permitir que uma pessoa ou agente retome o trabalho sem inventar decisões nem contradizer etapas anteriores. É um resumo vivo — não substitui o [GDD](GDD.md), as [especificações de sistemas](SYSTEMS_SPEC.md) e [combate](COMBAT_DESIGN.md), a [HUD/UX](HUD_UX_SPEC.md), a [arquitetura técnica](TECH_ARCHITECTURE.md), o [Painel Administrativo](ADMIN_PANEL_SPEC.md) nem o [Roadmap](ROADMAP.md).
+**Última atualização documental:** 2026-09-28. **Marco atual:** G2 (pré-produção técnica, segurança e UX) em andamento; não avançar para gameplay/vertical slice antes do gate G2.
 
-### Protocolo obrigatório por etapa
+**Checkout da sessão:** `/home/user/tower-idle-adventure` · **remote:** `origin` → `marmitero/tower-idle-adventure` · **branch obrigatória:** `arena/01a0e5e1-tower-idle-adventure`.
 
-1. **No início de cada etapa:** ler este arquivo primeiro; em seguida ler os documentos citados como fontes para a tarefa. Conferir o git status e identificar alterações existentes antes de editar.
-2. Confirmar etapa/marco atual e escopo autorizado no Roadmap. Não iniciar implementação de gameplay antes do portão de aprovação de design.
-3. Se houver ambiguidade, registrar a pergunta/decisão no documento relevante antes de codificar. Não apagar decisões anteriores sem registrar o motivo.
-4. **Ao terminar cada etapa:** atualizar esta seção (data, entregue, decisões, pendências, próximos passos, testes/evidências), atualizar os documentos-fonte afetados e garantir que o Roadmap reflita o estado real.
-5. Não marcar etapa concluída sem evidência verificável. Não alegar teste, lançamento ou sistema pronto que não tenha sido executado/feito.
-6. **Checkpoint obrigatório ao final de toda etapa:** depois de atualizar este AI_State e os documentos afetados, fazer `git add` dos arquivos de progresso da etapa, criar um commit e fazer push para `origin arena/01a0e5e1-tower-idle-adventure`. Isso se aplica mesmo quando a etapa estiver incompleta, pausada ou ainda depender de decisões; registrar no commit/AI_State que o trabalho é parcial quando for o caso. Não esperar a conclusão integral da etapa para salvar o progresso. Conferir que o push terminou com sucesso e informar o hash do commit. Nunca trocar de branch nem enviar para outra branch. Se o push falhar, não afirmar que o checkpoint foi publicado: registrar a falha e tratar o envio como pendente.
+## 1. Regras obrigatórias para quem continuar
 
-## Situação atual
+1. No início: ler este arquivo, conferir `git status`, branch e `git log`; depois abrir os documentos-fonte relevantes. Não presumir que uma anotação antiga prevalece sobre o estado mais recente.
+2. Trabalhar sempre na branch `arena/01a0e5e1-tower-idle-adventure`. **Nunca trocar de branch, criar outra branch para esta sessão, nem enviar alterações para outra branch.** O repositório canônico deste checkout é `marmitero/tower-idle-adventure`.
+3. Ao final de toda etapa, mesmo parcial/pausada: atualizar este AI_State e os documentos afetados; executar verificações pertinentes; criar commit e fazer push somente para `origin arena/01a0e5e1-tower-idle-adventure`; confirmar sucesso e informar o hash. Não deixar trabalho concluído sem checkpoint.
+4. Não afirmar que algo foi testado, implantado, aprovado ou configurado em um serviço externo sem evidência. Separar sempre **estado verificado no repositório**, **relato do usuário** e **proposta/recomendação**.
+5. O usuário prefere fluxo browser-first para GitHub, Supabase e Vercel e não quer instalar CLI, Docker ou outras ferramentas no próprio computador. O agente deve fazer primeiro tudo que for possível no repositório e pelas integrações disponíveis; só pedir ajuda ao usuário para login/OAuth/consentimento, ações que exijam Dashboard autenticado, permissões, billing ou algo que o agente não possa acessar. Nunca solicitar senha, token, service-role key, código MFA ou outro segredo; ensinar o clique necessário pelo navegador e pedir apenas confirmação/dados não secretos.
+6. O usuário pediu que o agente implemente o máximo possível e ensine apenas as partes que não consegue executar. Isso **não** autoriza pular o gate G2, publicar em produção, fazer merge em `main` sem revisão, nem apresentar apps/recursos não construídos como prontos.
+7. Documentação/design precedem implementação de produto. O baseline do MVP foi escolhido pelo agente sob delegação explícita do usuário; não atribuir cada valor a uma escolha individual do usuário, e manter valores adaptáveis quando ele pedir.
+8. Automatic Preview/Preview Branch do Supabase está deliberadamente desligado no plano atual. Não recomendar upgrade nem fluxos que dependam dele sem nova decisão do usuário. Sem preview DB por PR, migrations devem ser revisadas antes do merge e verificadas no projeto dev compartilhado depois.
 
-- **Data:** 2026-09-28.
-- **Branch obrigatória da sessão:** `arena/01a0e5e1-tower-idle-adventure`.
-- **Fase:** Etapa 2/G2 em andamento. Existem blueprints técnicos/ameaças/UX, click-through com 3 sprites do pack, migration-base com harness PGlite e pack Fantasy Dungeon inventariado. O usuário informa que criou o Supabase `tower-idle-adventure-dev` e o conectou ao GitHub na branch `main`; Automatic Preview/Branching está desligado por limitação do plano. A Vercel ainda não foi configurada. Não há gameplay, HUD de produção, Admin Web ou Edge Functions.
-- **Marco atual:** G1 foi fechado documentalmente na etapa anterior. Baseline MVP continua como decisão do agente sob delegação explícita do usuário (adaptável), sem atribuir escolhas individuais ao usuário. G2 requer prova da migration em Supabase hospedado, revisão de segurança e usabilidade com participantes; Automatic Preview/Branching está desligado no plano atual, então a validação prevista é no projeto dev compartilhado após merge revisado em `main` (ou outro projeto de teste separado se definido). Não requer instalação local de CLI/Docker. O usuário confirmou que abriu e validou visualmente o protótipo; isso não substitui teste de usabilidade com 5–8 convidados.
-- **Documentação atual:** README e arquivos-fonte em `docs/`; árvore de apps segue proposta, sem `apps/game-web/` nem `apps/admin-web/`. `sprites/ASSET_MANIFEST.md` documenta 422 PNGs, créditos/limites e candidatos visuais. `prototypes/g2-hud/index.html` (dados fictícios, sem APIs/backend) agora usa provisoriamente sheets hero/mage/slime e exibe o crédito/link Nika Studio; servidor estático da raiz disponível na porta 4173. Migration-base está em `supabase/migrations/`; testes PGlite em `supabase/tests/`.
-- **Validação técnica anterior do agente (não requisito do fluxo browser-only):** `npm ci --prefix supabase`; `npm test --prefix supabase` passou (9/9) em PGlite 0.5.8/PostgreSQL 18.3; `npm audit --prefix supabase` encontrou 0 vulnerabilidades conhecidas no harness. Config Supabase propõe PG15 (diferença explícita). Parser HTML e sintaxe JS passaram; servidor de preview do Arena redirecionou `/` e entregou HTML + 3 PNGs em HTTP 200; inventário conferiu 422 PNGs e `ui_dialog.png` em 4.689.811 bytes. Link-check em 17 arquivos Markdown/75 links relativos e `git diff --check` passaram. CLI/Docker/Vercel CLI ausentes; sem validação externa. PGlite não valida Supabase/PostgREST/Edge/Storage/concorrência/custos. Sem teste de segurança em serviço real nem estudo UX.
+## 2. O projeto em uma visão
 
-## Resumo confiável do projeto
+**Tower Idle Adventure** é um RPG idle automático 2D para navegador, centrado em uma torre, progressão de equipe, equipamentos e batalhas PvE automáticas. O MVP é individual, desktop-first e PT-BR; o jogo não está implementado. A conta escolhe um personagem, monta uma equipe de até três, faz hunts pessoais por andares, ganha XP/Coins/loot e retorna ao lobby. Detalhes de produto, números e critérios de aceite estão em [`MVP_DECISIONS.md`](MVP_DECISIONS.md), [`GDD.md`](GDD.md) e [`SYSTEMS_SPEC.md`](SYSTEMS_SPEC.md).
 
-**Tower Idle Adventure** é um RPG idle 2D para navegador. O MVP fechado é PvE individual, desktop-first, PT-BR e alpha por convite. Conta escolhe Guerreiro, Arcanista ou Ladino, monta equipe de até três, faz hunt individual em 10 andares, ganha XP/Coins/loot e retorna ao lobby; companheiros desbloqueiam nos andares 3 e 6. Nível compartilhado vai de 1–20. Há um boss solo recorrente no andar 10. A especificação numérica completa e critérios de aceite vivem em `MVP_DECISIONS.md`.
+O projeto encontra-se em **pré-produção**: especificações, threat model, protótipo UX estático, fundação SQL e inventário de arte existem; não há gameplay, backend funcional, app Game Web, Admin Web, deployment Vercel ou validação Supabase hospedada confirmada. O projeto Supabase dev e sua configuração GitHub são relatados pelo usuário, conforme §4.
 
-**Status importante:** escopo baseline foi decidido pelo agente após autorização explícita do usuário. Não tratar cada valor de `MVP_DECISIONS.md` como decisão individualmente escolhida ou aprovada pelo usuário. Pode ser adaptado futuramente por solicitação. Nenhuma feature/gameplay do produto foi implementada; fórmulas/valores precisam de playtest na vertical slice. A migration-base técnica é somente uma fundação G2 e não muda esse status.
+## 3. Produto, decisões e limites de escopo
 
-O MVP tem 10 slots (Arma, Peitoral, Elmo, Calça, Bota, Luva (armadura), Colar, Aura, Asa e Pet), oito stats por item, seis raridades e notas/poder definidos. Regra explicitamente confirmada pelo usuário: `x` independente por atributo, inteiro de 1–50; fator `x/10`, em passos de 0,1. `x=4,72` foi rejeitado. Qualquer personagem pode equipar qualquer arma. O baseline completo de combate/armas foi aprovado pelo usuário; Contracorte tem 20% de chance após ataque direto de alvo único e causa 50% do Ataque atual, sem recursão nem ativação por DoT. Valores podem mudar com evidência de playtest.
+### Decisões confirmadas diretamente pelo usuário
 
-**Stack aprovada:** Game Web e Admin Web separados na Vercel; Supabase Auth/PostgreSQL/Edge Functions/Storage no backend. Cliente não decide combate, economia ou conteúdo. Painel CMS no-code fica isolado; jogadores comuns não veem sua interface nem acessam APIs administrativas. O usuário relata um Supabase `tower-idle-adventure-dev` conectado a uma branch `main` do GitHub; o Auto Preview está desligado e a aplicação da migration ainda não foi confirmada. A Vercel permanece sem configuração; nenhum app web, endpoint, gameplay ou integração Vercel foi implementado/provisionado. Ver `TECH_ARCHITECTURE.md`, `ADMIN_PANEL_SPEC.md`, `G2_TECHNICAL_BLUEPRINT.md` e `THREAT_MODEL.md`.
+- Stack escolhida: **Supabase + Vercel**. Game Web é separado do servidor/backend; Admin Web/CMS será app separado, acessível apenas a administradores autorizados.
+- O usuário aprovou o baseline completo de combate/armas em [`COMBAT_DESIGN.md`](COMBAT_DESIGN.md). **Contracorte:** 20% de chance após ataque direto de alvo único; causa 50% do Ataque atual; sem recursão e sem ativação por DoT.
+- Equipamento: multiplicador `x` independente por atributo, inteiro de 1–50; fator `x/10`, em incrementos de 0,1. `x=4,72` foi rejeitado. Slot Arma existe e qualquer personagem pode equipar qualquer tipo de arma.
+- Usar o pack de sprites já existente como base e adicionar/criar arte depois; não usar arte procedural. Preservar créditos/licenças e seguir a leitura conservadora dos avisos do pack até qualquer conflito de licença ser esclarecido.
+- HUD modular, desktop-first; hunts pessoais não são compartilhadas. Recursos sociais compartilhados/instanciados são pós-MVP.
+- Evitar instalações locais e usar navegador para configuração das plataformas. Agent-first para o trabalho: agente implementa o que for acessível; usuário só é acionado para autorização/ações de Dashboard inacessíveis.
+- Merge em GitHub `main` deve, futuramente, disparar deploy de produção Vercel após build/checks. Vercel ainda não foi conectada e não existe app para deploy.
+- Automatic Preview/Preview Branch no Supabase fica **desligado**: o usuário informou que requer plano Pro e prefere não habilitar/pagar por isso.
 
-**G2 UX:** `HUD_UX_SPEC.md` e `G2_UX_BLUEPRINT.md` definem estados/flows e critérios; `prototypes/g2-hud/index.html` é um click-through sem backend, sem combate e com dados fictícios. Hero/mage/slime são estudos visuais provisórios do pack, não arte/mapeamento aprovados nem HUD de produção. Não equivale a gameplay real nem a teste de usabilidade concluído.
+### Baseline MVP delegado ao agente (adaptável; ver fonte canônica)
 
-MVP exclui VIP/monetização, Diamonds, caixas/gacha, market/transações entre jogadores, social/chat/guildas, PvP, bosses compartilhados, eventos live, skills/upgrades avançados e rewards offline. Jogadores nunca compartilham espaço da hunt pessoal; qualquer social futuro usa serviços compartilhados/instanciados. Base inicial escolhida: pack estático Fantasy Dungeon de Nika Studio em `sprites/` (422 PNGs válidos; preservar crédito/licença e evitar bundle do pack inteiro). Assets adicionais autorais podem ser criados/adicionados em lotes de dez; arte procedural não é permitida; efeitos podem ser implementados em código.
+O usuário autorizou o agente a resolver decisões abertas necessárias para fechar o MVP. O agente registrou o baseline em [`MVP_DECISIONS.md`](MVP_DECISIONS.md); não trate todos os números como se o usuário os tivesse escolhido individualmente. Resumo: classes Guerreiro/Arcanista/Ladino; nível compartilhado 1–20; equipe até três; 10 andares e boss solo no andar 10; slots Arma, Peitoral, Elmo, Calça, Bota, Luva, Colar, Aura, Asa e Pet; 8 stats por item; seis raridades; loot/economia, consumíveis e bot descritos no documento. O baseline não foi validado em playtest e pode ser ajustado por pedido/evidência.
 
-`HUD_UX_SPEC.md` define proposta desktop-first, gameplay central prioritário, equipe lateral e painéis recolhíveis em telas menores. No MVP não há chat; loja rápida não pausa combate; desconexão congela no último evento confirmado, sem reward offline. Valores/regra de bot constam no MVP Decisions. A especificação da HUD permanece design, sem implementação.
+**Fora do MVP:** VIP/monetização, Diamonds, caixas/gacha, market/transações entre jogadores, PvP, chat/guildas, bosses compartilhados, eventos live, sistemas avançados de skills/upgrades e rewards/progresso offline. Hunts pessoais são privadas.
 
-## Decisões registradas e trabalho restante
+## 4. Estado de plataformas e deploy
 
-### Confirmadas diretamente pelo usuário
+### Supabase — estado reportado pelo usuário em 2026-09-28
 
-- x independente para cada atributo e sempre inteiro de 1–50; fator `x/10`, passos de 0,1; exemplo `4,72` rejeitado.
-- Slot Arma oficial; qualquer personagem pode equipar qualquer tipo.
-- **Contracorte:** 20% de chance após ataque direto de alvo único, dano físico de 50% do Ataque atual; sem recursão nem ativação por DoT.
-- Baseline completo de `COMBAT_DESIGN.md` aprovado (fórmulas, armas, alvos e afinidade +5%); revisão futura só com teste/evidência registrada.
-- **Stack:** Vercel + Supabase, Game Web separado do servidor.
-- **Deploy confirmado:** merge em `main` do GitHub deve iniciar automaticamente um deploy de produção na Vercel após build/checks. Previews de PR são desejáveis; migrations Supabase têm fluxo separado. Integrações ainda não configuradas.
-- **Direção atual confirmada:** evitar instalações; configurar GitHub/Supabase/Vercel pelo navegador. Usuário criou `tower-idle-adventure-dev`, ligou-o ao GitHub na branch `main` e decidiu deixar Automatic Preview/Branching desligado porque o plano atual não oferece esse recurso; nenhuma instalação ou upgrade deve ser feito. Vercel ainda não foi configurada; importar apps Vercel somente após existirem shells seguros em `apps/game-web/` e `apps/admin-web/`. Antes de confiar na integração, conferir repo slug completo e toggle `Deploy to production` somente no projeto dev. Produção/domínio continuam fora desta etapa. Orientação anterior de CLI/Docker está superada, preservada como histórico.
-- **Admin:** CMS no-code para tipos suportados; jogadores comuns sem acesso à aplicação/APIs; segurança server-side/RLS, auditoria e versão/rollback.
-- **Arte inicial atualizada:** usar o pack existente de Nika Studio como base e adicionar/criar assets depois; o pack declara crédito obrigatório e não revenda isolada; preservar os avisos mais conservadores. Sem arte procedural. HUD modular, centralidade do gameplay, desktop-first e painéis recolhíveis. Hunts pessoais não são compartilhadas; social futuro em sistemas compartilhados/instanciados.
+O usuário forneceu os seguintes dados da configuração no Dashboard. **O agente não teve acesso autenticado ao Dashboard e não verificou visualmente esses valores; registre-os como informados pelo usuário, não como teste independente.**
 
-### Baseline MVP decidido pelo agente sob delegação explícita (adaptável pelo usuário)
+- Projeto de desenvolvimento criado: **`tower-idle-adventure-dev`**.
+- Repositório GitHub conectado: **`marmitero/tower-idle-adventure`** (confere com o remote deste checkout; a divergência de nome mencionada antes foi resolvida pelo usuário).
+- **Working directory:** `.` (raiz do repositório; `supabase/` está na raiz).
+- **Deploy to production:** ativado para essa integração/projeto Supabase dev.
+- **Production branch name:** usuário informou **`Main`**. A branch do repositório foi referida como `main`; como nomes de refs Git são sensíveis a maiúsculas/minúsculas, confirmar no Dashboard que o valor selecionado é exatamente a branch existente (`main`) se houver dúvida. O rótulo “production” nesse contexto da integração Supabase é a branch/projeto-base configurado, não significa que o banco público de produção do jogo foi criado.
+- **Automatic Preview/Automatic Branching/Preview Branch:** desligado, pois o usuário informou que a função exige plano Pro e deseja deixá-la desligada. Não há banco isolado automático para cada PR.
+- **Migration:** ainda não há confirmação de que `20260928000000_g2_core_schema.sql` foi aplicada ao projeto nem de que seu resultado foi inspecionado. O toggle ligado indica a intenção de aplicar mudanças da branch conectada ao projeto-base, mas só o histórico/status do Dashboard confirma a aplicação real.
+- Usar apenas dados sintéticos. Não conectar um eventual Supabase de produção a este fluxo; nenhum setup de produção foi reportado/verificado.
 
-`MVP_DECISIONS.md` fecha objetivo, roster (Guerreiro/Arcanista/Ladino), afinidades, nível compartilhado 1–20, 10 andares, boss solo, stats e skills, catálogo/base stats de itens, nota/poder, raridades/loot, XP/Coins, consumíveis/preços, bot/revive/retorno, login convidado, desktop/PT-BR e critérios de aceite. MVP exclui VIP/pagamentos, caixas, Diamonds/market, social, PvP, bosses compartilhados, events runtime, mobile completo e progresso offline. Não atribuir essas escolhas do agente ao usuário como decisões individualmente feitas por ele.
+**Consequência operacional:** após revisar um PR e integrar as alterações à branch correta `main`, a integração Supabase configurada para o projeto dev deve atualizar **o projeto dev**, se o repo/branch estão corretos e a migração é válida. Como Preview Branch está desligada, não há validação SQL em DB efêmero antes do merge. Revisar migration no PR e depois checar histórico de migrations/schema no Supabase Dashboard. Não dizer que migration está aplicada até haver essa evidência.
 
-### G2 — documentação e prova técnica parcial; gate aberto
+### Vercel — estado reportado pelo usuário
 
-- Baselines propostos em `G2_TECHNICAL_BLUEPRINT.md`: TypeScript/Next.js em projetos Vercel separados; Supabase; modelo de dados, contratos, rate limits iniciais, sessão Admin e lote fixo sem catch-up. Valores técnicos são propostas do agente a validar, não escolhas individualmente feitas pelo usuário.
-- `PROJECT_STRUCTURE.md` propõe apps em `apps/game-web/` e `apps/admin-web/`, contracts, Supabase, sprites, protótipos e docs. `DEPLOYMENT_GUIDE.md` registra o Supabase dev reportado pelo usuário, integração apontada a `main`, Auto Preview desligado e Vercel ainda não configurada. Sem instalação local. Importação Vercel espera apps seguros/buildáveis. Nome completo do repo e toggle de migration deploy precisam de confirmação.
-- `supabase/migrations/20260928000000_g2_core_schema.sql` cria schema-base com 17 tabelas, RLS/grants, constraints e view pública restrita ao release ativo. `supabase/tests/schema-smoke.test.mjs` aplica o SQL em PGlite; 9/9 smoke tests passaram. Isto não é validação Supabase CLI/Data API.
-- `THREAT_MODEL.md` registra 20 ameaças prioritárias; somente propriedades limitadas de schema/RLS foram exercitadas no harness local, sem serviço real.
-- `G2_UX_BLUEPRINT.md` define wireframes/flows/acessibilidade/plano; o usuário confirmou que abriu e validou visualmente `prototypes/g2-hud/index.html`. Não houve estudo com 5–8 testers.
-- G2 continua aberto até confirmar migrations no Supabase dev após merge em `main` (sem Preview Branch isolada no plano atual), validar Auth/Data API/RLS, transações/idempotência/retry/reconexão, limites/custos, isolamento Admin/MFA, backup/restore, revisão de segurança e teste UX planejado; ver `G2_TECHNICAL_BLUEPRINT.md` e `ROADMAP.md`. Não exigir instalação local.
-- Nenhum gameplay, Admin Web ou Edge Function foi implementado. Usuário relata Supabase dev conectado a GitHub/main, mas conexão/auto-aplicação ainda não verificada por agente; Vercel não foi configurada. `apps/game-web/` e `apps/admin-web/` continuam inexistentes. O pack está em `sprites/`; apenas o click-through usa sheets candidatos.
+- **Ainda não integrada ao GitHub; nenhum projeto Vercel foi criado.** O usuário confirmou que ainda não fez configuração na Vercel.
+- `apps/game-web/` e `apps/admin-web/` não existem; não há app para importar ou deployment de produção. Não inventar URLs, domínios, project IDs, build settings ou sucesso de deploy.
+- Futuro previsto: dois projetos Vercel independentes, Root Directory `apps/game-web/` e `apps/admin-web/`; Production Branch `main`; Preview por PR e Production após merge/checks. Configurar ambientes/secrets com Supabase dev em Preview e produção separada só depois dos gates.
 
-### Pós-MVP (backlog, não bloqueia G1/G2)
+### GitHub e limites de acesso
 
-- Regras efetivas de VIP/passe/pagamentos, odds de caixas/gacha, mercado e moderação social, PvP/guildas/bosses cooperativos, eventos em runtime, stars 2–5/fusão, conteúdo adicional e localização/mobile completa só são reabertos quando fase futura for autorizada.
+- Remote do repositório nesta sessão: `https://github.com/marmitero/tower-idle-adventure.git`.
+- O agente pode editar arquivos, executar verificações disponíveis no ambiente, fazer commit/push na branch fixa e usar integrações GitHub autorizadas (por exemplo, abrir PR/consultar checks quando as permissões permitirem). Repositório/configurações protegidas podem exigir permissão externa.
+- Não existe acesso confirmado do agente às sessões autenticadas dos Dashboards Supabase/Vercel. O usuário pode fornecer estado/status/screenshot sem segredos; não pedir credenciais.
+- A orientação antiga que exigia instalar Supabase CLI/Docker/Vercel CLI para começar foi superada. Comandos podem ser usados no ambiente do agente quando forem úteis/disponíveis, sem exigir instalação no computador do usuário.
 
-Não preencher essas lacunas silenciosamente no código; registrar decisão, motivo e impacto nos documentos relevantes.
+## 5. Estado real do código e evidências
 
-## Próximos passos
+### Artefatos presentes
 
-1. Revisar o click-through atualizado em `prototypes/g2-hud/index.html`: já exibe hero/mage/slime do pack como candidatos e crédito. Os demais placeholders e dados continuam fictícios; pedir feedback de legibilidade/mapeamento visual. G2 ainda exige 5–8 testes com participantes.
-2. No navegador, conferir no projeto `tower-idle-adventure-dev` o nome owner/repo completo e a branch `main`; o usuário informou `idle-tower-adventure`, enquanto o remoto desta sessão é `marmitero/tower-idle-adventure`. Pausar se houver diferença real.
-3. Verificar Working Directory `.` e `Deploy to production`. Para aplicar migrations após merge em `main`, esse toggle deve mirar somente o projeto dev; confirmar project-ref antes. Auto Preview/Branching permanece desligado conforme plano escolhido.
-4. Depois de confirmar repo/toggle, usar revisão do PR no GitHub e merge controlado em `main`; então verificar migration/status/schema pelo Dashboard Supabase. Isso atualiza o banco dev compartilhado, sem preview DB isolado. Não instalar CLI/Docker nem compartilhar credenciais.
-5. Vercel ainda não foi configurada. Pode-se autorizar GitHub pelo navegador, mas não importar/criar deployments de Game/Admin até existirem `apps/game-web/` e `apps/admin-web/`; manter production/domains desligados até os gates.
-5. Não implementar gameplay/Admin nem avançar G3 antes do gate G2. A migration-base é fundação de schema, não jogo/backend funcional; G2 ainda inclui Data API/Auth real, transações/idempotência, segurança, custos/backup e testes UX.
+- [`prototypes/g2-hud/index.html`](../prototypes/g2-hud/index.html): click-through estático, sem backend/gameplay e com dados fictícios; sheets `hero`, `mage`, `slime` são candidatos provisórios, não arte/mapeamento aprovados nem HUD de produção. O usuário já confirmou uma revisão visual individual; isso não substitui estudo com participantes.
+- [`supabase/migrations/20260928000000_g2_core_schema.sql`](../supabase/migrations/20260928000000_g2_core_schema.sql): migration-base/fundação de schema, não implementação do jogo.
+- [`supabase/tests/schema-smoke.test.mjs`](../supabase/tests/schema-smoke.test.mjs): 9 smoke tests PGlite. Histórico: `npm test --prefix supabase` passou 9/9 usando PGlite 0.5.8/PostgreSQL 18.3; `npm audit --prefix supabase` reportou 0 vulnerabilidades conhecidas no harness. `supabase/config.toml` propõe PostgreSQL 15; há diferença de major version em relação ao PGlite usado.
+- Schema atual documentado com 17 tabelas, RLS/`FORCE ROW LEVEL SECURITY`, grants e constraints. Seed `supabase/seed.sql` está vazio/desabilitado. Não há Edge Functions, endpoints de jogo/Admin, fluxo Auth implementado, transações econômicas, loop de batalha ou catálogo publicado.
+- [`sprites/`](../sprites/) contém o pack inicial Fantasy Dungeon de Nika Studio; manifesto [`sprites/ASSET_MANIFEST.md`](../sprites/ASSET_MANIFEST.md) registra 422 PNGs válidos, créditos e limitações. Usar subset aprovado; não empacotar o pack inteiro por padrão. Créditos/licença em `sprites/LICENSE.txt` e `sprites/README_IMPORT.txt` devem ser preservados.
 
-## Histórico de etapas
+### O que NÃO está implementado/confirmado
 
-### 2026-09-28 — Etapa 0: primeira documentação
+- Nenhum Game Web ou Admin Web em `apps/`; nenhum deployment Vercel.
+- Nenhum fluxo de gameplay, cliente autoritativo, Edge Function, Auth, Storage, API, CMS ou transação de economia.
+- A migration-base não foi confirmada como aplicada/testada em Supabase real; PGlite não testa Supabase Auth, PostgREST/Data API, Edge Functions, Storage, concorrência real, custos, backup ou configuração do provedor.
+- Nenhum preview Supabase por PR; nenhum teste de migration hospedado confirmado. Supabase dev/configuração GitHub são relato do usuário, não observação autenticada do agente.
+- Não há teste de segurança/backup/restore em ambiente real, nem estudo UX com os 5–8 participantes planejados.
+- Nenhum app foi implantado, nenhum domínio final foi escolhido, e nenhuma produção Supabase/Vercel foi liberada.
 
-- **Entregue:** README, GDD, especificação de sistemas, Roadmap e protocolo AI_State; sem features de jogo implementadas.
-- **Regra processual solicitada pelo usuário:** commit e push obrigatórios no fim de todas as etapas, mesmo incompletas.
-- **Checkpoint anterior:** commit `315e75f2b64bd3a28df6dd85ad7eaab440683b6a` na branch obrigatória.
+## 6. Gate G2: o que falta para encerrar
 
-### 2026-09-28 — Etapa 0: complemento de equipamentos e HUD
+Ver critérios completos em [`ROADMAP.md`](ROADMAP.md), [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md), [`THREAT_MODEL.md`](THREAT_MODEL.md) e [`G2_UX_BLUEPRINT.md`](G2_UX_BLUEPRINT.md). Mínimos pendentes:
 
-- **Entregue nesta atualização documental:** x individual por atributo confirmado; slot Arma e nove tipos adicionados; traços conhecidos listados com a característica da Espada pendente; arquitetura visual proposta da HUD, árvore de componentes, modelo de dados/intenções, dependências, modos/overlays, responsividade e questões pendentes.
-- **Documentos afetados:** README, GDD, SYSTEMS_SPEC, novo HUD_UX_SPEC e AI_State.
-- **Implementação/testes:** nenhuma implementação de gameplay ou HUD; validação documental, links internos e `git diff --check` verificados.
-- **Pendências à época:** precisão de x=4,72; valores dos traços/afinidade; comportamento de auto-retorno e loja em combate; prioridade de skills; aprovação do G1.
+1. Confirmar no Dashboard que a branch de produção do **Supabase dev** coincide com a ref GitHub `main`; verificar status/histórico e schema da migration-base após execução em dev. Não interpretar `Deploy to production` como Vercel ou como banco real de produção.
+2. Validar Auth, Data API/PostgREST, grants/RLS com usuários/roles representativos; registrar resultados reais.
+3. Projetar/testar transações, idempotência/replay, concorrência, reconexão e regras de segurança do servidor para ações de jogo. O cliente nunca decide combate, moeda, drops ou autorização.
+4. Definir/validar limites de Edge Functions, rate limiting, latência/custos, observabilidade, backups e restore. Não afirmar backup ativo antes de testar restauração.
+5. Fechar threat model e isolamento real de Admin/MFA antes de qualquer Admin acessível.
+6. Executar plano de usabilidade com 5–8 convidados; revisão visual individual do protótipo não basta.
+7. Confirmar planos/custos e manter produção isolada até os checks e aprovações apropriados.
 
-### 2026-09-28 — Etapa 0: confirmação de x inteiro e proposta para Espada
+Não usar a ausência de Preview Branch como motivo para instalar ferramentas ou pagar plano Pro. A validação browser-only neste estágio é no projeto dev compartilhado depois de merge revisado. Se for necessária uma prova antes de `main`, avaliar um segundo Supabase dev persistente ou GitHub Actions hospedado, sem assumir disponibilidade/custo nem habilitar sem decisão.
 
-- **Decisão confirmada:** x permanece inteiro de 1 a 50, rolado independentemente por atributo; fator de cálculo `x/10`. Exemplo fracionário `4,72` descartado.
-- **Proposta registrada:** Contracorte — após receber ataque direto de alvo único, chance de contra-atacar o agressor com dano físico baseado no Ataque. Valores iniciais sugeridos para playtest: 20% de chance e 50% do Ataque atual. Sem auto-recursão nem ativação por dano ao longo do tempo.
-- **Estado:** conceito e valores são recomendação, ainda aguardando aprovação e testes de balanceamento; nenhuma implementação.
-- **Documentos afetados:** GDD, SYSTEMS_SPEC, HUD_UX_SPEC, Roadmap, README e este AI_State.
-- **Validação:** conferidos links locais dos seis arquivos Markdown e `git diff --check`; sem testes de gameplay, pois o jogo não foi implementado.
-- **Próximo passo à época:** validar/ajustar Contracorte e continuar o fechamento do design G1.
+## 7. Próximo fluxo recomendado para a IA sucessora
 
-### 2026-09-28 — Etapa 1 (G1): proposta de combate e armas
+1. Ler novamente este AI_State; conferir branch, `git status`, `git log` e estado do remote. Continuar exclusivamente em `arena/01a0e5e1-tower-idle-adventure`.
+2. Não pedir novamente os dados já informados: Supabase `tower-idle-adventure-dev`, repo `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ON, Production branch `Main`, Automatic Preview OFF, Vercel sem integração/projeto. Em documentos futuros, preservar a ressalva de que são valores reportados pelo usuário, não verificados pelo agente. Pendências reais: confirmar se `Main` é exatamente a ref GitHub `main` e consultar no Dashboard se a migration-base já foi aplicada.
+3. Como tarefa repo-side de baixo risco, inspecionar se há workflow GitHub Actions; o checkout atual não tem `.github/`. Se continuar útil ao G2, propor/implementar workflow hospedado para executar `npm test --prefix supabase` (e eventualmente audit) em PRs. Isso não requer instalação no computador do usuário e não substitui teste Supabase.
+4. Não fazer merge automático em `main` nem provocar execução de migrations em ambiente externo sem revisar o PR/diff, verificar destino dev e obter aprovação humana apropriada. Deploy to production está ligado no Supabase dev reportado; o merge pode alterar esse banco compartilhado.
+5. Para aplicação real da migration, pedir ao usuário somente uma confirmação não secreta do Dashboard (migration status/schema ou screenshot com chaves ocultas); nunca pedir project password, access token, service-role key ou credenciais.
+6. Depois do gate G2, e só então, iniciar a vertical slice G3 conforme `ROADMAP.md`; implementar Game Web/Admin Web com limites de segurança documentados. Quando apps existirem, ajudar a configurar Vercel pelo navegador, pois o agente não tem sessão autenticada de Vercel.
+7. Ao final da etapa, sincronizar AI_State e os docs que mudaram, executar testes/document checks, commitar e dar push para a branch fixa, registrar hash no retorno.
 
-- **Decisão confirmada nesta etapa:** o usuário validou Contracorte com os parâmetros documentados (20% de chance, 50% do Ataque atual, sem recursão/DoT).
-- **Entregue:** `COMBAT_DESIGN.md` com fórmulas iniciais de dano, crítico, IAS/velocidade, alvo/skills automáticas, parâmetros de playtest para as demais armas e proposta de afinidade +5% no atributo ofensivo principal.
-- **Documentos sincronizados:** README, GDD, SYSTEMS_SPEC, COMBAT_DESIGN, HUD_UX_SPEC, Roadmap e AI_State.
-- **Estado:** checkpoint parcial da Etapa 1; as propostas das oito outras armas, afinidades e fórmulas ainda não foram validadas por playtest. Nenhuma implementação iniciada.
-- **Próximo passo à época:** revisar as propostas do documento de combate e fechar decisões pendentes para aprovação de G1.
+## 8. Mapa de documentos-fonte
 
-### 2026-09-28 — Etapa 1: aprovação do combate e arquitetura/plano administrativo
+- [`README.md`](../README.md): resumo do estado e navegação.
+- [`GDD.md`](GDD.md), [`SYSTEMS_SPEC.md`](SYSTEMS_SPEC.md), [`MVP_DECISIONS.md`](MVP_DECISIONS.md): visão, regras de produto e baseline MVP (decisões do agente sob delegação destacadas).
+- [`COMBAT_DESIGN.md`](COMBAT_DESIGN.md): fórmulas/armas/afinidades e decisões aprovadas.
+- [`HUD_UX_SPEC.md`](HUD_UX_SPEC.md), [`G2_UX_BLUEPRINT.md`](G2_UX_BLUEPRINT.md), `../prototypes/g2-hud/index.html`: UX e protótipo não funcional.
+- [`TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md), [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md), [`THREAT_MODEL.md`](THREAT_MODEL.md), [`ADMIN_PANEL_SPEC.md`](ADMIN_PANEL_SPEC.md): arquitetura, segurança, G2 e Admin.
+- [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md), [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md), [`ROADMAP.md`](ROADMAP.md): deploy browser-first, estrutura futura e gates.
+- [`../supabase/README.md`](../supabase/README.md), migration e tests: escopo SQL, limites do harness e validações.
+- [`../sprites/ASSET_MANIFEST.md`](../sprites/ASSET_MANIFEST.md): inventário e créditos do pack.
 
-- **Aprovação do usuário:** todo o baseline `COMBAT_DESIGN.md`, incluindo fórmulas, parâmetros das armas e afinidade, foi aprovado; valores ainda devem ser validados em playtests futuros. Contracorte (20% / 50% Ataque) também confirmado.
-- **Decisão de stack:** Vercel + Supabase, com Game Web separado do servidor/backend.
-- **Requisito de produto:** painel administrativo no-code para criar/editar/publicar conteúdo suportado; isolamento de jogadores comuns e controle de acesso obrigatório em UI, servidor e banco.
-- **Entregue:** `TECH_ARCHITECTURE.md` e `ADMIN_PANEL_SPEC.md`; README, GDD, SYSTEMS_SPEC, COMBAT_DESIGN, HUD_UX_SPEC, Roadmap e AI_State sincronizados. Nenhuma implementação foi iniciada.
-- **Próximo passo à época:** fechar decisões restantes de G1; em seguida detalhar tecnicamente a arquitetura e segurança no G2.
+## 9. Histórico resumido e instruções superadas
 
-### 2026-09-28 — G1: baseline de MVP e sincronização documental
-
-- **Autorização do usuário:** o agente pode resolver decisões pendentes necessárias ao MVP; usuário poderá pedir adaptações. As escolhas de escopo foram feitas pelo agente e não são atribuídas como decisões individuais do usuário.
-- **Entregue:** `MVP_DECISIONS.md` detalha produto, roster/progressão/combate/itens/loot/economia/bot, exclusões pós-MVP e critérios de aceite; incluídos vetores-base de 18 templates e estatísticas/papéis de inimigos.
-- **Sincronizados:** README, GDD, SYSTEMS_SPEC, COMBAT_DESIGN, HUD_UX_SPEC, ROADMAP e AI_STATE. G1 fechado documentalmente; G2 é próxima etapa.
-- **Limites:** nenhum jogo/painel/HUD foi implementado; sem playtest/balanceamento de runtime. As escolhas numéricas são baseline revisável e não indicação de prontidão.
-- **Validação:** links locais em 10 arquivos Markdown e `git diff --cached --check` passaram; nenhum teste de runtime aplicável/possível sem implementação. Branch local alinhada ao remoto `2fd98d3`; checkpoint desta atualização documental ainda será commitado e enviado.
-
-### 2026-09-28 — G2: especificação técnica, ameaça e UX (parcial)
-
-- **Escopo seguido:** Etapa 2 do Roadmap; não implementar gameplay, Admin Web ou infraestrutura. G2 autoriza detalhamento e protótipo de UX não funcional.
-- **Entregue:** `G2_TECHNICAL_BLUEPRINT.md` (dados, APIs, RLS, idempotência, simulação por lote, ambientes); `THREAT_MODEL.md` (20 ameaças e evidências); `G2_UX_BLUEPRINT.md` (wireframes/flows/a11y/plano de teste); `prototypes/g2-hud/index.html` (click-through local com dados fictícios). Specs de Tech/Admin/HUD, README, Roadmap e AI_State sincronizados.
-- **Estado:** etapa parcial; nenhum serviço, migration, API, HUD ou painel criado. Sem prova técnica, testes de segurança ou teste de usabilidade com participantes; Gate G2 aberto.
-- **Validação realizada:** link-check local passou em 13 Markdown; servidor estático retornou HTTP 200; parser HTML e `node --check` no JavaScript embutido passaram; `git diff --check` passou. Preview estático ficou disponível na porta 4173. Supabase CLI/Docker não estavam disponíveis; G2 seguiu parcial.
-
-### 2026-09-28 — G2: migration-base e smoke test PostgreSQL (parcial)
-
-- **Feedback do usuário:** conseguiu abrir o protótipo e confirmou que está tudo certo visualmente. Isso é revisão individual do click-through, não teste de usabilidade com a amostra de 5–8 pessoas do plano.
-- **Escopo:** avançar G2 com uma fundação de schema autorizada pelo Roadmap, sem criar gameplay, Edge Functions, Admin Web ou provisionar serviço.
-- **Entregue:** `supabase/config.toml`, migration `20260928000000_g2_core_schema.sql`, seed vazio/desabilitado e harness PGlite 0.5.8 com dependência de desenvolvimento fixada. Schema de 17 tabelas, RLS/grants, view de conteúdo ativo, segregação de seed/snapshot e constraints para rolls/equipe/sessões.
-- **Teste executado:** `npm test --prefix supabase` — 9/9 passaram no PGlite 0.5.8/PostgreSQL 18.3, cobrindo aplicação do SQL, isolamento A/B, negação de escrita direta, catálogo ativo, dados privados/admin, constraints, idempotency key, append-only e cascata de exclusão de conta. `npm audit --prefix supabase` reportou zero vulnerabilidades conhecidas no harness.
-- **Limites:** PGlite simula roles/Auth, executa PostgreSQL 18.3 (a config Supabase proposta mira PG15) e não é Supabase. Sem Supabase CLI/Docker, não houve teste de migration via Supabase, Auth/PostgREST, Edge Functions, Storage, transações reais de compra/combate, concorrência, RLS em serviço real, custo ou backup.
-- **Estado:** G2 continua aberta; schema é fundação técnica, não backend/gameplay. Próxima prova depende de Supabase CLI + Docker ou ambiente Supabase local equivalente, e continua pendente o estudo de usabilidade com 5–8 convidados.
-
-### 2026-09-28 — Guia de deploy automático (documentação; sem configuração externa)
-
-- **Pedido confirmado:** explicar Supabase + Vercel passo a passo para iniciante e planejar deploy de produção automático após merge em GitHub `main`.
-- **Entregue:** `docs/DEPLOYMENT_GUIDE.md`, com PR/Preview/Production, projetos/ambientes, variáveis e chaves, migrations Supabase, proteção do Admin, compatibilidade de schema e rollback. Sincronizados README, arquitetura, blueprint G2, Roadmap e AI_State.
-- **Precisão de escopo:** deploy só ocorre após build/checks; Vercel e Supabase são fluxos independentes. Nenhuma integração/serviço/app foi conectado ou configurado; `game-web/` e `admin-web/` inexistem. G2 permanece aberta.
-- **Validação:** link-check cobriu 14 arquivos Markdown e 60 links relativos; todos os destinos existem. `git diff --check` passou. Não houve implantação/teste em serviços externos.
-
-### 2026-09-28 — Sequência para iniciar código e integrar serviços
-
-- **Pergunta do usuário:** começar codificando e integrar Vercel/Supabase depois, ou incluir desde já?
-- **Recomendação registrada:** integração progressiva, não deixar tudo para o final nem provisionar produção agora. Durante G2, Supabase CLI local; após G2 e com skeleton seguro/buildável, previews Vercel; staging remoto quando começar Auth/API; produção/domínio e deploy de `main` antes do alpha fechado após hardening.
-- **Natureza:** recomendação de processo do agente, não escolha individualmente confirmada pelo usuário. G2 permanece aberta; nenhum código de jogo ou serviço foi criado/configurado nesta etapa.
-- **Validação:** link-check cobriu 14 arquivos Markdown e 60 links relativos; todos os destinos existem. `git diff --check` passou. Nenhum app foi compilado nem serviço externo testado.
-
-### 2026-09-28 — Estrutura local e preview antes de serviços externos
-
-- **Direção confirmada pelo usuário:** deixar Vercel e Supabase para mais adiante; estruturar o projeto e testar previews primeiro.
-- **Interpretação adotada:** neste estágio, “preview” é a prévia local estática de UX, não um Vercel Preview Deployment. Integração e serviços externos permanecem adiados; depois da revisão local, retomar testes restantes de G2.
-- **Entregue:** `docs/PROJECT_STRUCTURE.md` com árvore e fronteiras propostas; atualizado guia de deploy/arquitetura/Roadmap/README. Servidor estático do protótipo existente iniciado na porta 4173; HTTP 200.
-- **Limites:** não criados `game-web/`/`admin-web/`, gameplay, APIs ou novos serviços. O protótipo continua com dados fictícios e não é a aplicação.
-- **Validação:** 15 arquivos Markdown e 65 links relativos verificados; todos os destinos existem. `git diff --check` passou. HTTP local do protótipo respondeu 200; sem serviços externos.
-
-### 2026-09-28 — Pack existente como arte inicial + início do onboarding Supabase/Vercel (parcial)
-
-- **Direções confirmadas pelo usuário:** usar o pack de sprites já versionado como arte inicial e acrescentar/criar assets depois; iniciar agora o processo Supabase + Vercel e receber instruções detalhadas. Isto supera a orientação anterior de adiar integrações remotas, mantida acima apenas como histórico.
-- **Inventário:** `sprites/ASSET_MANIFEST.md` registra 422 PNGs válidos (92,11 MiB), fonte/avisos e limitações. O maior PNG, `sprites/ui/ui_dialog.png`, foi confirmado em 4.689.811 bytes. As licenças/README incluídos foram preservados; seguir crédito obrigatório e a condição conservadora até esclarecer aviso MIT vs restrição de revenda individual.
-- **Protótipo:** `prototypes/g2-hud/index.html` agora referencia sheets existentes de `hero`, `mage` e `slime` como mapeamentos visuais provisórios; apresenta crédito/link “Assets by Nika Studio”. Continua click-through fictício, sem gameplay/API, e outros elementos são placeholders.
-- **Documentação sincronizada:** README, GDD, MVP_DECISIONS, ROADMAP, PROJECT_STRUCTURE, DEPLOYMENT_GUIDE, TECH_ARCHITECTURE, G2_TECHNICAL_BLUEPRINT, G2_UX_BLUEPRINT e AI_STATE atualizam a origem dos assets, a sequência atual e os limites reais do deploy.
-- **Onboarding proposto:** CLI/runtime local → migration local → projeto Supabase dev sintético → autorização GitHub; contas Vercel/GitHub podem ser autorizadas agora, mas importação aguarda `apps/game-web/` e `apps/admin-web/`. Nenhum serviço externo foi criado/conectado e produção continua fora do escopo desta etapa.
-- **Limite de ambiente:** comandos `supabase`, Docker e `vercel` não estão disponíveis nesta sandbox; não executar nem afirmar provisionamento remoto. Guia com comandos e ações no Dashboard em `docs/DEPLOYMENT_GUIDE.md`.
-- **Segurança do workspace:** histórico menciona stash `safety before syncing sprite pack branch`, mas `git stash list` está vazio neste checkout; não presumir que o stash ainda existe nem tentar reaplicá-lo.
-- **Validação desta etapa:** `npm ci --prefix supabase` concluiu; `npm test --prefix supabase` 9/9; `npm audit --prefix supabase` 0 vulnerabilidades; HTML parser/JS syntax passaram; raiz do preview redireciona corretamente e página + hero/mage/slime retornam HTTP 200; PNG count 422 e maior arquivo 4.689.811 bytes confirmados. Link-check: 16 Markdown/75 links relativos; `git diff --check` passou. Não houve integração/provisionamento externo.
-- **Checkpoint desta etapa:** trabalho parcial deve ser registrado por commit e push na branch obrigatória antes do encerramento; confirmar sucesso e informar o hash no retorno.
-
-### 2026-09-28 — Restrição browser-only para Vercel/Supabase/GitHub
-
-- **Instrução explícita mais recente do usuário:** evitar instalar qualquer ferramenta para usar Vercel, Supabase e GitHub; conduzir configurações pelo navegador dessas plataformas.
-- **Decisão operacional:** onboarding via Supabase Dashboard + GitHub Integration/Automatic Branching + Preview Branch hospedada; Vercel/GitHub por navegador. Não exigir Docker/Supabase CLI/Vercel CLI local. A orientação anterior de validação CLI/Docker foi superada.
-- **Documentação atualizada:** `DEPLOYMENT_GUIDE.md`, `PROJECT_STRUCTURE.md`, `TECH_ARCHITECTURE.md`, `G2_TECHNICAL_BLUEPRINT.md`, `ROADMAP.md`, `SYSTEMS_SPEC.md`, `supabase/README.md`, `README.md` e este AI_State.
-- **Limite:** nenhum acesso autenticado às contas/browser do usuário nesta sessão; nenhum projeto Supabase/Vercel, integração GitHub, PR ou deployment foi criado. O guia contém os passos para o usuário realizar pelo Dashboard e não solicita que envie segredos.
-- **Estado técnico:** a migration-base continua sem validação em Supabase hospedado; Automatic Branching depende da disponibilidade/plano. PGlite não substitui Preview Branch/Auth/Data API reais. G2 permanece aberta.
-- **Validação desta atualização documental:** link-check em 17 Markdown/75 links relativos e `git diff --check` passaram. Não foram instalados CLI, Docker, Vercel CLI ou dependências nesta etapa; sem testes de integração externa porque nenhum Dashboard foi conectado.
-- **Checkpoint:** atualizar este estado, fazer commit e push na branch fixa e confirmar hash no retorno.
-
-### 2026-09-28 — Supabase dev criado pelo usuário; Auto Preview desativado
-
-- **Relato do usuário:** criou `tower-idle-adventure-dev`, conectou-o a um repositório GitHub na branch `main`, e não configurou a Vercel. O Auto Preview/Automatic Branching exige plano Pro e foi deixado desligado por decisão do usuário.
-- **Precisão:** ainda não vimos o Dashboard; não confirmamos owner/repo exato, `Working directory`, estado do toggle `Deploy to production`, nem se alguma migration foi aplicada. Não afirmar que merge já está aplicando migrations sem confirmar o toggle/histórico.
-- **Diferença aparente de repositório:** o usuário informou `idle-tower-adventure`, mas este checkout remoto é `marmitero/tower-idle-adventure`. Confirmar nome completo (owner/repo) na plataforma antes de habilitar auto-aplicação.
-- **Documentação sincronizada nesta atualização:** `DEPLOYMENT_GUIDE.md`, `README.md`, `ROADMAP.md`, `PROJECT_STRUCTURE.md`, `TECH_ARCHITECTURE.md`, `G2_TECHNICAL_BLUEPRINT.md`, `SYSTEMS_SPEC.md`, `supabase/README.md` e este AI_State registram o projeto dev reportado, `main`, Preview Branch desligada, Vercel pendente e os passos de verificação browser-only.
-- **Estado:** nenhuma ação foi feita pelo agente nas contas externas. A branch `main` é o alvo de integração reportado; sem Preview DB por PR, a verificação da migration ocorrerá no dev compartilhado após merge e precisa ser observada pelo Dashboard.
-- **Próximo passo:** confirmar repo slug e toggle `Deploy to production` no Supabase Dashboard; Vercel permanece sem projeto por falta de apps.
+- G0/G1 foram fechados documentalmente; G2 foi aberta para arquitetura, segurança, pipeline de arte e UX, sem gameplay de produção.
+- G2 produziu blueprints, threat model, click-through estático, migration-base e harness PGlite. É trabalho parcial; nenhum desses artefatos por si fecha G2 ou representa jogo/back-end pronto.
+- O usuário abriu/revisou visualmente o protótipo e autorizou o início do onboarding Supabase/Vercel. Depois especificou o fluxo browser-only e que Automatic Preview exige Pro e deve continuar desligado.
+- A recomendação antiga de instalar CLI/Docker para validação local está **superada**. A recomendação anterior de habilitar Preview Branch também está **superada**.
+- Snapshot anterior sincronizado antes desta revisão: commit `5705d14` na branch desta sessão; consulte `git log` para o hash atual após este checkpoint.
