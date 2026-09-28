@@ -15,7 +15,7 @@ Esta especificação traduz as regras fornecidas para fórmulas e invariantes te
 
 Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, Chance Crítica, Velocidade de Ataque e Velocidade. Todo equipamento, inclusive qualquer arma, possui todos esses oito atributos e uma rolagem `x_i` independente para cada atributo. Os atributos percentuais devem ser armazenados e apresentados sem misturar pontos percentuais e frações (ex.: 10% = 0,10 internamente, se essa for a convenção escolhida).
 
-**Observação:** espada é um subtipo de arma oficial. O exemplo “Espada Draco” não define por si só uma característica intrínseca da Espada; essa característica continua pendente.
+**Observação:** espada é um subtipo de arma oficial. O exemplo “Espada Draco” não define por si só uma característica intrínseca da Espada; a proposta Contracorte abaixo foi acrescentada posteriormente e aguarda aprovação.
 
 ### Multiplicadores
 
@@ -32,12 +32,10 @@ Para cada atributo `i`:
 
 - `Base_i`: valor-base tabulado para aquele item/slot/nível.
 - `x_i`: rolagem gerada aleatoriamente **e independentemente para cada atributo** do equipamento; nunca há obrigação de um único x compartilhado pelo item.
-- Regra numérica previamente definida: x inteiro de 1 a 50 (inclusive); `MultiplicadorX_i = x_i / 10`, intervalo 0,1–5,0 em passos de 0,1.
+- Regra confirmada pelo usuário: `x_i` é sempre inteiro de 1 a 50 (inclusive); `MultiplicadorX_i = x_i / 10`, intervalo 0,1–5,0 em passos de 0,1. Não gerar nem exibir x fracionário, como 4,72.
 - `ValorFinal_i = Base_i × R × MultiplicadorX_i`.
 
-Exemplo do pedido, sem x (ou com x=10, portanto multiplicador x = 1): Base de Ataque 30 resulta em 30 Comum, 45 Raro e 90 Celestial. Para Ataque Especial base 22: 22, 33 e 66. Cálculos devem manter precisão decimal internamente e arredondar apenas na apresentação, segundo regra ainda a aprovar.
-
-**PENDENTE — precisão do x:** um exemplo de HUD fornecido depois mostra `x=4,72`, que não é representável pelos inteiros 1–50 em passos de 0,1 (nesse modelo, o valor mais próximo seria 4,7). Até confirmação, manter como regra registrada a geração inteira individual de 1–50 e não implementar precisão contínua; atualizar a regra se o exemplo 4,72 for intencional.
+Exemplo do pedido, sem x (ou com x=10, portanto multiplicador x = 1): Base de Ataque 30 resulta em 30 Comum, 45 Raro e 90 Celestial. Para Ataque Especial base 22: 22, 33 e 66. Cálculos mantêm precisão decimal internamente e arredondam apenas na apresentação. Para evitar confusão entre rolagem e fator, tooltip pode mostrar ambos: `Rolagem x: 37` e `Fator aplicado: ×3,7`.
 
 ### Característica única de raridade
 
@@ -49,7 +47,7 @@ Todo subtipo de arma possui seu traço de tipo, independentemente de o item ser 
 
 | Tipo | Traço definido no conceito | Parâmetros pendentes |
 |---|---|---|
-| Espada | Ainda não definido; não inventar. | Todo o efeito permanece pendente. |
+| Espada | **Contracorte (proposta):** ao sofrer um ataque direto de alvo único, chance de contra-atacar imediatamente o agressor com dano físico baseado no Ataque do personagem. Valores exploratórios para playtest: 20% de chance, dano de 50% do Ataque atual. Não ativa contra si mesmo nem por dano ao longo do tempo. | Confirmar conceito/valores; definir resolução com esquiva, bloqueio, crítico, cooldown e outros procs. Os números são recomendação, não regra aprovada. |
 | Adaga | Pode causar envenenamento. | Chance, duração, acúmulo, dano e resistência. |
 | Machado | Dano aumentado. | Multiplicador, condição e categoria de dano. |
 | Maça | Chance crítica aumentada. | Valor, soma/multiplicação e limite. |
@@ -99,7 +97,7 @@ Toda caixa deve declarar chances completas (soma = 100%), itens possíveis, nív
 
 Cada unidade (aliada ou inimiga) tem velocidade efetiva. Uma proposta simples é ordenar ações por maior velocidade e resolver desempates via regra estável (atributo secundário/seed de combate), mas **a semântica de velocidade ainda deve ser escolhida**: iniciativa por rodada ou intervalo entre ações contínuo.
 
-Cada ação seleciona alvo automaticamente, executa skill/ataque elegível, calcula acerto, crítico, dano, mitigação e efeitos, aplica HP/cooldowns e emite evento visual/log. A lista de prioridade de alvos, chance de acerto, fórmula de dano, limites e ordem de efeitos serão formalizados no balanceamento. O subtipo de arma aplica seu traço intrínseco (ver tabela acima): veneno, dano aumentado, crítico, velocidade, ataque a todos, cura por Ataque Especial, stun ou golpe duplo. Os parâmetros exatos pendentes não devem ser inventados; Espada permanece sem traço definido. Afinidade pode mudar eficiência após regra aprovada, sem restringir quem equipa a arma.
+Cada ação seleciona alvo automaticamente, executa skill/ataque elegível, calcula acerto, crítico, dano, mitigação e efeitos, aplica HP/cooldowns e emite evento visual/log. A lista de prioridade de alvos, chance de acerto, fórmula de dano, limites e ordem de efeitos serão formalizados no balanceamento. O subtipo de arma aplica seu traço intrínseco (ver tabela acima): veneno, dano aumentado, crítico, velocidade, ataque a todos, cura por Ataque Especial, stun, golpe duplo ou Contracorte. Parâmetros finais continuam pendentes; Contracorte é uma sugestão e não deve ser tratado como aprovado sem validação. Afinidade pode mudar eficiência após regra aprovada, sem restringir quem equipa a arma.
 
 Encontros têm 1–3 inimigos. Vitória encerra o encontro, recompensa a run e inicia o próximo encontro no andar enquanto hunt estiver ativa. Derrota total encerra hunt e retorna ao lobby. A HUD solicita uma opção de retorno após derrota; regra candidata é curar gratuitamente no lobby e reiniciar o mesmo andar se o jogador tiver ativado a opção. Isso ainda requer confirmação, e não autoriza autoavanço de andar (exclusivo VIP). Sem automação aprovada/ativa, reinício não ocorre após derrota.
 
@@ -139,9 +137,9 @@ A composição da HUD e seus estados/dependências estão em [HUD_UX_SPEC.md](HU
 ## 10. Contratos de teste futuros
 
 - Raridade aplica-se antes de x; com x=10, exemplos da tabela calculam exatamente.
-- Cada atributo recebe sua própria rolagem x, independente das demais; x só assume inteiros de 1 a 50 sob a regra atual, cada valor final corresponde a `Base × R × x/10`.
+- Cada atributo recebe sua própria rolagem x, independente das demais; x assume apenas inteiros de 1 a 50, nunca casas decimais, e cada valor final corresponde a `Base × R × x/10`.
 - Personagem pode equipar qualquer subtipo de arma; afinidade não bloqueia equipar.
-- Cada subtipo ativa o traço de arma documentado; característica da Espada não pode ser gerada até ser definida.
+- Cada subtipo ativa seu traço documentado; Contracorte só é implementado após aprovação e deve respeitar as regras de não-recursão.
 - Apenas Lendário/Celestial podem receber característica adicional de raridade conforme pool configurado, além do traço de tipo da arma.
 - Nota/poder são reproduzíveis para mesmo item e mesma versão de pesos.
 - Chances de cada loot table totalizam 100% e não incluem resultados não configurados.

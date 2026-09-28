@@ -63,7 +63,7 @@ Combates curtos, leitura visual imediata e encadeamento automático entre encont
 
 ### Armas e afinidades
 
-Além dos nove slots de equipamento, todo personagem possui um slot **Arma**. Tipos: Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas e Garras. Qualquer personagem pode equipar qualquer tipo; certos personagens terão afinidades, cujos efeitos ainda serão definidos. Cada tipo possui um traço próprio: Adaga pode envenenar; Machado causa dano aumentado; Maça aumenta chance crítica; Besta aumenta velocidade de ataque; Cajado ataca todos os inimigos; Livro Arcano recupera vida por ataque conforme Ataque Especial; Luvas podem atordoar temporariamente; Garras atacam duas vezes. **A característica da Espada permanece pendente e não deve ser inventada.** Valores, chances, duração, alvos e fórmulas dos traços ainda precisam de balanceamento.
+Além dos nove slots de equipamento, todo personagem possui um slot **Arma**. Tipos: Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas e Garras. Qualquer personagem pode equipar qualquer tipo; certos personagens terão afinidades, cujos efeitos ainda serão definidos. Cada tipo possui um traço próprio: Adaga pode envenenar; Machado causa dano aumentado; Maça aumenta chance crítica; Besta aumenta velocidade de ataque; Cajado ataca todos os inimigos; Livro Arcano recupera vida por ataque conforme Ataque Especial; Luvas podem atordoar temporariamente; Garras atacam duas vezes. **Sugestão para a Espada — Contracorte:** ao receber um ataque direto de alvo único, há chance de contra-atacar imediatamente o agressor com dano físico baseado no Ataque do personagem. Proposta inicial para playtest: 20% de chance, causando 50% do Ataque atual. O contra-ataque não pode ativar a si próprio, não dispara por dano ao longo do tempo e seus valores finais dependem do balanceamento/aprovação. Os parâmetros dos demais traços também precisam ser definidos.
 
 A característica intrínseca do tipo de arma é separada da característica aleatória adicional de itens Lendários/Celestiais; um efeito não substitui o outro. O subtipo de arma também é distinto do slot de armadura Luva.
 
@@ -75,7 +75,7 @@ Sprites estáticos estilo card, com balanço/avanço ao agir, piscar ao receber 
 
 Slots definidos: **Arma, Peitoral, Elmo, Calça, Bota, Luva, Colar, Aura, Asa e Pet**. Todo equipamento possui os oito atributos descritos na especificação de sistemas; bases por slot/tipo/nível serão tabeladas antes da implementação. O slot Arma tem nove tipos definidos nesta revisão.
 
-Raridades: **Comum, Incomum, Raro, Épico, Lendário, Celestial**, com multiplicadores de atributos-base de 1,0; 1,2; 1,5; 2,0; 2,5; 3,0. Cada atributo do item possui seu próprio x, gerado aleatoriamente de forma independente. Regra-base previamente informada: x inteiro entre 1 e 50, que representa 0,1x–5,0x em passos de 0,1. Um exemplo recente mostra x=4,72, incompatível com esses passos; precisão contínua versus discreta fica pendente de confirmação.
+Raridades: **Comum, Incomum, Raro, Épico, Lendário, Celestial**, com multiplicadores de atributos-base de 1,0; 1,2; 1,5; 2,0; 2,5; 3,0. Cada atributo do item possui seu próprio x, gerado aleatoriamente de forma independente. Regra confirmada: x é sempre um número inteiro de 1 a 50; o fator aplicado é `x/10`, de 0,1x a 5,0x em passos de 0,1. Exemplo de exibição: rolagem `x=37`, fator aplicado `×3,7`. Não usar valores fracionários como `x=4,72`.
 
 Equipamentos Lendários e Celestiais recebem uma característica única escolhida de uma lista aprovada (ex.: roubo de vida, quebra de armadura, chance crítica, redução de cooldown). Essa característica não é escalada pela raridade ou por x; o balanceamento definirá sua força e limites.
 
@@ -157,17 +157,16 @@ O MVP deve provar primeiro: seleção inicial simples, lobby, equipe, slots, atr
 
 1. Nome e quantidade de classes/personagens iniciais, skills e papéis.
 2. Progressão de nível, XP, materiais, custos, bases por slot/nível e fórmulas de ataque/defesa.
-3. x por atributo já está confirmado; resolver apenas a precisão: inteiro 1–50 (passos de 0,1) ou decimais como 4,72 no exemplo de tooltip.
-4. Característica da Espada; valores, gatilhos e limites dos traços das outras armas; efeitos das afinidades.
-5. Definição numérica e pesos para nota/poder total; tratamento de percentuais e limites.
-6. Regras de morte/revive para equipe de três e valor de recuperação (máximo vs. perdido).
-7. Auto-retorno após derrota (default, cura e reinício do mesmo andar) e se abrir a loja pausa o combate.
-8. Duração e multiplicadores de poções; preço, chance e pool das dez caixas; odds exibidas.
-9. Arena ao vivo ou assíncrona; regras de guildas e matchmaking.
-10. Escopo e momento da simulação offline, persistência quando desconectado e limite de farm.
-11. Plataforma de contas/pagamentos, classificação etária, regiões, privacidade, retenção e política contra abuso.
-12. Limites de VIP/buffs, taxa do mercado, diamantes negociáveis e impacto no PvP.
-13. Breakpoints/layout responsivo final, navegação e arte visual da HUD; dispositivos/navegadores e idiomas de lançamento.
-14. Stack técnica, servidor autoritativo, banco de dados e orçamento/cronograma.
+3. Aprovar/ajustar a proposta da Espada (Contracorte) e definir valores/gatilhos/limites finais dos traços de armas e efeitos das afinidades.
+4. Definição numérica e pesos para nota/poder total; tratamento de percentuais e limites.
+5. Regras de morte/revive para equipe de três e valor de recuperação (máximo vs. perdido).
+6. Auto-retorno após derrota (default, cura e reinício do mesmo andar) e se abrir a loja pausa o combate.
+7. Duração e multiplicadores de poções; preço, chance e pool das dez caixas; odds exibidas.
+8. Arena ao vivo ou assíncrona; regras de guildas e matchmaking.
+9. Escopo e momento da simulação offline, persistência quando desconectado e limite de farm.
+10. Plataforma de contas/pagamentos, classificação etária, regiões, privacidade, retenção e política contra abuso.
+11. Limites de VIP/buffs, taxa do mercado, diamantes negociáveis e impacto no PvP.
+12. Breakpoints/layout responsivo final, navegação e arte visual da HUD; dispositivos/navegadores e idiomas de lançamento.
+13. Stack técnica, servidor autoritativo, banco de dados e orçamento/cronograma.
 
 Nenhuma dessas lacunas deve ser preenchida silenciosamente em código: cada decisão precisa ser registrada nesta documentação e no AI_State antes do desenvolvimento do sistema correspondente.

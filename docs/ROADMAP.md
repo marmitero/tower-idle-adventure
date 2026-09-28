@@ -28,7 +28,7 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 
 ### Etapa 1 — Fechamento de escopo e design (G1)
 
-- Resolver decisões prioritárias: roster/classe, precisão decimal/discreta do x (x individual por atributo já confirmado), traços e afinidades das armas (traço de Espada ainda pendente), fórmula de combate, atributos-base por slot/nível, nota/poder, loot odds e preços, regras de revive/retorno após derrota/estrelas, VIP, offline, market e PvP.
+- Resolver decisões prioritárias: roster/classe; x individual por atributo e inteiro de 1–50 já confirmado; validar/ajustar a proposta Contracorte e definir parâmetros dos traços/afinidades das armas; fórmula de combate, atributos-base por slot/nível, nota/poder, loot odds e preços, regras de revive/retorno após derrota/estrelas, VIP, offline, market e PvP.
 - Definir experiência de onboarding, wireframes, condições de vitória/derrota e instrumentação de testes.
 - Priorizar MVP, itens fora do lançamento inicial e critérios de sucesso; criar registro de decisões.
 - **Entregáveis:** GDD aprovado, especificações de conteúdo/economia, backlog e critérios de aceite.

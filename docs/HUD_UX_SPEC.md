@@ -164,13 +164,13 @@ Se estoque elegível acabar, não sugerir que a automação segue funcionando: m
 
 A batalha mostra no palco os eventos visualmente relevantes: avanço/balanço de ação, dano/crit, hit recebido, efeitos de lâmina/impacto/magia, status aplicados e morte. Feedback deve corresponder ao evento confirmado pela simulação, sem efeitos enganosos.
 
-O feed e indicadores reconhecem traços de arma: veneno da Adaga, dano aumentado do Machado, crítico da Maça, velocidade de ataque da Besta, ataque em área do Cajado, cura do Livro Arcano, atordoamento das Luvas e ataque duplo das Garras. A característica da Espada permanece **PENDENTE** e não deve ser improvisada. Valores e gatilhos mecânicos ficam na especificação do sistema de armas.
+O feed e indicadores reconhecem traços de arma: veneno da Adaga, dano aumentado do Machado, crítico da Maça, velocidade de ataque da Besta, ataque em área do Cajado, cura do Livro Arcano, atordoamento das Luvas, ataque duplo das Garras e a proposta **Contracorte** da Espada (contra-ataque visual de corte). Contracorte aguarda aprovação; odds e efeito não devem ser apresentados como definitivos até validar a regra. Valores e gatilhos mecânicos ficam na especificação do sistema de armas.
 
 ## 8. Regras de conteúdo e detalhes fora da HUD
 
 - Perfil resume; tela de personagem mostra atributos completos.
 - Cards da equipe resumem HP, poder, nível/estrelas, buffs/debuffs e estado. Skills/cooldowns só quando significativos/legíveis.
-- Tooltip/painel de item revela slot/subtipo, raridade, nível, base, multiplicador de raridade, **x próprio de cada atributo**, valor final, característica, poder e nota.
+- Tooltip/painel de item revela slot/subtipo, raridade, nível, base, multiplicador de raridade, **x inteiro próprio de cada atributo**, fator aplicado (`x/10`, exibido em passos de 0,1), valor final, característica, poder e nota. Exemplo: `Rolagem x: 37; fator: ×3,7`; nunca exibir rolagens como `x=4,72`.
 - Equipment view apresenta dez slots: arma, peitoral, elmo, calça, bota, luva (armadura), colar, aura, asa e pet. O subtipo de arma é separado do slot de armadura “Luva”.
 - Tela de comparação deve explicar diferenças de stats e afinidade quando sua regra estiver definida; estrelas/raridade não substituem os dados reais.
 - Banners de item raro/loot são concisos e podem ser desligados/reduzidos em acessibilidade; log mantém histórico conforme política de sessão.
