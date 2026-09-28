@@ -1,0 +1,6 @@
+# JavaScript dependencies; regenerate from package-lock.json
+node_modules/
+**/node_modules/
+
+# Supabase CLI local state and generated files
+supabase/.temp/
