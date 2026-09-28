@@ -1,0 +1,46 @@
+name: Supabase schema checks
+
+on:
+  pull_request:
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase-schema-checks.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase-schema-checks.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: supabase-schema-checks-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  schema-smoke-tests:
+    name: PGlite schema smoke tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: supabase/package-lock.json
+
+      - name: Install locked dependencies
+        run: npm ci --prefix supabase
+
+      - name: Run schema smoke tests
+        run: npm test --prefix supabase
+
+      - name: Audit dependencies
+        run: npm audit --prefix supabase --audit-level=low

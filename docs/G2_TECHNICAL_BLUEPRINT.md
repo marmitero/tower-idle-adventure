@@ -1,7 +1,7 @@
 # G2 — blueprint técnico do MVP
 
 **Versão:** 0.6 — projeto dev reportado; Auto Preview desligado; evidência PGlite parcial
-**Status:** baseline técnico proposto pelo agente. A migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` passou 9 smoke tests PostgreSQL via PGlite, mas ainda não foi confirmada como aplicada/testada contra Supabase hospedado. O usuário informa `tower-idle-adventure-dev` ligado a `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ON e Production branch `Main`; Automatic Preview/Branching está desligado por escolha/plano. Agente não verificou o Dashboard nem aplicação da migration; conferir `Main` vs ref GitHub `main`. Vercel não está integrada e não tem projeto. Onboarding browser-only; não exigir CLI/Docker local. O pack de arte em `sprites/` foi inventariado, mas não está integrado ao app. G2 continua aberta.
+**Status:** baseline técnico proposto pelo agente. A migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` passou 9 smoke tests PostgreSQL via PGlite; o usuário confirmou “Inserted at UTC”, tabelas em `public` e os nomes `equipment_loadouts` e `hunt_session_private_state`, correspondentes à migration (evidência de aplicação no dev; sem acesso independente do agente). O usuário informa `tower-idle-adventure-dev` ligado a `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ON e Production branch `main`; Automatic Preview/Branching está desligado por escolha/plano. Vercel não está integrada e não tem projeto. Onboarding browser-only; não exigir CLI/Docker local. O pack de arte em `sprites/` foi inventariado, mas não está integrado ao app. G2 continua aberta.
 
 Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md) para o MVP de [`MVP_DECISIONS.md`](MVP_DECISIONS.md). Regras de produto do MVP não são reabertas aqui. Decisões técnicas dependentes de plano, custo e uma prova técnica ainda precisam de verificação antes de G2 ser encerrada.
 
@@ -33,7 +33,7 @@ Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`]
 ### Deploy contínuo planejado
 
 - O requisito confirmado é: PRs recebem Vercel Preview; merge em `main` inicia Production Deployment da Vercel após build/checks. O Admin permanece separado e protegido no próprio app/servidor.
-- Supabase migrations têm fluxo separado da Vercel. O usuário relata GitHub Integration no Supabase dev ligada a `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ON e Production branch `Main`; conferir se corresponde à ref GitHub `main`. Automatic Branching/Preview Branch está desligado. Vercel não aplica migrations. Se app e migrations forem disparados pelo mesmo merge, a ordem não é atômica; preferir migrations compatíveis com app antigo/novo (expandir → migrar app → limpar).
+- Supabase migrations têm fluxo separado da Vercel. O usuário relata GitHub Integration no Supabase dev ligada a `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ON e Production branch `main`, confirmada pelo usuário. Automatic Branching/Preview Branch está desligado. Vercel não aplica migrations. Se app e migrations forem disparados pelo mesmo merge, a ordem não é atômica; preferir migrations compatíveis com app antigo/novo (expandir → migrar app → limpar).
 - Ainda não há apps `game-web`/`admin-web`, integração/projeto Vercel, secrets, domínio ou CI configurado. A GitHub Integration Supabase e suas opções foram reportadas pelo usuário, não verificadas pelo agente; nenhuma migration foi confirmada aplicada. O roteiro está em [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md). A ausência de deploy não fecha nem reabre sozinha o gate G2.
 
 ## 3. Domínios de dados MVP
@@ -177,7 +177,7 @@ Roles finais recomendadas para MVP:
 
 ## 9. Critérios de saída G2 (abertos; evidência parcial abaixo)
 
-- Prova hospedada da migration e seed sintética no Supabase dev compartilhado após um merge revisado em `main`; confirmar histórico/status e schema no Dashboard. **Pendente:** usuário relata projeto/integracão, mas migration aplicada não foi confirmada; Automatic Branching/Preview Branch está desligado no plano atual. CLI/Docker locais não serão exigidos.
+- Prova hospedada da migration e seed sintética no Supabase dev compartilhado após um merge revisado em `main`; confirmar histórico/status e schema no Dashboard. **Parcial:** o usuário relata migration registrada e tabelas em `public`; validar RLS, grants, Data API/Auth e demais comportamentos diretamente no Supabase. Automatic Branching/Preview Branch está desligado no plano atual. CLI/Docker locais não serão exigidos.
 - Testes de RLS/grants contra o Supabase dev e Data API para anon, jogador A/B e roles Admin. **Parcial:** smoke tests PGlite exercitam PostgreSQL, grants, RLS e constraints sob roles simulados; não validam stack Supabase real. Sem Preview Branch por PR no plano atual.
 - Rate limits compartilham contador entre instâncias, retornam `429/retry_after`, resistem a `X-Forwarded-For` forjado e têm custo/latência medidos. **Pendente.**
 - Compra/lote concorrente e repetido com mesmo `request_id` não duplica saldo/itens/XP/consumível/cursor; body diferente gera conflito. **Parcial:** unicidade de request key está modelada; não há transações de comando nem teste de concorrência.
