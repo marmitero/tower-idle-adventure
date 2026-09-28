@@ -1,7 +1,7 @@
 # HUD / UX — arquitetura visual da tela principal
 
-**Versão:** 0.2 — arquitetura UX sincronizada ao MVP
-**Estado:** proposta documental, decisões de escopo/estados MVP fechadas em `MVP_DECISIONS.md`; nenhuma HUD foi implementada. Decisões visuais finais e protótipo pertencem a G2/G3.
+**Versão:** 0.3 — arquitetura e click-through UX G2
+**Estado:** HUD de jogo não implementada; wireframes e protótipo não funcional em [`G2_UX_BLUEPRINT.md`](G2_UX_BLUEPRINT.md) e `prototypes/g2-hud/index.html`. Teste de usabilidade com participantes ainda não ocorreu; G2 não está concluída.
 
 Esta especificação transforma o briefing de interface em arquitetura de layout e componentes. É conceitual, original e não reproduz arte, ícones, personagens ou identidade de outro jogo. Ainda não fixa framework, medidas em pixels ou design visual final.
 
@@ -101,7 +101,7 @@ A HUD renderiza o snapshot e envia comandos intencionais — por exemplo, `SetPo
 
 ### Dependências entre componentes
 
-- `PlayerProfilePanel` depende de perfil/progressão/carteira/VIP; abre detalhes do personagem ou loja conforme ação.
+- `PlayerProfilePanel` MVP depende de perfil/progressão/Coins; VIP é pós-MVP.
 - `CharacterStatusCard` depende de snapshot da equipe/combate; abre detalhes/skills do membro e reflete eventos de HP/derrota.
 - `ActivityContextHeader` e `BattleStage` dependem de modo, andar, encontro e eventos de batalha; a lista de eventos também alimenta `SessionEventLog`.
 - `AutomationPanel` depende da configuração do bot, skills automáticas equipadas e estoques elegíveis; mudar controles envia comandos, e a confirmação/erro atualiza estado e badge.
@@ -109,7 +109,7 @@ A HUD renderiza o snapshot e envia comandos intencionais — por exemplo, `SetPo
 - No MVP, `SystemNoticeDock` depende do estado de conexão/erros; componentes de chat são pós-MVP e não renderizados.
 - `PrimaryNavigation` escolhe uma view/painel dentro de `OverlayHost`; não apaga sessão nem reinicia a hunt.
 
-Se sessão estiver desconectada ou desatualizada, mostrar aviso e último estado confirmado; comandos que possam alterar economia devem aguardar conexão/validação. Recuperação e sincronização de sessão serão definidas na arquitetura online.
+Se sessão estiver desconectada ou desatualizada, mostrar aviso e último estado confirmado; comandos econômicos aguardam conexão/validação. Baseline de reconexão sem catch-up está em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md); o protótipo não exerce esse fluxo contra servidor.
 
 ## 5. Estados de tela e máquina de transição
 
@@ -133,7 +133,7 @@ Separar **modo principal**, **estado derivado da batalha** e **overlays** para e
 
 ### Overlays independentes
 
-- **LOJA RÁPIDA ABERTA:** painel/modal sobre o contexto; ao fechar, retorna à batalha/lobby que estava ativo. O combate continua, salvo futura regra de pausa aprovada.
+- **LOJA RÁPIDA ABERTA:** painel/modal sobre o contexto; ao fechar, retorna à batalha/lobby que estava ativo. No MVP, combate continua e não pausa.
 - **MENU SECUNDÁRIO:** qualquer módulo aberto via navegação; manter sessão e contexto.
 - Tooltip, confirmação, mensagens de sistema e avisos são camadas menores e não trocam modo principal.
 
@@ -167,12 +167,12 @@ O feed e indicadores reconhecem traços de arma: veneno da Adaga, dano aumentado
 - Cards da equipe resumem HP, poder, nível/estrelas, buffs/debuffs e estado. Skills/cooldowns só quando significativos/legíveis.
 - Tooltip/painel de item revela slot/subtipo, raridade, nível, base, multiplicador de raridade, **x inteiro próprio de cada atributo**, fator aplicado (`x/10`, exibido em passos de 0,1), valor final, característica, poder e nota. Exemplo: `Rolagem x: 37; fator: ×3,7`; nunca exibir rolagens como `x=4,72`.
 - Equipment view apresenta dez slots: arma, peitoral, elmo, calça, bota, luva (armadura), colar, aura, asa e pet. O subtipo de arma é separado do slot de armadura “Luva”.
-- Tela de comparação deve explicar diferenças de stats e afinidade quando sua regra estiver definida; estrelas/raridade não substituem os dados reais.
-- Banners de item raro/loot são concisos e podem ser desligados/reduzidos em acessibilidade; log mantém histórico conforme política de sessão.
+- Tela de comparação deve explicar diferenças de stats e afinidade (+5% ao atributo ofensivo principal); raridade não substitui os dados reais. Estrelas além de 1★ são pós-MVP.
+- Banners de item raro/loot são concisos e podem ser desligados/reduzidos em acessibilidade; log mantém no servidor até 100 eventos confirmados da última hunt, conforme `MVP_DECISIONS.md`.
 
 ## 9. Responsividade, acessibilidade e hierarquia
 
-Prioridade visual: 1) batalha, 2) HP/estado da equipe, 3) andar/encontro, 4) automação/estoque, 5) progresso/loot, 6) perfil, 7) navegação, 8) chat, 9) detalhes secundários.
+Prioridade visual: 1) batalha, 2) HP/estado da equipe, 3) andar/encontro, 4) automação/estoque, 5) progresso/loot, 6) perfil, 7) navegação, 8) avisos de sistema, 9) detalhes secundários.
 
 Em resoluções menores: recolher automação/equipe em painéis acionáveis, transformar navegação em overflow e abrir módulos em camada; não reduzir excessivamente a área central. MVP tem suporte formal desktop-first ≥1280×720; mobile completo é pós-MVP.
 
@@ -182,6 +182,6 @@ A UI deve suportar navegação por teclado/foco visível, texto legível e contr
 
 Fechados para o MVP: desktop-first (mínimo recomendado 1280×720, Chrome/Edge/Firefox recentes), PT-BR, painéis recolhíveis em telas menores, gameplay central prioritário, loja rápida sem pausar, bot/revive/retorno conforme as regras acima, sem offline/social/VIP, e poder da equipe pela fórmula de `MVP_DECISIONS.md`. A ordem de skills é fixa por slot e valores de armas seguem `COMBAT_DESIGN.md`; números podem ser balanceados após playtest.
 
-Trabalho de G2/G3, não pendência de escopo: finalizar art direction (tipografia/paleta/componentes/ícones), wireframes e medidas visuais, protótipo clicável, hierarquia e acessibilidade dos painéis, usabilidade com testers e revisão de navegação/erros. Mobile completo, chat e módulos sociais são pós-MVP.
+Trabalho restante de G2/G3, não pendência de escopo: revisar wireframes/click-through de `G2_UX_BLUEPRINT.md` com 5–8 testers convidados, incorporar achados críticos e fechar art direction (tipografia/paleta/componentes/ícones) e medidas visuais. O protótipo atual é apenas de navegação local; não é produção. Mobile completo, chat e módulos sociais são pós-MVP.
 
 Antes de implementar a HUD: ler AI_State, GDD e esta especificação; conferir o estado do repositório; propor/validar a arquitetura, estados e dependências; registrar decisões; então implementar apenas após os gates do Roadmap. Ao fechar a etapa, executar testes aplicáveis e atualizar AI_State, documentação, commit e push, inclusive se o trabalho continuar parcial.

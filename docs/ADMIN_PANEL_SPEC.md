@@ -1,6 +1,6 @@
 # Especificação do Painel Administrativo de Conteúdo
 
-**Versão:** 0.1 — requisito de produto e segurança
+**Versão:** 0.2 — recorte MVP e baseline de autorização G2
 **Estado:** escopo aprovado; regras técnicas detalhadas ligadas a [TECH_ARCHITECTURE.md](TECH_ARCHITECTURE.md). Não implementado.
 
 ## 1. Objetivo
@@ -18,14 +18,14 @@ O painel é exclusivamente interno: jogadores comuns não devem ver entrada/link
 - Login via Supabase Auth, sem cadastro público de administradores. Contas autorizadas entram por allowlist/convite feito por owner.
 - Usuário sem role administrativa recebe negação genérica (401/403/404 ou página indisponível), sem shell do painel, catálogo privado ou capacidade de mutar dados. Nenhum dado administrativo é carregado antes da verificação de autorização.
 - Endpoints administrativos no Supabase revalidam a role em cada requisição; remover acesso revoga sessões/claims conforme política. Não confiar em rota escondida, segredo no JavaScript ou role enviada pelo navegador.
-- MFA obrigatório/recomendado para owner/admin em production, com sessão curta, reautenticação para publicar e registrar ação sensível.
+- MFA TOTP obrigatório para todas as contas admin em production; reautenticação para publicar, rollback, conceder/revogar role e ação destrutiva. Baseline proposto (30 min inativo/8 h absoluto, MFA nos 10 min anteriores à ação) consta no blueprint G2 e depende de validação de configuração/UX antes do gate.
 
 ## 3. Papéis iniciais
 
 Modelo mínimo recomendado:
 
 - **Owner:** concede/revoga admins, gerencia todo conteúdo, publica e faz rollback.
-- **Editor:** cria e edita rascunhos, valida e envia para publicação conforme autorização; sem gerenciar usuários/roles.
+- **Editor:** cria, edita, valida e submete rascunhos; não publica, faz rollback ou gerencia usuários/roles. Owner revisa diff e publica.
 - **Leitor/Auditor:** visualiza conteúdo e histórico sem editar.
 
 Para o primeiro lançamento pode existir somente Owner (dono do projeto); os papéis não devem ser controlados por campos editáveis pelo próprio usuário. Toda alteração de permissão é auditada.
@@ -57,8 +57,8 @@ Na primeira entrega, expor CRUD/publicação para os tipos que alimentam o escop
 2. **Editar rascunho:** autosave opcional com confirmação de alterações; jogador nunca lê conteúdo de rascunho.
 3. **Validar:** schema, IDs duplicados, referências quebradas, ranges, peso/raridade, requisito de nível, slots/estrelas, chance total de loot, conteúdo faltante e imagens. Erros bloqueiam publicação e indicam caminho/campo.
 4. **Preview:** visualizar a ficha/tooltip/tela no layout do jogo e simular referência do catálogo sem conceder loot real.
-5. **Publicar:** ação restrita a role autorizada, com resumo/diff, confirmação e registro de autor/motivo. Publicação cria release imutável e atômico; cliente só lê release completo.
-6. **Monitorar/rollback:** consultar versões e audit log; reativar release anterior com motivo, sem apagar histórico.
+5. **Publicar:** somente Owner aprova após resumo/diff, motivo, confirmação e MFA recente; Editor submete draft, sem publicação direta. Publicação cria release imutável e atômico; cliente só lê release completo.
+6. **Monitorar/rollback:** Owner reativa release anterior com MFA recente e motivo; consultar audit log sem apagar histórico. Auditor tem leitura; Editor não faz rollback.
 
 Alterações de conteúdo já publicado não sobrescrevem uma sessão de combate ativa: a run fixa a versão da configuração usada na entrada, salvo regra futura explícita.
 
@@ -91,4 +91,4 @@ Alterações de conteúdo já publicado não sobrescrevem uma sessão de combate
 
 ## 9. Dependências e decisões para G2
 
-Definir schema final e fluxo de aprovação; proteção MFA/SSO; formato de papéis e provisionamento do primeiro Owner; desenho dos drafts/releases; armazenamento/CDN; limites de upload; versionamento/caching; política de backups e rollback; retenção de logs; estrutura de preview. A superfície do painel será fechada antes de implementação junto do threat model da plataforma.
+O baseline de roles, grants, release, sessão e isolamento está detalhado em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) e [`THREAT_MODEL.md`](THREAT_MODEL.md), como proposta do agente para validar. Antes de implementar, G2 ainda exige verificar plano/SSO disponível, provisionamento do primeiro Owner, suporte real a expiração/reautenticação, storage/CDN e limites de upload, backups/retenção, threat-model review e testes automatizados de acesso. Esta especificação não significa que o painel foi construído ou que o isolamento já foi testado.

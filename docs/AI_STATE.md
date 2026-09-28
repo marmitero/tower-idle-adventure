@@ -17,10 +17,10 @@ Este arquivo é a passagem de contexto do projeto **Tower Idle Adventure**. Deve
 
 - **Data:** 2026-09-28.
 - **Branch obrigatória da sessão:** `arena/01a0e5e1-tower-idle-adventure`.
-- **Fase:** Etapa 1/G1 concluída documentalmente; G2 é o próximo marco. Esta atualização continua sendo trabalho documental e não implementa gameplay/painel.
-- **Marco atual:** baseline de escopo MVP registrado em `MVP_DECISIONS.md` sob autorização explícita do usuário para o agente decidir pendências. As escolhas do agente não são atribuídas como decisões individuais do usuário. MVP ainda sem implementação/playtest. Arquitetura-base Supabase + Vercel e Admin CMS estão documentadas, não provisionadas.
-- **Documentação atual:** README e nove arquivos Markdown em `docs/`, incluindo o novo `MVP_DECISIONS.md`.
-- **Validação desta etapa:** revisão documental concluída; links locais em 10 Markdown e `git diff --cached --check` passaram. Nenhum jogo/teste de runtime existe. Branch sincronizada com o remoto antes das alterações; commit e push desta etapa ainda pendentes.
+- **Fase:** Etapa 2/G2 em andamento, estritamente pré-produção. Criados blueprints técnicos/ameaças/UX e um protótipo navegável isolado, sem implementar gameplay, HUD real, Admin Web ou infraestrutura.
+- **Marco atual:** G1 foi fechado documentalmente na etapa anterior. Baseline MVP continua como decisão do agente sob delegação explícita do usuário (adaptável), sem atribuir escolhas individuais ao usuário. G2 ainda requer prova técnica e avaliação de usabilidade; nenhum serviço foi provisionado e não houve teste real de segurança/infra/usuários.
+- **Documentação atual:** README e doze arquivos Markdown em `docs/`; protótipo local em `prototypes/g2-hud/index.html` (dados fictícios, sem APIs/backend).
+- **Validação desta etapa:** 13 arquivos Markdown passaram no link-check local; protótipo serviu HTTP 200, foi lido pelo parser HTML e passou `node --check` no JavaScript embutido; `git diff --check` passou. A sandbox não tem Supabase CLI nem Docker, então não foi possível testar migrations/RLS/transações. Nenhum teste real de segurança, infraestrutura de backend ou usabilidade foi executado.
 
 ## Resumo confiável do projeto
 
@@ -30,7 +30,9 @@ Este arquivo é a passagem de contexto do projeto **Tower Idle Adventure**. Deve
 
 O MVP tem 10 slots (Arma, Peitoral, Elmo, Calça, Bota, Luva (armadura), Colar, Aura, Asa e Pet), oito stats por item, seis raridades e notas/poder definidos. Regra explicitamente confirmada pelo usuário: `x` independente por atributo, inteiro de 1–50; fator `x/10`, em passos de 0,1. `x=4,72` foi rejeitado. Qualquer personagem pode equipar qualquer arma. O baseline completo de combate/armas foi aprovado pelo usuário; Contracorte tem 20% de chance após ataque direto de alvo único e causa 50% do Ataque atual, sem recursão nem ativação por DoT. Valores podem mudar com evidência de playtest.
 
-**Stack aprovada:** Game Web e Admin Web separados na Vercel; Supabase Auth/PostgreSQL/Edge Functions/Storage no backend. Cliente não decide combate, economia ou conteúdo. Painel CMS no-code de conteúdo fica isolado; jogadores comuns não veem sua interface nem acessam APIs administrativas. Docs de arquitetura e segurança estão em `TECH_ARCHITECTURE.md` e `ADMIN_PANEL_SPEC.md`; nada foi provisionado/implementado.
+**Stack aprovada:** Game Web e Admin Web separados na Vercel; Supabase Auth/PostgreSQL/Edge Functions/Storage no backend. Cliente não decide combate, economia ou conteúdo. Painel CMS no-code fica isolado; jogadores comuns não veem sua interface nem acessam APIs administrativas. Especificações em `TECH_ARCHITECTURE.md`, `ADMIN_PANEL_SPEC.md`, `G2_TECHNICAL_BLUEPRINT.md` e `THREAT_MODEL.md`; nada foi provisionado/implementado.
+
+**G2 UX:** `HUD_UX_SPEC.md` e `G2_UX_BLUEPRINT.md` definem estados/flows e critérios; `prototypes/g2-hud/index.html` é um click-through sem backend, sem combate e com dados fictícios. Não equivale a HUD real nem a teste de usabilidade concluído.
 
 MVP exclui VIP/monetização, Diamonds, caixas/gacha, market/transações entre jogadores, social/chat/guildas, PvP, bosses compartilhados, eventos live, skills/upgrades avançados e rewards offline. Jogadores nunca compartilham espaço da hunt pessoal; qualquer social futuro usa serviços compartilhados/instanciados. Assets de jogo são PNGs autorais estáticos em lotes de dez; arte procedural não é permitida; efeitos podem ser implementados em código.
 
@@ -52,11 +54,13 @@ MVP exclui VIP/monetização, Diamonds, caixas/gacha, market/transações entre 
 
 `MVP_DECISIONS.md` fecha objetivo, roster (Guerreiro/Arcanista/Ladino), afinidades, nível compartilhado 1–20, 10 andares, boss solo, stats e skills, catálogo/base stats de itens, nota/poder, raridades/loot, XP/Coins, consumíveis/preços, bot/revive/retorno, login convidado, desktop/PT-BR e critérios de aceite. MVP exclui VIP/pagamentos, caixas, Diamonds/market, social, PvP, bosses compartilhados, events runtime, mobile completo e progresso offline. Não atribuir essas escolhas do agente ao usuário como decisões individualmente feitas por ele.
 
-### Para G2 — pré-produção técnica/UX
+### G2 — documentação-base entregue; gate aberto
 
-- Refinar arquitetura em schemas/migrações, contratos API/eventos, autoridade do simulador, RLS, roles/MFA, threat model, rate limits, backup/recuperação, cache/versionamento e custos.
-- Fechar desenho/protótipo UX e detalhar provisioning/isolamento do Owner/Admin; implementar e testar segurança só nos marcos autorizados do Roadmap.
-- Definir instrumentação/QA e pipeline de assets, sem iniciar gameplay na etapa documental atual.
+- Baselines propostos em `G2_TECHNICAL_BLUEPRINT.md`: TypeScript/Next.js em projetos Vercel separados; Supabase; modelo de dados MVP, endpoints, revisões/idempotência, RLS/grants, rate limits iniciais, sessão Admin e lote de simulação fixo sem catch-up. Valores técnicos são propostas do agente a validar, não escolhas individualmente feitas pelo usuário.
+- `THREAT_MODEL.md` registra atores/fronteiras, 20 ameaças prioritárias, mitigações e evidências necessárias; nenhum controle foi testado em ambiente real.
+- `G2_UX_BLUEPRINT.md` define wireframes, fluxos, estados, acessibilidade e plano de teste. `prototypes/g2-hud/index.html` é protótipo somente local/fictício.
+- G2 continua aberto até prova local de migrations/RLS/transações/retry/reconexão, revisão de custo/backup, testes de isolamento admin e teste de usabilidade com 5–8 testers; conferir critérios em `G2_TECHNICAL_BLUEPRINT.md` e `ROADMAP.md`.
+- Nenhum gameplay, Admin Web ou serviço foi implementado/provisionado nesta atualização.
 
 ### Pós-MVP (backlog, não bloqueia G1/G2)
 
@@ -66,10 +70,10 @@ Não preencher essas lacunas silenciosamente no código; registrar decisão, mot
 
 ## Próximos passos
 
-1. Conferir diffs/Git status e revisar consistência do MVP com GDD, Sistemas, Combate, HUD, Roadmap e arquitetura; validar links Markdown e `git diff --check`.
-2. Registrar atualização final do AI_State; criar commit e push na branch obrigatória e confirmar hash.
-3. Próxima etapa: G2 — schemas/API, threat model, isolamento/Admin, UX/protótipo e planejamento técnico. Não implementar gameplay ou painel antes dos gates G2/G3 no Roadmap.
-4. Em cada checkpoint, ler AI_State no início, atualizar documentos e fazer commit + push mesmo que a etapa termine parcial.
+1. Checagens documentais concluídas: links locais, consistência cruzada, smoke test estático (HTTP 200, parse HTML e sintaxe JS) e `git diff --check`; o checkpoint desta atualização preserva o estado parcial.
+2. G2 permanece aberta. A próxima fatia precisa de toolchain Supabase CLI + Docker disponível para testar migrations/RLS/grants/transações/idempotência/desconexão-reconexão; depois, avaliação UX com 5–8 testers e revisão de segurança/custo/backup. Esta sandbox não tem CLI nem Docker.
+3. Não implementar gameplay ou Admin Web nesta etapa sem o gate; especificações e click-through não significam que funcionalidades estejam prontas.
+4. Só avançar a G3/vertical slice quando os critérios G2 forem executados e o gate revisado; em cada etapa ler AI_State primeiro e fazer checkpoint mesmo se parcial.
 
 ## Histórico de etapas
 
@@ -118,3 +122,10 @@ Não preencher essas lacunas silenciosamente no código; registrar decisão, mot
 - **Sincronizados:** README, GDD, SYSTEMS_SPEC, COMBAT_DESIGN, HUD_UX_SPEC, ROADMAP e AI_STATE. G1 fechado documentalmente; G2 é próxima etapa.
 - **Limites:** nenhum jogo/painel/HUD foi implementado; sem playtest/balanceamento de runtime. As escolhas numéricas são baseline revisável e não indicação de prontidão.
 - **Validação:** links locais em 10 arquivos Markdown e `git diff --cached --check` passaram; nenhum teste de runtime aplicável/possível sem implementação. Branch local alinhada ao remoto `2fd98d3`; checkpoint desta atualização documental ainda será commitado e enviado.
+
+### 2026-09-28 — G2: especificação técnica, ameaça e UX (parcial)
+
+- **Escopo seguido:** Etapa 2 do Roadmap; não implementar gameplay, Admin Web ou infraestrutura. G2 autoriza detalhamento e protótipo de UX não funcional.
+- **Entregue:** `G2_TECHNICAL_BLUEPRINT.md` (dados, APIs, RLS, idempotência, simulação por lote, ambientes); `THREAT_MODEL.md` (20 ameaças e evidências); `G2_UX_BLUEPRINT.md` (wireframes/flows/a11y/plano de teste); `prototypes/g2-hud/index.html` (click-through local com dados fictícios). Specs de Tech/Admin/HUD, README, Roadmap e AI_State sincronizados.
+- **Estado:** etapa parcial; nenhum serviço, migration, API, HUD ou painel criado. Sem prova técnica, testes de segurança ou teste de usabilidade com participantes; Gate G2 aberto.
+- **Validação realizada:** link-check local passou em 13 Markdown; servidor estático retornou HTTP 200; parser HTML e `node --check` no JavaScript embutido passaram; `git diff --check` passou. Preview estático ficou disponível na porta 4173. Supabase CLI/Docker não estão disponíveis; nenhuma prova backend ou de segurança foi executada, então G2 segue parcial.

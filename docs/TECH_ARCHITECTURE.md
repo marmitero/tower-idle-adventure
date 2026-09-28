@@ -1,8 +1,8 @@
 # Arquitetura técnica — Vercel + Supabase
 
-**Versão:** 0.2 — direção tecnológica e limites do MVP
+**Versão:** 0.3 — arquitetura Vercel + Supabase e contratos G2
 **Decisão confirmada pelo usuário:** usar **Vercel + Supabase**, separando o cliente do jogo do servidor.
-**Estado:** arquitetura proposta para detalhamento técnico; nenhuma infraestrutura/código foi implementado. Política de produto MVP: sem rewards offline; desconexão pausa no último evento confirmado (detalhes em `MVP_DECISIONS.md`).
+**Estado:** especificação-base detalhada; nenhuma infraestrutura, migration ou aplicação foi implementada/testada. Ver [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) para schemas/APIs propostos e [`THREAT_MODEL.md`](THREAT_MODEL.md) para riscos. G2 ainda não passou no gate.
 
 ## 1. Separação de responsabilidades
 
@@ -34,7 +34,7 @@ Estrutura sugerida para o repositório/entregas (nomes ajustáveis na etapa téc
 - `admin-web`: CMS/painel administrativo, outro projeto Vercel e domínio restrito por autenticação.
 - `supabase/`: migrations SQL, políticas RLS, Edge Functions, tipos e seeds de desenvolvimento.
 
-Ambientes **dev**, **staging** e **production** devem ter projetos/configurações Supabase e Vercel isolados. Preview deployments não podem receber segredo de produção nem publicar conteúdo real. Migrações de schema são versionadas e revisadas; dados de conteúdo são editados pelo painel, sem código.
+Ambientes **dev**, **staging** e **production** devem ter projetos/configurações Supabase e Vercel isolados. O fluxo proposto usa Supabase CLI local, migrations revisadas e seeds sintéticas; Preview deployments usam somente dev e nunca recebem segredo de produção nem podem publicar conteúdo real. Em staging valida-se migration/release antes de production; não executar reset destrutivo remoto. O blueprint técnico registra escopos de environment e responsabilidades.
 
 ## 3. Contrato cliente-servidor
 
@@ -50,7 +50,7 @@ O navegador nunca informa como verdade HP/dano final, raridade/x de drop, saldo,
 
 ### Combate idle e trabalhos longos
 
-Edge Functions são endpoints de execução curta, não um processo de game server sempre ligado. No MVP, lotes determinísticos/idempotentes avançam no servidor apenas enquanto uma sessão autenticada está ativa; a conexão/cliente pode sinalizar continuidade, mas nunca tem autoridade sobre simulação. Cursor/seed/versão/rewards são persistidos no servidor. Em desconexão/fechamento, congelar no último lote confirmado e, ao reconectar, retomar sem catch-up e sem recompensa offline. G2 deve testar viabilidade/custo desse modelo; não há autorização de produto para mudar a política de no-offline.
+Edge Functions são endpoints de execução curta, não um processo de game server sempre ligado. Baseline técnico G2: um comando autenticado `advance_hunt` aplica lote fixo de 5 s de simulação; o cliente não envia tempo transcorrido nem estado/resultado. Lotes requerem calls ativos, são idempotentes e têm cursor/release/seed persistidos no servidor. Não há cron/catch-up; ao reconectar, retoma-se sem simular o intervalo desconectado. Limites/custo deste modelo ainda precisam de prova técnica. Detalhes em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md); a política de produto sem offline não pode mudar por implementação silenciosa.
 
 Supabase Realtime pode avisar sobre estado de sessão no MVP; chat, presença, grupos, boss global, arena e market são pós-MVP. Mensagem Realtime nunca prova que uma transação/combate aconteceu; futuras operações competitivas/comerciais exigem comando validado e persistência transacional antes do broadcast.
 
@@ -62,7 +62,7 @@ Supabase Realtime pode avisar sobre estado de sessão no MVP; chat, presença, g
 - **Edge Functions:** API server-side para ações de jogo e operações de administrador. Validar JWT/role, schema, autorização, limite de taxa, idempotência e transação em cada comando.
 - **Storage:** PNGs e dados publicados; assets aprovados podem ter leitura pública. Upload/escrita e substituição são administrativos, passam por autorização, validação de arquivo e trilha de auditoria.
 - **Realtime:** somente canais apropriados, com regras de acesso; não substituir transação de banco nem validação server-side.
-- **Segredos:** `service_role` e secrets existem apenas em ambiente server-side Supabase. Nunca no bundle Vercel do navegador nem em variável `NEXT_PUBLIC_*`.
+- **Segredos:** chaves privilegiadas Supabase (legacy `service_role`/`sb_secret`) existem apenas em ambientes server-side/Edge Functions; ignoram RLS e são tratadas como credencial crítica. Nunca no bundle Vercel do navegador nem em variável `NEXT_PUBLIC_*`. Grants, RLS e prova de não exposição estão em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md).
 
 ## 5. Conteúdo e versionamento
 
@@ -83,4 +83,4 @@ Eventos de servidor devem gerar logs sem expor segredos ou dados pessoais excess
 - Uso de Realtime para sessão/avisos, necessidades futuras de chat/bosses/arena/market (estes módulos não bloqueiam MVP).
 - Domínios finais, identidade visual, fluxo MFA/admin e política de preview deployment.
 
-A escolha Vercel + Supabase e a separação client/server estão aprovadas. Os detalhes de implantação e limites ainda são critérios da pré-produção técnica, não pressupostos de que a infraestrutura já existe.
+A escolha Vercel + Supabase e a separação client/server estão aprovadas. O baseline de schemas/contratos foi detalhado em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md), as ameaças em [`THREAT_MODEL.md`](THREAT_MODEL.md) e o click-through de UX em [`G2_UX_BLUEPRINT.md`](G2_UX_BLUEPRINT.md). Os detalhes de implantação/limites, testes reais, protótipo com usuários, provisionamento e revisão de segurança ainda são critérios do G2; nenhum serviço ou aplicação existe.

@@ -1,6 +1,6 @@
 # GDD — Tower Idle Adventure
 
-**Versão:** 0.2 — visão de longo prazo e escopo MVP sincronizados
+**Versão:** 0.3 — G2 e pré-produção sincronizados
 **Estado:** baseline do MVP fechado para pré-produção; nenhum gameplay implementado. Regras exatas e números estão em [MVP_DECISIONS.md](MVP_DECISIONS.md). Sistemas de longo prazo explicitamente marcados como pós-MVP.
 **Data da atualização:** 2026-09-28
 
@@ -148,7 +148,7 @@ Scope, login, trio inicial e afinidades, progressão 1–20, XP/Coins, 10 andare
 - Modelo de VIP, passe, pagamentos, Diamonds, market, fees, proteção econômica e operação/legislação por região.
 - Chat, moderação, guildas, PvP, matchmaking, bosses colaborativos e eventos ao vivo.
 - Expansão de conteúdo além da Torre das Brumas (classes, áreas, inimigos, skills e equipamentos).
-- Detalhes técnicos de schema, migrações, limites/jobs, MFA, backups, recuperação e orçamento (G2); não são decisões de escopo que devem ser inventadas no código.
+- Validação técnica de schema/API/RLS, migrations, limites/custos, MFA, backup/restore e orçamento (G2); o baseline está em `G2_TECHNICAL_BLUEPRINT.md`, mas não foi provado nem provisionado.
 - Arte-final e protótipos visuais; pipeline e princípios estão registrados, implementação/criação de assets ainda não aconteceu.
 
 ## 15. Arquitetura aprovada e painel administrativo

@@ -1,7 +1,7 @@
 # Roadmap — Tower Idle Adventure
 
-**Versão:** 0.2 — MVP decidido e fases sincronizadas
-**Status atual:** Etapa 1/G1 concluída documentalmente; Etapa 2/G2 é o próximo trabalho, iniciada apenas em documentação. Nenhum produto, gameplay, HUD ou painel foi implementado. O baseline de MVP foi escolhido pelo agente sob autorização explícita do usuário; não foi playtestado.
+**Versão:** 0.3 — estado G2 parcial e critérios sincronizados
+**Status atual:** Etapa 1/G1 concluída documentalmente; Etapa 2/G2 em andamento. Blueprints técnico/ameaças/UX e click-through sem backend foram preparados. Gate G2 segue aberto: sem prova técnica, teste de segurança ou usabilidade com participantes. Nenhum produto, gameplay, HUD real, Admin Web ou infraestrutura foi implementado.
 **Princípio:** cada etapa começa lendo [AI_State](AI_STATE.md), altera a documentação antes do código quando houver decisão de design e termina atualizando AI_State e evidências.
 
 ## Marcos de aprovação
@@ -35,16 +35,17 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 - **Entregável:** baseline documental completo para pré-produção. Não houve código, implementação, playtest ou balanceamento em runtime.
 - **Gate G1:** fechado quanto a escopo/decisões necessárias para iniciar G2; não equivale a G3 nem a balanceamento final.
 
-### Etapa 2 — Pré-produção técnica, segurança e UX (G2, próxima; especificações-base iniciadas)
+### Etapa 2 — Pré-produção técnica, segurança e UX (G2, em andamento; parcial)
 
 - Detalhar a arquitetura já escolhida: Game Web e Admin Web em projetos separados da Vercel; servidor Supabase (Auth, PostgreSQL, Edge Functions, Storage e Realtime conforme uso), com ambientes dev/staging/production.
 - Definir domínio autoritativo do servidor, schema/migrações, contratos API/eventos, autenticação, roles, RLS, rate limits, logs, backup, restauração e proteção da economia.
 - Desenhar o CMS no-code, isolamento do painel, provisioning de administradores, fluxo draft/validate/publish/rollback, versionamento do catálogo e threat model, conforme `ADMIN_PANEL_SPEC.md` e `TECH_ARCHITECTURE.md`.
 - Revisar e aprovar a arquitetura, os componentes, os estados e as dependências da HUD documentados em `HUD_UX_SPEC.md` antes de implementar a interface; definir UX responsiva, acessibilidade, protótipos navegáveis e teste de usabilidade.
 - Definir plano de privacidade, retenção, suporte e revisão legal antes de qualquer beta público; monetização/moderação de recursos sociais só se aplicam a fases futuras.
-- **Entregáveis:** especificações-base Supabase/Vercel e painel (já documentadas), schemas/migrações, threat model, decisões de MFA/RLS, protótipo UX, QA/observabilidade, pipeline de assets e documentação técnica.
-- **Situação:** nenhum serviço Supabase/Vercel foi provisionado e nenhuma interface ou proteção foi implementada/testada.
-- **Gate:** revisão técnica/segurança e aceite UX antes de G3/produção.
+- **Entregues nesta fatia documental:** `G2_TECHNICAL_BLUEPRINT.md` (modelo conceitual, contratos, grants/RLS, idempotência e operação de sessão), `THREAT_MODEL.md` e `G2_UX_BLUEPRINT.md`, além do protótipo local `prototypes/g2-hud/index.html`. Baselines/frameworks são propostas do agente para validação, não sistemas prontos.
+- **Entregáveis ainda pendentes:** migrations/seed reais e prova local; teste RLS/idempotência/reconexão; prova de limites/custo; teste automatizado do isolamento Admin; review de MFA, restore, segurança e plano; sessões de usabilidade com 5–8 convidados e incorporação dos achados; decisão visual final.
+- **Situação:** nenhum serviço Supabase/Vercel foi provisionado; protótipo é estático e sem dados reais, gameplay ou Admin. Esta sandbox não tem Supabase CLI nem Docker, então migrations/RLS/transações locais não foram executadas. Nenhuma segurança/backup foi implementada/testada.
+- **Gate G2:** manter aberto até critérios de `G2_TECHNICAL_BLUEPRINT.md` executados/revistos, ameaça crítica sem lacuna, UX validada e limitações/custos aprovados. Somente então iniciar G3.
 
 ### Etapa 3 — Vertical slice e prova de diversão (G3)
 
