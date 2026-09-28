@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tower Idle Adventure — Sonda de RLS (G2)</title>
+<style>
+  :root{
+    --bg:#0d1117; --panel:#161b22; --line:#30363d; --txt:#e6edf3; --dim:#8b949e;
+    --ok:#3fb950; --fail:#f85149; --warn:#d29922; --info:#58a6ff;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding:24px}
+  h1{font-size:20px;margin:0 0 4px}
+  h2{font-size:15px;margin:28px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line);color:var(--info)}
+  p.lead{color:var(--dim);margin:0 0 20px;max-width:80ch}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;margin-bottom:20px}
+  label{display:block;margin:10px 0 4px;font-size:13px;color:var(--dim)}
+  input{width:100%;padding:8px 10px;background:#0d1117;color:var(--txt);border:1px solid var(--line);border-radius:6px;font:13px ui-monospace,SFMono-Regular,Menlo,monospace}
+  input:focus{outline:2px solid var(--info);outline-offset:-1px}
+  button{padding:9px 16px;border-radius:6px;border:1px solid var(--line);background:#21262d;color:var(--txt);font-weight:600;cursor:pointer;margin:4px 6px 4px 0}
+  button:hover:not(:disabled){background:#30363d}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  button.primary{background:#1f6feb;border-color:#1f6feb}
+  .note{background:#1c2128;border-left:3px solid var(--warn);padding:10px 14px;border-radius:0 6px 6px 0;margin:14px 0;font-size:13px;color:var(--dim)}
+  .note strong{color:var(--txt)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--dim);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+  td.res{font-weight:700;white-space:nowrap;font-family:ui-monospace,monospace}
+  .OK{color:var(--ok)} .FALHA{color:var(--fail)} .INFO{color:var(--warn)} .NEUTRO{color:var(--dim)}
+  code{background:#0d1117;padding:1px 5px;border-radius:4px;font-size:12px}
+  .det{color:var(--dim);font-size:12px;font-family:ui-monospace,monospace}
+  .group td{background:#1c2128;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim)}
+  #sum{font-size:15px;font-weight:700;padding:12px 14px;border-radius:6px;margin:14px 0}
+  textarea{width:100%;height:110px;background:#0d1117;color:var(--txt);border:1px solid var(--line);border-radius:6px;font:11px ui-monospace,monospace;padding:8px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<h1>Sonda de RLS — validação G2</h1>
+<p class="lead">
+  Esta página roda <strong>somente leituras</strong> contra o Data API do seu projeto Supabase de desenvolvimento
+  e verifica se as regras de segurança do banco funcionam de verdade. Nenhum dado é enviado, alterado ou apagado.
+  Nada do que você digitar aqui é enviado para o GitHub, para mim ou para qualquer outro lugar.
+</p>
+
+<div class="note">
+  <strong>Sobre segurança:</strong> a chave pública abaixo é pública por desenho (vai no código do jogo).
+  A senha que você digitar é usada <strong>apenas dentro desta aba do seu navegador</strong>, para obter um token
+  de sessão e testá-lo. Ela não sai do seu computador. As senhas não ficam salvas em lugar nenhum.
+</div>
+
+<div class="panel">
+  <h2 style="margin-top:0">1. Dados do projeto</h2>
+  <div class="grid">
+    <div>
+      <label>Project URL</label>
+      <input id="url" value="https://xzhdqjttmwdrtnilpktu.supabase.co">
+      <label>Chave pública (publishable / anon)</label>
+      <input id="key" value="sb_publishable_aoL7L1R7asUE-9nZZxChAA_awnrJS4G">
+    </div>
+    <div>
+      <label>UUID do usuário de teste A</label>
+      <input id="uuidA" value="d597b2d4-febb-4a0a-b9e6-6cea9902d861">
+      <label>UUID do usuário de teste B</label>
+      <input id="uuidB" value="472e3a41-d121-4790-8cd0-152d375e3ef5">
+    </div>
+  </div>
+
+  <h2>2. Senhas (opcional — só para a parte 2)</h2>
+  <div class="grid">
+    <div>
+      <label>Senha do usuário A</label>
+      <input id="passA" type="password" placeholder="deixe vazio para pular" autocomplete="off">
+      <label>Senha do usuário B</label>
+      <input id="passB" type="password" placeholder="deixe vazio para pular" autocomplete="off">
+    </div>
+  </div>
+  <p class="det" style="margin-top:12px">
+    Sem senha, a página roda apenas os testes de visitante anônimo (parte 1), que já provam o ponto mais crítico:
+    <strong>ninguém sem login enxerga dados de jogador</strong>.
+  </p>
+
+  <div style="margin-top:16px">
+    <button class="primary" id="btn1">Rodar teste 1 — visitante sem login</button>
+    <button id="btn2">Rodar tudo (1 + 2 + 3)</button>
+    <button id="btnReset">Limpar</button>
+  </div>
+  <div id="sum"></div>
+</div>
+
+<div class="panel">
+  <h2 style="margin-top:0">Resultados</h2>
+  <table>
+    <thead><tr><th style="width:34%">Verificação</th><th style="width:88px">Esperado</th><th style="width:88px">Obtido</th><th>Detalhe</th></tr></thead>
+    <tbody id="tbody"><tr><td colspan="4" class="det">Nada executado ainda.</td></tr></tbody>
+  </table>
+</div>
+
+<div class="panel">
+  <h2 style="margin-top:0">Relatório para enviar</h2>
+  <p class="det" style="margin-top:0">Ao terminar, clique em copiar e cole o conteúdo na conversa. Não contém senha nem token.</p>
+  <textarea id="report" readonly placeholder="O relatório aparece aqui após rodar os testes."></textarea>
+  <button id="btnCopy">Copiar relatório</button>
+</div>
+
+<script>
+const T = {
+  // Tabelas que o jogador deve conseguir ler apenas da própria conta
+  playerTables: ['player_profiles','player_roster','player_items','equipment_loadouts','consumable_stacks','coin_ledger','bot_settings','hunt_sessions','hunt_events'],
+  // Tabelas que NINGUÉM do navegador pode tocar
+  secretTables: ['content_drafts','hunt_session_private_state','idempotency_records','admin_memberships','admin_audit_log'],
+  // Tabelas-base de release: sem grant para o navegador
+  releaseTables: ['content_releases','release_entries'],
+  publicView: 'published_content',
+};
+
+let rows = [];
+const tb = document.getElementById('tbody');
+const sum = document.getElementById('sum');
+const report = document.getElementById('report');
+
+function esc(s){ return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function render(){
+  let html = '';
+  for (const r of rows){
+    if (r.group){ html += `<tr class="group"><td colspan="4">${esc(r.group)}</td></tr>`; continue; }
+    html += `<tr>
+      <td>${esc(r.name)}</td>
+      <td class="res ${r.expected===r.got?'OK':'NEUTRO'}">${esc(r.expected)}</td>
+      <td class="res ${r.verdict||'NEUTRO'}">${esc(r.got)}</td>
+      <td class="det">${esc(r.detail)}</td>
+    </tr>`;
+  }
+  tb.innerHTML = html;
+  const ok = rows.filter(r=>!r.group && r.verdict==='OK').length;
+  const fail = rows.filter(r=>!r.group && r.verdict==='FALHA').length;
+  const warn = rows.filter(r=>!r.group && r.verdict==='INFO').length;
+  sum.textContent = `${ok} OK · ${fail} falha(s) · ${warn} inconclusivo(s)`;
+  sum.style.background = fail ? '#3d1518' : (ok ? '#12261a' : '#1c2128');
+  sum.style.color = fail ? '#f85149' : '#3fb950';
+  report.value = JSON.stringify({
+    quando: new Date().toISOString(),
+    projeto: document.getElementById('url').value,
+    parte1_e_2: rows.filter(r=>!r.group).map(r=>({verificacao:r.name, esperado:r.expected, obtido:r.got, detalhe:r.detail}))
+  }, null, 1);
+}
+function push(group){ rows.push({group}); }
+function add(name, expected, got, verdict, detail){ rows.push({name, expected, got, verdict, detail}); }
+
+async function api(path, {method='GET', key, token, body, extraHeaders}={}){
+  const h = { apikey: key };
+  if (token) h.Authorization = 'Bearer ' + token;
+  if (body) h['Content-Type'] = 'application/json';
+  h.Prefer = 'return=representation';
+  Object.assign(h, extraHeaders||{});
+  const res = await fetch(path, { method, headers: h, body: body ? JSON.stringify(body) : undefined });
+  let data = null, msg = '';
+  const text = await res.text();
+  try { data = JSON.parse(text); } catch { data = null; }
+  if (data && data.code) msg = ` [${data.code}] ${data.message||''}`.slice(0,150);
+  else if (data && data.hint) msg = ` [${data.code||''}] ${data.hint}`.slice(0,150);
+  else if (!data) msg = ' ' + text.slice(0,110);
+  return { status: res.status, data, msg };
+}
+
+// "denied" = o banco recusou (é o resultado que queremos)
+function isDenied(r){ return r.status===401 || r.status===403 || /42501|PGRST301|PGRST302|permission denied|jwt/i.test(r.msg); }
+function isOk(r){ return r.status===200; }
+// schema cache do PostgREST ainda não viu a tabela -> inconclusivo
+function isCacheMiss(r){ return r.status===404 || /PGRST202|PGRST205|not found in the schema cache/i.test(r.msg); }
+function short(r){ return r.status + (r.msg||''); }
+
+async function testAnon(url, key){
+  push('PARTE 1 — visitante SEM login (chave pública)');
+
+  const spec = await fetch(url + '/rest/v1/', { headers:{ apikey:key, Accept:'application/openapi+json' } });
+  let exposed = [];
+  if (spec.ok){
+    const j = await spec.json();
+    exposed = Object.keys(j.paths||{}).filter(p => !p.includes('{'));
+  }
+  add('Esquema exposto pelo Data API',
+      'informativo', exposed.length ? exposed.length + ' rotas' : 'erro',
+      'INFO',
+      exposed.length ? exposed.slice(0,60).join(' ') : 'não foi possível ler a lista');
+
+  for (const t of T.secretTables){
+    const r = await api(`${url}/rest/v1/${t}?select=*&limit=1`, {key});
+    if (isCacheMiss(r)) add(`visitante lê ${t}`, 'NEGADO', 'inconclusivo', 'INFO', short(r) + ' — recarregue o schema cache do PostgREST');
+    else if (isDenied(r)) add(`visitante lê ${t}`, 'NEGADO', 'NEGADO', 'OK', short(r));
+    else if (isOk(r) && Array.isArray(r.data) && r.data.length===0) add(`visitante lê ${t}`, 'NEGADO', 'PERMITIDO', 'FALHA', short(r) + ' — tabela secreta respondeu vazio em vez de negar');
+    else add(`visitante lê ${t}`, 'NEGADO', r.status===200?'PERMITIDO':'outro', r.status===200?'FALHA':'INFO', short(r));
+  }
+
+  for (const t of T.playerTables){
+    const r = await api(`${url}/rest/v1/${t}?select=*&limit=1`, {key});
+    if (isCacheMiss(r)) add(`visitante lê ${t}`, 'NEGADO', 'inconclusivo', 'INFO', short(r) + ' — cache do PostgREST');
+    else if (isDenied(r)) add(`visitante lê ${t}`, 'NEGADO', 'NEGADO', 'OK', short(r));
+    else if (isOk(r) && Array.isArray(r.data) && r.data.length===0) add(`visitante lê ${t}`, 'NEGADO', 'PERMITIDO', 'FALHA', short(r) + ' — vazio em vez de negar');
+    else add(`visitante lê ${t}`, 'NEGADO', r.status===200?'PERMITIDO':'outro', r.status===200?'FALHA':'INFO', short(r));
+  }
+
+  for (const t of T.releaseTables){
+    const r = await api(`${url}/rest/v1/${t}?select=*&limit=1`, {key});
+    if (isDenied(r)) add(`visitante lê ${t} (tabela-base)`, 'NEGADO', 'NEGADO', 'OK', short(r));
+    else if (isOk(r)) add(`visitante lê ${t} (tabela-base)`, 'NEGADO', 'PERMITIDO', 'FALHA', short(r) + ' — só a view publicada deveria ser pública');
+    else add(`visitante lê ${t} (tabela-base)`, 'NEGADO', 'inconclusivo', 'INFO', short(r));
+  }
+
+  const v = await api(`${url}/rest/v1/${T.publicView}?select=*&limit=1`, {key});
+  if (isOk(v)) add(`visitante lê ${T.publicView} (catálogo público)`, 'PERMITIDO', 'PERMITIDO', 'OK', short(v) + (Array.isArray(v.data)? ` — ${v.data.length} linha(s)`:''));
+  else if (isCacheMiss(v)) add(`visitante lê ${T.publicView}`, 'PERMITIDO', 'inconclusivo', 'INFO', short(v) + ' — cache do PostgREST');
+  else add(`visitante lê ${T.publicView}`, 'PERMITIDO', 'NEGADO', 'INFO', short(v) + ' — aceitável se ainda não há release publicado');
+
+  // Nenhuma função de public pode ser chamada por anon
+  const rpcs = exposed.filter(p => p.startsWith('/rpc/'));
+  if (!rpcs.length) add('Funções expostas para o navegador', 'nenhuma ou com grant revogado', rpcs.length + ' expostas', rpcs.length?'INFO':'OK', rpcs.length ? 'existem: '+rpcs.join(', ') : 'nenhuma função RPC exposta');
+  for (const p of rpcs){
+    const r = await api(url + '/rest/v1' + p, {key, method:'POST', body:{}});
+    add(`anon chama ${p}`, 'NEGADO', isDenied(r)?'NEGADO':(r.status===200?'PERMITIDO':'outro'), isDenied(r)?'OK':(r.status===200?'FALHA':'INFO'), short(r));
+  }
+}
+
+async function login(url, key, email, pass, uuid){
+  const r = await api(`${url}/auth/v1/token?grant_type=password`, { key, method:'POST', body:{ email, password: pass } });
+  if (r.status===200 && r.data && r.data.access_token) return { token: r.data.access_token, sub: uuid };
+  return { error: short(r) };
+}
+
+async function testUser(url, key, token, uuid, otherUuid, label){
+  push(`PARTE 2/3 — ${label}`);
+
+  const own = await api(`${url}/rest/v1/player_profiles?select=*&user_id=eq.${uuid}`, {key, token});
+  const nOwn = Array.isArray(own.data) ? own.data.length : -1;
+  if (own.status===200) add(`${label} lê o próprio perfil`, 'PERMITIDO', 'PERMITIDO', 'OK', `${nOwn} linha(s) — ${nOwn===0?'perfil ainda não provisionado (esperado nesta fase)':'ok'}`);
+  else if (isDenied(own)) add(`${label} lê o próprio perfil`, 'PERMITIDO', 'NEGADO', 'FALHA', short(own));
+  else add(`${label} lê o próprio perfil`, 'PERMITIDO', 'inconclusivo', 'INFO', short(own));
+
+  for (const t of T.playerTables){
+    const r = await api(`${url}/rest/v1/${t}?select=*&user_id=eq.${otherUuid}`, {key, token});
+    if (r.status===200 && Array.isArray(r.data) && r.data.length===0) add(`${label} lê dados do OUTRO usuário em ${t}`, 'VAZIO', 'VAZIO', 'OK', short(r));
+    else if (isDenied(r)) add(`${label} lê dados do OUTRO usuário em ${t}`, 'VAZIO', 'NEGADO', 'OK', short(r));
+    else if (r.status===200) add(`${label} lê dados do OUTRO usuário em ${t}`, 'VAZIO', 'VAZIO COM '+r.data.length+' LINHA(S)', 'FALHA', 'VAZAMENTO — o filtro de dono não funcionou');
+    else add(`${label} lê dados do OUTRO usuário em ${t}`, 'VAZIO', 'inconclusivo', 'INFO', short(r));
+  }
+
+  for (const t of T.secretTables){
+    const r = await api(`${url}/rest/v1/${t}?select=*&limit=1`, {key, token});
+    if (isDenied(r)) add(`${label} lê ${t}`, 'NEGADO', 'NEGADO', 'OK', short(r));
+    else if (r.status===200 && Array.isArray(r.data) && r.data.length===0) add(`${label} lê ${t}`, 'NEGADO', 'PERMITIDO', 'FALHA', short(r)+' — vazio em vez de negar');
+    else add(`${label} lê ${t}`, 'NEGADO', r.status===200?'PERMITIDO':'outro', r.status===200?'FALHA':'INFO', short(r));
+  }
+
+  // escritas diretas no banco precisam ser sempre recusadas
+  const writes = [
+    ['player_profiles', { coins: 999999 }, 'coins'],
+    ['bot_settings', { potion_threshold: 10 }, 'bot'],
+    ['consumable_stacks', { quantity: 99 }, 'consumível'],
+  ];
+  for (const [t, patch, human] of writes){
+    const r = await api(`${url}/rest/v1/${t}?user_id=eq.${uuid}`, {key, token, method:'PATCH', body:patch});
+    if (isDenied(r)) add(`${label} altera ${human} direto no banco`, 'NEGADO', 'NEGADO', 'OK', short(r));
+    else if (r.status===200) add(`${label} altera ${human} direto no banco`, 'NEGADO', 'PERMITIDO', 'FALHA', 'GRAVE — economia editável pelo cliente');
+    else add(`${label} altera ${human} direto no banco`, 'NEGADO', 'outro', 'INFO', short(r));
+  }
+  const del = await api(`${url}/rest/v1/hunt_sessions?user_id=eq.${uuid}`, {key, token, method:'DELETE'});
+  if (isDenied(del)) add(`${label} apaga sessão de hunt`, 'NEGADO', 'NEGADO', 'OK', short(del));
+  else if (del.status===204) add(`${label} apaga sessão de hunt`, 'NEGADO', 'PERMITIDO', 'FALHA', 'GRAVE — exclusão direta permitida');
+  else add(`${label} apaga sessão de hunt`, 'NEGADO', 'outro', 'INFO', short(del));
+
+  const pv = await api(`${url}/rest/v1/${T.publicView}?select=*&limit=1`, {key, token});
+  add(`${label} lê ${T.publicView}`, 'PERMITIDO', isOk(pv)?'PERMITIDO':'NEGADO', isOk(pv)?'OK':'INFO', short(pv));
+}
+
+document.getElementById('btn1').onclick = () => run(false);
+document.getElementById('btn2').onclick = () => run(true);
+document.getElementById('btnReset').onclick = () => { rows=[]; render(); report.value=''; };
+document.getElementById('btnCopy').onclick = async () => { if(!report.value) return; try{ await navigator.clipboard.writeText(report.value); alert('Relatório copiado.'); }catch{ report.select(); document.execCommand('copy'); } };
+
+async function run(withAuth){
+  const url = document.getElementById('url').value.trim().replace(/\/+$/,'');
+  const key = document.getElementById('key').value.trim();
+  const uuidA = document.getElementById('uuidA').value.trim();
+  const uuidB = document.getElementById('uuidB').value.trim();
+  const passA = document.getElementById('passA').value;
+  const passB = document.getElementById('passB').value;
+  rows = []; render();
+  document.getElementById('btn1').disabled = document.getElementById('btn2').disabled = true;
+
+  try{
+    await testAnon(url, key);
+    render();
+
+    if (withAuth && passA && passB){
+      const a = await login(url, key, 'a', passA, uuidA);
+      add('Login com a senha do usuário A', 'sucesso', a.token?'sucesso':'falhou', a.token?'OK':'INFO',
+          a.token?'token obtido e guardado só nesta aba': a.error + ' — confira a senha e se a conta está Confirmed');
+      render();
+      if (a.token) await testUser(url, key, a.token, uuidA, uuidB, 'Usuário A');
+      render();
+
+      const b = await login(url, key, 'b', passB, uuidB);
+      if (b.token) await testUser(url, key, b.token, uuidB, uuidA, 'Usuário B');
+      else add('Login com a senha do usuário B', 'sucesso', 'falhou', 'INFO', b.error);
+    } else if (withAuth){
+      add('Parte 2 e 3 (usuários A e B)', 'executada', 'pulada', 'INFO', 'sem senha preenchida — só a parte 1 foi executada');
+    }
+  } catch(e){
+    add('Execução', 'concluir', 'erro', 'INFO', e.message);
+  } finally {
+    document.getElementById('btn1').disabled = document.getElementById('btn2').disabled = false;
+    render();
+  }
+}
+</script>
+</body>
+</html>

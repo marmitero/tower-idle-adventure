@@ -4,3 +4,6 @@ node_modules/
 
 # Supabase CLI local state and generated files
 supabase/.temp/
+
+# Local G2 validation output (generated on a developer machine, no secrets)
+supabase/tests/hosted/rls-result.json
