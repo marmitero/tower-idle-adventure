@@ -53,7 +53,7 @@ Combates curtos, leitura visual imediata e encadeamento automático entre encont
 
 ## 5. Torre e combate
 
-As fórmulas-base de dano, velocidade, alvos e a tabela de valores propostos para os traços de armas estão em [Combate e balanceamento](COMBAT_DESIGN.md). Esses valores, exceto Contracorte já validado, são candidatos de G1 e precisam de análise/playtest antes de serem congelados.
+O baseline aprovado de fórmulas de dano, velocidade, alvos e traços de armas está em [Combate e balanceamento](COMBAT_DESIGN.md). Valores poderão ser ajustados após playtests, mas não permanecem pendentes de aprovação conceitual.
 
 - Cada andar tem requisito mínimo de nível, inimigos e faixas próprias de recompensa; andares mais altos oferecem recompensas potencialmente maiores/mais raras.
 - O jogador seleciona manualmente o andar. Conta VIP pode ativar opção de subir para o próximo andar após cumprir as condições de progressão; é desligada por padrão e não remove a escolha manual do jogador.
@@ -65,7 +65,7 @@ As fórmulas-base de dano, velocidade, alvos e a tabela de valores propostos par
 
 ### Armas e afinidades
 
-Além dos nove slots de equipamento, todo personagem possui um slot **Arma**. Tipos: Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas e Garras. Qualquer personagem pode equipar qualquer tipo; há uma proposta de afinidade documentada em `COMBAT_DESIGN.md`, pendente de validação do roster. Cada tipo possui um traço próprio: Adaga pode envenenar; Machado causa dano aumentado; Maça aumenta chance crítica; Besta aumenta velocidade de ataque; Cajado ataca todos os inimigos; Livro Arcano recupera vida por ataque conforme Ataque Especial; Luvas podem atordoar temporariamente; Garras atacam duas vezes. **Espada — Contracorte (validado):** ao receber um ataque direto de alvo único, há 20% de chance de contra-atacar imediatamente o agressor com dano físico de 50% do Ataque atual. O contra-ataque não pode ativar a si próprio nem disparar por dano ao longo do tempo. Esses valores iniciais foram validados pelo usuário; ajustes posteriores só por balanceamento/playtest. Os parâmetros dos demais traços estão na proposta de combate e aguardam validação.
+Além dos nove slots de equipamento, todo personagem possui um slot **Arma**. Tipos: Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas e Garras. Qualquer personagem pode equipar qualquer tipo; a regra de afinidade (+5% no atributo ofensivo principal) está aprovada e documentada em `COMBAT_DESIGN.md`; atribuições no roster inicial ficam pendentes. Cada tipo possui um traço próprio: Adaga pode envenenar; Machado causa dano aumentado; Maça aumenta chance crítica; Besta aumenta velocidade de ataque; Cajado ataca todos os inimigos; Livro Arcano recupera vida por ataque conforme Ataque Especial; Luvas podem atordoar temporariamente; Garras atacam duas vezes. **Espada — Contracorte (validado):** ao receber um ataque direto de alvo único, há 20% de chance de contra-atacar imediatamente o agressor com dano físico de 50% do Ataque atual. O contra-ataque não pode ativar a si próprio nem disparar por dano ao longo do tempo. Esses valores iniciais foram validados pelo usuário; ajustes posteriores só por balanceamento/playtest. Os parâmetros baseline dos demais traços estão aprovados e detalhados em `COMBAT_DESIGN.md`; atribuições de afinidade no roster e calibração por playtests ainda serão feitas.
 
 A característica intrínseca do tipo de arma é separada da característica aleatória adicional de itens Lendários/Celestiais; um efeito não substitui o outro. O subtipo de arma também é distinto do slot de armadura Luva.
 
@@ -158,8 +158,8 @@ O MVP deve provar primeiro: seleção inicial simples, lobby, equipe, slots, atr
 ## 14. Decisões pendentes prioritárias
 
 1. Nome e quantidade de classes/personagens iniciais, skills e papéis.
-2. Progressão de nível, XP, materiais, custos e bases por slot/nível; revisar e aprovar as fórmulas de ataque/defesa propostas em `COMBAT_DESIGN.md`.
-3. Contracorte está validado (20% / 50% Ataque); revisar por playtest se necessário. Aprovar/ajustar as propostas de parâmetros das outras armas e o bônus/distribuição das afinidades.
+2. Progressão de nível, XP, materiais, custos e bases por slot/nível; validar as fórmulas de ataque/defesa aprovadas em `COMBAT_DESIGN.md` durante a implementação/playtest.
+3. Baseline de traços de armas e afinidade (+5% atributo ofensivo) está aprovado; atribuir afinidades ao roster inicial e avaliar ajustes apenas por playtest documentado.
 4. Definição numérica e pesos para nota/poder total; tratamento de percentuais e limites.
 5. Regras de morte/revive para equipe de três e valor de recuperação (máximo vs. perdido).
 6. Auto-retorno após derrota (default, cura e reinício do mesmo andar) e se abrir a loja pausa o combate.
@@ -169,6 +169,12 @@ O MVP deve provar primeiro: seleção inicial simples, lobby, equipe, slots, atr
 10. Plataforma de contas/pagamentos, classificação etária, regiões, privacidade, retenção e política contra abuso.
 11. Limites de VIP/buffs, taxa do mercado, diamantes negociáveis e impacto no PvP.
 12. Breakpoints/layout responsivo final, navegação e arte visual da HUD; dispositivos/navegadores e idiomas de lançamento.
-13. Stack técnica, servidor autoritativo, banco de dados e orçamento/cronograma.
+13. Detalhes de implementação da arquitetura Supabase + Vercel (schemas, jobs, ambientes, backup), orçamento e cronograma.
 
 Nenhuma dessas lacunas deve ser preenchida silenciosamente em código: cada decisão precisa ser registrada nesta documentação e no AI_State antes do desenvolvimento do sistema correspondente.
+
+## 15. Arquitetura aprovada e painel administrativo
+
+A direção tecnológica aprovada é **Vercel + Supabase**, mantendo Game Web (cliente de navegador) separado do servidor. Vercel entrega a experiência visual; Supabase concentra Auth, banco persistente e endpoints confiáveis para gameplay/economia. Dano, loot, inventário, saldo e transações nunca são decididos pelo cliente. Consulte [Arquitetura técnica](TECH_ARCHITECTURE.md).
+
+Também é requisito aprovado um **Painel Administrativo de Conteúdo** sem necessidade de código para criar/editar/arquivar/publicar equipamentos, personagens, skills, inimigos, bosses, eventos, andares, loot e catálogos suportados. O painel será uma aplicação Vercel isolada da aplicação de jogadores, sem link no Game Web, com acesso e APIs protegidos por role administrativa validada no servidor/Supabase. Conteúdo passa por validação, rascunho, publicação versionada, auditoria e rollback; não se pode depender apenas de esconder uma URL. Nova lógica de gameplay ainda exigirá desenvolvimento, mas novos registros dos tipos suportados não exigem redeploy. Ver [especificação do Painel Administrativo](ADMIN_PANEL_SPEC.md).

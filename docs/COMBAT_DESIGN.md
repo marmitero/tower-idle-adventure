@@ -1,9 +1,9 @@
 # Combate automático e balanceamento de armas
 
 **Versão:** 0.1 — proposta de design para G1
-**Estado:** Contracorte da Espada validado pelo usuário. Fórmulas e parâmetros das outras armas são propostas iniciais para análise/playtest; não são código nem balanço final.
+**Estado:** baseline de combate e valores de armas aprovados pelo usuário. Contracorte também validado. Os valores podem ser ajustados futuramente com evidência de playtest; esta aprovação não significa que o combate foi implementado.
 
-Este documento propõe um núcleo de combate automático coerente com os atributos e os nove tipos de arma. Onde o briefing já decidiu algo, está marcado como **confirmado**; números sugeridos aguardam análise de balanceamento. O objetivo é avançar o G1 sem esconder hipóteses.
+Este documento registra o baseline aprovado para o núcleo de combate automático e os nove tipos de arma. Onde o briefing já decidiu algo, está marcado como **confirmado**; os demais parâmetros foram aprovados pelo usuário como ponto de partida de design e podem ser revistos somente com evidência de balanceamento/playtest. Nada aqui significa implementação pronta.
 
 ## 1. Princípios e convenções
 
@@ -13,7 +13,7 @@ Este documento propõe um núcleo de combate automático coerente com os atribut
 - Todos podem usar qualquer arma. Afinidade dá uma vantagem moderada, nunca é requisito para equipar.
 - Resultados são reprodutíveis para estado e seed iguais; empates usam uma ordem estável. As propostas devem ser simuladas em encontros com 1, 2 e 3 inimigos antes de congelar G1.
 
-## 2. Fórmulas-base propostas
+## 2. Fórmulas-base aprovadas
 
 ### Dano físico e mágico
 
@@ -32,7 +32,7 @@ DanoFinal = max(1, floor(DanoBase × ModificadoresDeDano))
 
 ### Crítico
 
-- Chance efetiva = chance crítica acumulada do personagem + modificadores planos do tipo de arma, limitada a **75%** na proposta inicial.
+- Chance efetiva = chance crítica acumulada do personagem + modificadores planos do tipo de arma, limitada a **75%**.
 - Crítico multiplica o dano final mitigado por **1,5**, depois dos modificadores de dano. Multiplicador crítico adicional, se existir no futuro, é um efeito separado.
 - Maça adiciona **10 pontos percentuais** de chance crítica como valor inicial de playtest, antes do limite.
 
@@ -41,12 +41,12 @@ DanoFinal = max(1, floor(DanoBase × ModificadoresDeDano))
 Separar os dois atributos para que tenham funções claras:
 
 - **Velocidade:** define a ordem inicial de ação no começo de cada encontro; maior valor age primeiro. Empate: desempate estável por formação/slot e, se ainda necessário, seed de combate.
-- **Velocidade de Ataque:** define a recorrência depois da primeira ação. Proposta: `intervalo = T0 / (1 + IAS)`, com `T0 = 2,0 s` e `IAS` convertido de percentual para fração. Limitar IAS efetivo a `-50%…+100%`, dando intervalo de `4…1 s` e evitando loops extremos. Ações de skills usam o mesmo intervalo; cooldowns são medidos em tempo de simulação e não são reduzidos por IAS nesta primeira versão.
+- **Velocidade de Ataque:** define a recorrência depois da primeira ação: `intervalo = T0 / (1 + IAS)`, com `T0 = 2,0 s` e `IAS` convertido de percentual para fração. IAS efetivo limitado a `-50%…+100%`, dando intervalo de `4…1 s` e evitando loops extremos. Ações de skills usam o mesmo intervalo; cooldowns são medidos em tempo de simulação e não são reduzidos por IAS.
 - A unidade que age recebe seu próximo horário pelo intervalo próprio; quando vários eventos empatam, Velocidade e a ordem estável decidem. O tempo real/pausado e a forma de simular tempo ocioso serão fechados na arquitetura técnica.
 
-Esses valores (`T0` e caps) são recomendações de protótipo; ajustar após medir duração/legibilidade e combinar com bases de atributos por nível.
+Os valores (`T0` e caps) fazem parte do baseline aprovado; o balanceamento pode ajustá-los futuramente após medir duração/legibilidade junto às bases de atributos por nível.
 
-## 3. Alvos e skills automáticas — proposta
+## 3. Alvos e skills automáticas — baseline aprovado
 
 - Ataque básico de alvo único prioriza o inimigo com menor percentual de HP restante; empate: menor HP absoluto, depois posição/ID estável. Skills em área usam a lista de alvos declarada pela skill.
 - Skill de cura, se houver, prioriza aliado vivo com menor percentual de HP; empate por posição/ID estável.
@@ -56,7 +56,7 @@ Esses valores (`T0` e caps) são recomendações de protótipo; ajustar após me
 
 ## 4. Traços de arma — parâmetros iniciais para playtest
 
-Os valores abaixo são uma **proposta de primeira passagem**, não uma promessa de equilíbrio. Todo efeito deve produzir evento visual/log legível. Traços não escalam diretamente com raridade nem com x; bônus explícitos são constantes do tipo de arma.
+Os valores abaixo são o **baseline de design aprovado** pelo usuário, não uma promessa de equilíbrio matemático definitivo. Todo efeito deve produzir evento visual/log legível. Traços não escalam diretamente com raridade nem com x; bônus explícitos são constantes do tipo de arma. Alterações posteriores devem vir de playtests e ser registradas como decisão.
 
 | Arma | Atributo usado e efeito proposto | Regras para evitar abuso |
 |---|---|---|
@@ -72,28 +72,29 @@ Os valores abaixo são uma **proposta de primeira passagem**, não uma promessa 
 
 **Por que a Espada:** Contracorte cria uma identidade reativa e confiável no auto-combate, recompensa permanecer lutando e não se confunde com veneno da Adaga, dano do Machado, crítico da Maça, área do Cajado ou ataque duplo das Garras. Os valores de 20%/50% foram confirmados junto com o conceito pelo usuário; ainda podem ser ajustados futuramente por balanceamento sem mudar a identidade.
 
-## 5. Afinidade de arma — proposta
+## 5. Afinidade de arma — baseline aprovado
 
-- Afinidade não bloqueia equipamento. Proposta inicial: personagem pode ter **uma afinidade de arma ou nenhuma**; isso é um dado da ficha do personagem.
+- Afinidade não bloqueia equipamento. Personagem pode ter **uma afinidade de arma ou nenhuma**; esse dado fica na ficha do personagem.
 - Com a arma correspondente equipada, recebe **+5% multiplicativo no atributo ofensivo principal** final: Ataque para Espada/Adaga/Machado/Maça/Besta/Luvas/Garras; Ataque Especial para Cajado/Livro Arcano.
 - Afinidade não altera os rolls x, bases, raridade, chances de proc, número de alvos ou número de golpes. Como aumenta o atributo principal, melhora indiretamente dano (e cura do Livro Arcano, quando pertinente).
-- Os personagens com afinidade e distribuição no roster ficam para a definição do elenco inicial. O bônus de 5% é sugestão; validar se é suficiente e se há personagens sem afinidade.
+- A regra e o bônus de 5% estão aprovados. A atribuição de afinidades a personagens específicos depende do roster inicial.
 
 ## 6. Interações e estados
 
 - Efeitos de arma, skills, características Lendárias/Celestiais, poções, revive e VIP devem ter `id`, fonte, alvo, duração, limite/stack e regra de dispel explícitos.
-- Efeitos de dano periódico resolvem dano usando o tipo/defesa documentados, não podem causar crítico na proposta base e têm regra explícita de acumular/renovar.
-- Atordoamento pula uma única ação agendada do alvo e então expira. Aplicações consecutivas não estendem a duração nesta primeira versão.
-- Quando um alvo morre, ações/cooldowns do alvo são cancelados; efeitos periódicos ativos precisam ter regra final (proposta: expiram com o alvo).
-- Bosses e PvP podem ter resistência/imunidade a controle/DoT configurada por conteúdo; ainda não definir exceções globais sem decidir seus modos.
+- Efeitos de dano periódico resolvem dano usando o tipo/defesa documentados, não causam crítico e seguem regra explícita de acumular/renovar (veneno não acumula; nova aplicação renova).
+- Atordoamento pula uma única ação agendada do alvo e então expira. Aplicações consecutivas não estendem a duração.
+- Quando um alvo morre, ações/cooldowns do alvo são cancelados e seus efeitos periódicos expiram.
+- Resistência/imunidade de bosses e conteúdo PvP a controle/DoT é definida por configuração de conteúdo, não por exceção codificada; valores por boss/modo são dados a preencher.
 
-## 7. Pendências antes de congelar G1
+## 7. Próximas validações de implementação e balanceamento
 
-1. Aprovar/ajustar os números propostos para Adaga, Machado, Maça, Besta, Cajado, Livro, Luvas e Garras.
-2. Aprovar bônus e distribuição de afinidades no roster.
-3. Validar base de atributos/nível e se o limite de IAS, crítico e defesa mantém lutas rápidas.
-4. Definir resistência de chefes/PvP a veneno/stun, cooldowns e efeitos lendários que interagem com golpes múltiplos.
-5. Fechar regra de alvos para skills, buffs, cura de grupo, empate e tempos/reconexão.
-6. Simular e playtestar os parâmetros na vertical slice antes de chamá-los de balanceamento final.
+O baseline desta especificação está aprovado; os itens abaixo são trabalho de conteúdo/implementação e validação, não pendências para reaprovar o conceito:
 
-Nenhum número provisório deve ser tratado como oficial até ser registrado como aprovado no GDD e neste documento. Contracorte (20% / 50% Ataque) é a exceção já validada pelo usuário nesta revisão.
+1. Atribuir afinidades a personagens quando o roster inicial for definido.
+2. Tabelar bases de atributos por nível e testar se caps de IAS, crítico e defesa mantêm lutas legíveis e rápidas.
+3. Configurar resistência de chefes/PvP a veneno e stun, cooldowns e interação de efeitos Lendários com golpes múltiplos.
+4. Definir por conteúdo os alvos de cada skill, buffs, curas de grupo, desempates e persistência/reconexão.
+5. Simular e playtestar os parâmetros na vertical slice; eventuais ajustes serão registrados com evidências e versão, sem desconsiderar a aprovação atual silenciosamente.
+
+O usuário aprovou o baseline deste documento, incluindo Contracorte (20% / 50% Ataque), os demais traços, fórmulas-base e afinidade de +5%. A implementação e validação de runtime ainda não aconteceram.

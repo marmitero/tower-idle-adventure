@@ -1,7 +1,7 @@
 # Roadmap — Tower Idle Adventure
 
 **Versão:** 0.1 — plano macro
-**Status atual:** Etapa 1 (G1 — fechamento de escopo e design) em andamento; proposta de combate/armas documentada, aguardando revisão das pendências; nenhum produto implementado.
+**Status atual:** Etapa 1 (G1 — fechamento de escopo e design) em andamento; baseline de combate aprovado, demais decisões de roster/economia/MVP em aberto; nenhum produto implementado.
 **Princípio:** cada etapa começa lendo [AI_State](AI_STATE.md), altera a documentação antes do código quando houver decisão de design e termina atualizando AI_State e evidências.
 
 ## Marcos de aprovação
@@ -28,19 +28,21 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 
 ### Etapa 1 — Fechamento de escopo e design (G1, em andamento)
 
-- Decisões já fechadas: x individual por atributo, inteiro de 1–50; Contracorte da Espada (20% / 50% Ataque). Revisar a proposta de parâmetros das outras armas e afinidades em `COMBAT_DESIGN.md`, validar fórmulas de combate e resolver o restante do G1: roster/classe, bases por nível, nota/poder, loot/preços, revive/retorno, estrelas, VIP, offline, market e PvP.
+- Decisões fechadas: x inteiro individual 1–50; Contracorte (20% / 50% Ataque); baseline completo de combate/armas/afinidades em `COMBAT_DESIGN.md` aprovado pelo usuário; stack Vercel + Supabase e requisito do painel administrativo aprovados.
+- Resolver o restante do G1: roster/classe, bases por nível, nota/poder, loot/preços, revive/retorno, estrelas, VIP, offline, market e PvP. Calibração do combate após playtests pode ajustar valores, com evidência e registro de versão.
 - Definir experiência de onboarding, wireframes, condições de vitória/derrota e instrumentação de testes.
 - Priorizar MVP, itens fora do lançamento inicial e critérios de sucesso; criar registro de decisões.
-- **Entregáveis:** GDD aprovado, especificações de conteúdo/economia/combate, proposta de combate validada ou revisada, backlog e critérios de aceite.
+- **Entregáveis:** GDD aprovado, especificações de conteúdo/economia/combate (baseline COMBAT_DESIGN já aprovado), backlog e critérios de aceite.
 - **Gate:** nenhuma ambiguidade crítica que force reescrita do núcleo; escopo e política de monetização aprovados.
 
 ### Etapa 2 — Pré-produção técnica, segurança e UX (G2)
 
-- Escolher arquitetura e stack após requisitos de conta, estado persistente, mercado e escalabilidade.
-- Definir domínio autoritativo do servidor, modelo de dados, contratos API/eventos, autenticação, rate limits, logs, backup, restauração e proteção de economia.
+- Detalhar a arquitetura já escolhida: Game Web e Admin Web em projetos separados da Vercel; servidor Supabase (Auth, PostgreSQL, Edge Functions, Storage e Realtime conforme uso), com ambientes dev/staging/production.
+- Definir domínio autoritativo do servidor, schema/migrações, contratos API/eventos, autenticação, roles, RLS, rate limits, logs, backup, restauração e proteção da economia.
+- Desenhar o CMS no-code, isolamento do painel, provisioning de administradores, fluxo draft/validate/publish/rollback, versionamento do catálogo e threat model, conforme `ADMIN_PANEL_SPEC.md` e `TECH_ARCHITECTURE.md`.
 - Revisar e aprovar a arquitetura, os componentes, os estados e as dependências da HUD documentados em `HUD_UX_SPEC.md` antes de implementar a interface; definir UX responsiva, acessibilidade, protótipos navegáveis e teste de usabilidade.
 - Definir plano de privacidade, retenção, moderação, suporte e revisão legal/plataformas para pagamentos, VIP e caixas.
-- **Entregáveis:** arquitetura aprovada, threat model, protótipos, plano de QA/observabilidade, pipeline de assets/documentação técnica.
+- **Entregáveis:** arquitetura Supabase/Vercel aprovada, threat model, desenho do painel administrativo, protótipos, plano de QA/observabilidade, pipeline de assets/documentação técnica.
 - **Gate:** revisão técnica/segurança e aceite de experiência antes de produção em escala.
 
 ### Etapa 3 — Vertical slice e prova de diversão (G3)
@@ -55,6 +57,7 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 
 - Construir núcleo de conta/progresso previsto no escopo, lobby e cura, seleção de andar, combate auto de encontros 1–3, derrota/retorno, equipe, equipamento/raridade/x, nota/poder, inventário e comparação.
 - Implementar bot de poção/revive com consumíveis, lojas NPC necessárias, progressão inicial e saves seguros.
+- Entregar o Admin Web isolado na Vercel para CRUD no-code do conteúdo do MVP (equipamentos, personagens, inimigos, skills, andares, encontros e drops), com role admin, validação, rascunho/publicação versionada, auditoria e rollback; confirmar inacessibilidade por contas comuns.
 - Usar servidor autoritativo para dados persistentes e recompensas caso já haja contas online; não confiar em cliente para economia.
 - Testes unitários de fórmulas e integrações do loop; telemetria de erros sem coletar dados pessoais desnecessários.
 - **Gate:** fluxo completo reproduzível e sem perda/duplicação crítica de estado.
@@ -62,6 +65,7 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 ### Etapa 5 — Conteúdo, balanceamento e produção de arte (G4)
 
 - Criar guia visual, naming e manifestos. Produzir os assets originais em lotes de 10, com revisão de consistência, transparência, tamanho, atribuição/origem e QA.
+- Criar/preencher conteúdo usando o painel administrativo, sem editar código, para os tipos de dados já suportados; novos comportamentos continuam dependendo de implementação.
 - Tabelar personagens/classes, skills, inimigos, andares, equipamentos, características, drops, economia e tutorial.
 - Balancear curvas de XP/nível/loot e validar que equipamento inferior pode ser útil sem tornar raridade irrelevante.
 - **Gate:** cobertura de conteúdo do MVP, localização e testes de assets aprovados; odds documentadas.

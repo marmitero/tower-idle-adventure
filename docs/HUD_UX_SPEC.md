@@ -164,7 +164,7 @@ Se estoque elegível acabar, não sugerir que a automação segue funcionando: m
 
 A batalha mostra no palco os eventos visualmente relevantes: avanço/balanço de ação, dano/crit, hit recebido, efeitos de lâmina/impacto/magia, status aplicados e morte. Feedback deve corresponder ao evento confirmado pela simulação, sem efeitos enganosos.
 
-O feed e indicadores reconhecem traços de arma: veneno da Adaga, dano aumentado do Machado, crítico da Maça, velocidade de ataque da Besta, ataque em área do Cajado, cura do Livro Arcano, atordoamento das Luvas, ataque duplo das Garras e **Contracorte** da Espada (contra-ataque visual de corte). Contracorte foi validado (20% de chance, 50% do Ataque); os demais números de armas permanecem em proposta e não devem aparecer como valores finais na UI antes da aprovação. Fórmulas e gatilhos estão em `COMBAT_DESIGN.md` e `SYSTEMS_SPEC.md`.
+O feed e indicadores reconhecem traços de arma: veneno da Adaga, dano aumentado do Machado, crítico da Maça, velocidade de ataque da Besta, ataque em área do Cajado, cura do Livro Arcano, atordoamento das Luvas, ataque duplo das Garras e **Contracorte** da Espada (contra-ataque visual de corte). Contracorte foi validado (20% de chance, 50% do Ataque); o baseline dos demais traços também foi aprovado. Valores de `COMBAT_DESIGN.md` podem aparecer na UI; ajustes posteriores devem seguir balanceamento versionado/testado. Fórmulas e gatilhos estão em `COMBAT_DESIGN.md` e `SYSTEMS_SPEC.md`.
 
 ## 8. Regras de conteúdo e detalhes fora da HUD
 

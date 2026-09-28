@@ -1,9 +1,9 @@
 # Especificação de sistemas — Tower Idle Adventure
 
 **Versão:** 0.1 — base para decisões de design
-**Estado:** proposta inicial; números de balanceamento ainda não aprovados
+**Estado:** baseline de combate/armas v0.1 aprovado pelo usuário; implementação e playtests pendentes.
 
-Esta especificação traduz as regras fornecidas para fórmulas e invariantes testáveis. Onde há ambiguidade, a proposta está marcada como **PENDENTE**, para não transformar uma suposição em requisito definitivo.
+Esta especificação traduz as regras aprovadas e pendências abertas em fórmulas e invariantes testáveis. Decisões novas não devem ser assumidas em silêncio: marcar como **PENDENTE** até aprovação.
 
 ## 1. Equipamentos e atributos
 
@@ -45,19 +45,19 @@ Somente Lendário e Celestial recebem uma característica adicional sorteada da 
 
 Todo subtipo de arma possui seu traço de tipo, independentemente de o item ser Comum ou Celestial. Este traço não é a característica aleatória adicional de raridade; os dois efeitos podem coexistir em Lendário/Celestial.
 
-| Tipo | Traço definido no conceito | Parâmetros pendentes |
+| Tipo | Baseline aprovado | Integrações / referência |
 |---|---|---|
-| Espada | **Contracorte (validado):** ao sofrer um ataque direto de alvo único, 20% de chance de contra-atacar imediatamente o agressor com dano físico de 50% do Ataque atual. Não ativa contra si próprio nem por dano ao longo do tempo. | Interações finas com esquiva, bloqueio e outros procs devem seguir COMBAT_DESIGN; valores iniciais aprovados, sujeitos a futura revisão de balanceamento. |
-| Adaga | Pode causar envenenamento. | Chance, duração, acúmulo, dano e resistência. |
-| Machado | Dano aumentado. | Multiplicador, condição e categoria de dano. |
-| Maça | Chance crítica aumentada. | Valor, soma/multiplicação e limite. |
-| Besta | Velocidade de ataque aumentada. | Valor e interação com limites de velocidade. |
-| Cajado | Ataca todos os inimigos do encontro. | Dano por alvo, custo/targeting e mitigação AoE. |
-| Livro Arcano | Recupera vida a cada ataque baseado em Ataque Especial. | Coeficiente, alvo curado, limites e interações. |
-| Luvas (arma) | Chance de atordoar; alvo fica temporariamente sem atacar. | Chance, duração, imunidade/recorrência e resistência. |
-| Garras | Ataca o alvo duas vezes. | Divisão do dano, eventos críticos, procs e efeitos por golpe. |
+| Espada | **Contracorte:** 20% de chance de contra-atacar por ataque direto de alvo único recebido, com dano físico de 50% do Ataque; sem recursão ou proc por DoT. | Usa fórmula física e chance crítica do personagem; ver COMBAT_DESIGN. |
+| Adaga | 20% por ação para aplicar veneno: 3 pulsos de 10% do Ataque, 1 por segundo; não acumula, reaplicar renova. | Pulsos mitigados por Defesa física, sem crítico; resistência por boss/PvP configurada em conteúdo. |
+| Machado | +15% de dano físico final em ataques básicos e skills físicas. | Não aumenta dano mágico, cura nem DoT. |
+| Maça | +10 pontos percentuais de chance crítica. | Teto crítico 75%; multiplicador de crítico 1,5×. |
+| Besta | +20% de Velocidade de Ataque aditiva. | Sujeita ao cap global de IAS; não reduz cooldowns. |
+| Cajado | Ataque Especial atinge todos os inimigos; coeficiente 1,0 em alvo único e 0,70 por alvo quando há múltiplos. | Cada alvo tem mitigação/crítico próprios; ver COMBAT_DESIGN. |
+| Livro Arcano | Ataque Especial; ataque básico que acerta cura o portador em 10% do Ataque Especial. | Uma cura por ação, limitada ao HP faltante; não cura aliados no baseline. |
+| Luvas (arma) | 15% por ação de arma para atordoar e fazer o alvo perder a próxima ação. | Não acumula; exceções de boss/PvP são configuradas por conteúdo. |
+| Garras | Dois golpes de 0,60 cada contra o mesmo alvo (120% no total); cada golpe pode critar. | Conta como uma ação; outros procs por acerto disparam uma vez por ação. |
 
-Qualquer personagem pode equipar qualquer tipo; afinidade não bloqueia o uso. Proposta inicial de bônus e mapeamento de atributos por tipo está em [COMBAT_DESIGN.md](COMBAT_DESIGN.md), ainda aguardando validação do roster/balanceamento. A luva do slot de armadura e o tipo de arma Luvas devem ser IDs distintos.
+Qualquer personagem pode equipar qualquer tipo; afinidade não bloqueia o uso. Baseline aprovado: afinidade dá +5% multiplicativo ao atributo ofensivo principal final (Ataque ou Ataque Especial, conforme arma); personagens específicos são definidos no roster. Detalhes em [COMBAT_DESIGN.md](COMBAT_DESIGN.md). A luva do slot de armadura e o tipo de arma Luvas devem ser IDs distintos.
 
 ## 2. Nota e poder do item
 
@@ -97,7 +97,7 @@ Toda caixa deve declarar chances completas (soma = 100%), itens possíveis, nív
 
 A proposta de iniciativa/recorrência já está registrada em [COMBAT_DESIGN.md](COMBAT_DESIGN.md): Velocidade determina a ordem inicial; Velocidade de Ataque define o intervalo entre ações, com desempates estáveis. É uma decisão de design proposta para G1, ainda aguardando validação e playtest.
 
-Cada ação seleciona alvo automaticamente, executa skill/ataque elegível, calcula acerto, crítico, dano, mitigação e efeitos, aplica HP/cooldowns e emite evento visual/log. Fórmulas de dano, ordem, alvos, limites e parâmetros de arma estão detalhados como proposta em [COMBAT_DESIGN.md](COMBAT_DESIGN.md). Contracorte está validado pelo usuário (20% de chance, 50% do Ataque); os demais números continuam em análise. Afinidade nunca restringe quem equipa a arma.
+Cada ação seleciona alvo automaticamente, executa skill/ataque elegível, calcula acerto, crítico, dano, mitigação e efeitos, aplica HP/cooldowns e emite evento visual/log. Baseline aprovado para dano, ordem, alvos, limites e traços está em [COMBAT_DESIGN.md](COMBAT_DESIGN.md). Valores podem ser ajustados com evidência de playtest; não reabrir a aprovação silenciosamente. Afinidade nunca restringe quem equipa a arma.
 
 Encontros têm 1–3 inimigos. Vitória encerra o encontro, recompensa a run e inicia o próximo encontro no andar enquanto hunt estiver ativa. Derrota total encerra hunt e retorna ao lobby. A HUD solicita uma opção de retorno após derrota; regra candidata é curar gratuitamente no lobby e reiniciar o mesmo andar se o jogador tiver ativado a opção. Isso ainda requer confirmação, e não autoriza autoavanço de andar (exclusivo VIP). Sem automação aprovada/ativa, reinício não ocorre após derrota.
 
@@ -128,7 +128,9 @@ Invariantes propostos para backend:
 
 ## 8. Conta, sessão e recursos online
 
-Como o jogo inclui moeda negociável, VIP, PvP, chat e drops, resultados e inventários que têm valor devem ser autoritativos no servidor. O cliente é apresentação e envia intenções; não define dano, loot, cooldown, moeda nem transação. Detalhes de autenticação, persistência, privacidade, moderação e recuperação são pré-requisitos de arquitetura, não decisões de stack desta revisão.
+Como o jogo inclui moeda negociável, VIP, PvP, chat e drops, resultados e inventários que têm valor devem ser autoritativos no servidor. A stack aprovada é **Game Web na Vercel** e **servidor Supabase** (Auth, PostgreSQL, Edge Functions e serviços selecionados), separados por API autenticada. O cliente é apresentação e envia intenções; não define dano, loot, cooldown, moeda nem transação. O desenho e seus limites estão em [TECH_ARCHITECTURE.md](TECH_ARCHITECTURE.md).
+
+O CMS administrativo será uma aplicação Vercel separada, sem acesso público para jogadores, com roles checadas pelo servidor e RLS/Edge Functions. Escrita de conteúdo nunca usa permissões do cliente comum. Ver [ADMIN_PANEL_SPEC.md](ADMIN_PANEL_SPEC.md). Detalhes de schema, privacidade, moderação, jobs e recuperação serão fechados na pré-produção técnica.
 
 ## 9. Interface e autoridade dos dados
 
