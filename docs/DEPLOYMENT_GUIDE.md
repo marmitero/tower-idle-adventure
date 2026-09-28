@@ -39,7 +39,7 @@ Até 28/09/2026, segundo o estado do repositório e o relato do usuário:
 
 - `apps/game-web/` e `apps/admin-web/` ainda não existem; não há app web para importar na Vercel. O pack de sprites estático fica em `sprites/`; um subset final poderá ser servido pelo app/Vercel, sem exigir upload imediato para Supabase Storage.
 - O usuário relata projeto Supabase `tower-idle-adventure-dev` ligado a `marmitero/tower-idle-adventure`, Working Directory `.`, **Deploy to production ON** e Production branch `Main`. A migration-base existe em `supabase/migrations/`, mas a aplicação ainda não foi confirmada. Os 9 testes PGlite não substituem validação Supabase.
-- O usuário prefere Automatic Branching/Preview Branch desligado, pois exige Pro; não há banco isolado por PR. O merge correto para o projeto dev deve mirar a branch GitHub `main`; verificar que o valor reportado `Main` representa essa ref.
+- O usuário prefere Automatic Branching/Preview Branch desligado, pois exige Pro; não há banco isolado por PR. PR #1 foi mesclado à branch GitHub `main` por pedido explícito do usuário. O check Supabase Preview do PR ficou `SKIPPED`; no commit de merge, um check-run do app Supabase com o mesmo nome terminou `success`. Isso indica que a integração reportou sucesso, mas o check não detalha o schema/migration aplicada; verificar o histórico no Dashboard. O valor reportado `Main` deve corresponder à ref `main`.
 - Vercel não foi integrada nem teve projeto criado; não há domínio ou deployment. `apps/game-web/` e `apps/admin-web/` ainda não existem.
 - A G2 continua aberta. O projeto dev informado não fecha o gate nem inicia implementação de gameplay/Admin.
 

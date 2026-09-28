@@ -5,6 +5,7 @@
 **Última atualização documental:** 2026-09-28. **Marco atual:** G2 (pré-produção técnica, segurança e UX) em andamento; não avançar para gameplay/vertical slice antes do gate G2.
 
 **Checkout da sessão:** `/home/user/tower-idle-adventure` · **remote:** `origin` → `marmitero/tower-idle-adventure` · **branch obrigatória:** `arena/01a0e5e1-tower-idle-adventure`.
+**Último PR:** [#1](https://github.com/marmitero/tower-idle-adventure/pull/1), da branch fixa para `main`, mesclado a pedido do usuário; merge commit `5d0d6a79319ad3aafe5594359c7cd5155ede96f3`. O check `Supabase Preview` do PR ficou `SKIPPED`; depois, o check-run da integração Supabase no merge commit terminou `success`. Isso sugere que a integração processou o merge, mas não prova qual migration/schema foi aplicada; conferir no Dashboard.
 
 ## 1. Regras obrigatórias para quem continuar
 
@@ -54,10 +55,10 @@ O usuário forneceu os seguintes dados da configuração no Dashboard. **O agent
 - **Deploy to production:** ativado para essa integração/projeto Supabase dev.
 - **Production branch name:** usuário informou **`Main`**. A branch do repositório foi referida como `main`; como nomes de refs Git são sensíveis a maiúsculas/minúsculas, confirmar no Dashboard que o valor selecionado é exatamente a branch existente (`main`) se houver dúvida. O rótulo “production” nesse contexto da integração Supabase é a branch/projeto-base configurado, não significa que o banco público de produção do jogo foi criado.
 - **Automatic Preview/Automatic Branching/Preview Branch:** desligado, pois o usuário informou que a função exige plano Pro e deseja deixá-la desligada. Não há banco isolado automático para cada PR.
-- **Migration:** ainda não há confirmação de que `20260928000000_g2_core_schema.sql` foi aplicada ao projeto nem de que seu resultado foi inspecionado. O toggle ligado indica a intenção de aplicar mudanças da branch conectada ao projeto-base, mas só o histórico/status do Dashboard confirma a aplicação real.
+- **Migration:** ainda não há confirmação de que `20260928000000_g2_core_schema.sql` foi aplicada ao projeto nem de que seu resultado foi inspecionado. O PR #1 (que inclui o arquivo) foi mesclado em `main` em 2026-09-28. Como Deploy to production está ligado segundo o usuário, a integração **pode ter aplicado** a migration ao projeto-base dev; somente o histórico/status do Dashboard confirma.
 - Usar apenas dados sintéticos. Não conectar um eventual Supabase de produção a este fluxo; nenhum setup de produção foi reportado/verificado.
 
-**Consequência operacional:** após revisar um PR e integrar as alterações à branch correta `main`, a integração Supabase configurada para o projeto dev deve atualizar **o projeto dev**, se o repo/branch estão corretos e a migração é válida. Como Preview Branch está desligada, não há validação SQL em DB efêmero antes do merge. Revisar migration no PR e depois checar histórico de migrations/schema no Supabase Dashboard. Não dizer que migration está aplicada até haver essa evidência.
+**Consequência operacional:** PR #1 já foi revisado/mesclado conforme pedido explícito do usuário; isso não é autorização permanente para merges futuros. As alterações chegaram à branch GitHub `main`; o Deploy to production do Supabase dev pode ter executado migrations, mas a execução real ainda precisa ser conferida no Dashboard. Como Preview Branch está desligada, não houve DB efêmero para PR. Não dizer que a migration está aplicada até haver evidência.
 
 ### Vercel — estado reportado pelo usuário
 
@@ -132,4 +133,4 @@ Não usar a ausência de Preview Branch como motivo para instalar ferramentas ou
 - G2 produziu blueprints, threat model, click-through estático, migration-base e harness PGlite. É trabalho parcial; nenhum desses artefatos por si fecha G2 ou representa jogo/back-end pronto.
 - O usuário abriu/revisou visualmente o protótipo e autorizou o início do onboarding Supabase/Vercel. Depois especificou o fluxo browser-only e que Automatic Preview exige Pro e deve continuar desligado.
 - A recomendação antiga de instalar CLI/Docker para validação local está **superada**. A recomendação anterior de habilitar Preview Branch também está **superada**.
-- Snapshot anterior sincronizado antes desta revisão: commit `5705d14` na branch desta sessão; consulte `git log` para o hash atual após este checkpoint.
+- Snapshot anterior a esta etapa era `5705d14`. Após pedido explícito do usuário, foi criado o [PR #1](https://github.com/marmitero/tower-idle-adventure/pull/1) de `arena/01a0e5e1-tower-idle-adventure` para `main`, mesclado em 2026-09-28 às 15:43:58 UTC. Merge commit: `5d0d6a79319ad3aafe5594359c7cd5155ede96f3`. No PR, o check `Supabase Preview` ficou **SKIPPED** (esperado com Preview Branch desligado). No commit de merge, o GitHub check-run emitido pelo app Supabase, também chamado `Supabase Preview`, terminou **success** às 15:44:44 UTC. O check não expõe no GitHub o nome/schema da migration; confirmar no Dashboard exatamente o que foi aplicado. O checkout da branch obrigatória foi fast-forwardado ao merge commit sem trocar de branch. Esta autorização valeu para o PR #1; não presumir autorização geral para merges futuros.
