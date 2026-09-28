@@ -1,12 +1,12 @@
 # Roadmap — Tower Idle Adventure
 
-**Versão:** 0.1 — plano macro
-**Status atual:** Etapa 1 (G1 — fechamento de escopo e design) em andamento; baseline de combate aprovado, demais decisões de roster/economia/MVP em aberto; nenhum produto implementado.
+**Versão:** 0.2 — MVP decidido e fases sincronizadas
+**Status atual:** Etapa 1/G1 concluída documentalmente; Etapa 2/G2 é o próximo trabalho, iniciada apenas em documentação. Nenhum produto, gameplay, HUD ou painel foi implementado. O baseline de MVP foi escolhido pelo agente sob autorização explícita do usuário; não foi playtestado.
 **Princípio:** cada etapa começa lendo [AI_State](AI_STATE.md), altera a documentação antes do código quando houver decisão de design e termina atualizando AI_State e evidências.
 
 ## Marcos de aprovação
 
-- **G0 — visão documentada:** visão, requisitos e riscos registrados (documentação inicial entregue; aguarda revisão).
+- **G0 — visão documentada:** visão, requisitos e riscos registrados (baseline documental inicial concluído).
 - **G1 — design aprovado:** decisões de gameplay/economia, MVP, critérios de aceite e escopo assinados antes de implementar.
 - **G2 — pré-produção pronta:** arquitetura, pipeline de arte, privacidade/segurança e protótipo de UX aprovados.
 - **G3 — vertical slice validada:** loop curto jogável com qualidade visual/técnica e métricas de diversão/legibilidade validadas.
@@ -24,26 +24,27 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 - Criar AI_State, documentação principal e caminho de produção.
 - **Saída:** GDD v0.1, especificação de sistemas v0.1, arquitetura proposta da HUD/UX v0.1, roadmap v0.1, AI_State atualizado.
 - **Critério:** requisitos rastreáveis; nenhum código apresentado como jogo pronto.
-- **Situação:** concluída nesta entrega como primeira versão, aguardando revisão/decisões para fechar G0.
+- **Situação:** baseline de documentação inicial registrado; escopo consolidado no fechamento posterior de G1.
 
-### Etapa 1 — Fechamento de escopo e design (G1, em andamento)
+### Etapa 1 — Fechamento de escopo e design (G1, concluída documentalmente)
 
-- Decisões fechadas: x inteiro individual 1–50; Contracorte (20% / 50% Ataque); baseline completo de combate/armas/afinidades em `COMBAT_DESIGN.md` aprovado pelo usuário; stack Vercel + Supabase e requisito do painel administrativo aprovados.
-- Resolver o restante do G1: roster/classe, bases por nível, nota/poder, loot/preços, revive/retorno, estrelas, VIP, offline, market e PvP. Calibração do combate após playtests pode ajustar valores, com evidência e registro de versão.
-- Definir experiência de onboarding, wireframes, condições de vitória/derrota e instrumentação de testes.
-- Priorizar MVP, itens fora do lançamento inicial e critérios de sucesso; criar registro de decisões.
-- **Entregáveis:** GDD aprovado, especificações de conteúdo/economia/combate (baseline COMBAT_DESIGN já aprovado), backlog e critérios de aceite.
-- **Gate:** nenhuma ambiguidade crítica que force reescrita do núcleo; escopo e política de monetização aprovados.
+- Baseline de combate/armas/afinidades em `COMBAT_DESIGN.md` permanece aprovado pelo usuário; parâmetros de Contracorte: 20% / 50% Ataque, sem recursão/DoT.
+- Stack Vercel + Supabase, separação Game Web/servidor e painel administrativo no-code isolado foram aprovados pelo usuário e especificados.
+- Sob autorização explícita do usuário para resolver pendências, baseline MVP foi fechado pelo agente em `MVP_DECISIONS.md`: roster, progressão, bases, nota/poder, inimigos, loot/economia, bot, UX de escopo, exclusões pós-MVP e aceite. Estas escolhas do agente não são alegadas como decisões individuais escolhidas pelo usuário; podem ser adaptadas posteriormente.
+- GDD, SYSTEMS_SPEC, COMBAT_DESIGN, HUD_UX_SPEC, Roadmap e AI_State foram sincronizados para diferenciar MVP de pós-MVP.
+- **Entregável:** baseline documental completo para pré-produção. Não houve código, implementação, playtest ou balanceamento em runtime.
+- **Gate G1:** fechado quanto a escopo/decisões necessárias para iniciar G2; não equivale a G3 nem a balanceamento final.
 
-### Etapa 2 — Pré-produção técnica, segurança e UX (G2)
+### Etapa 2 — Pré-produção técnica, segurança e UX (G2, próxima; especificações-base iniciadas)
 
 - Detalhar a arquitetura já escolhida: Game Web e Admin Web em projetos separados da Vercel; servidor Supabase (Auth, PostgreSQL, Edge Functions, Storage e Realtime conforme uso), com ambientes dev/staging/production.
 - Definir domínio autoritativo do servidor, schema/migrações, contratos API/eventos, autenticação, roles, RLS, rate limits, logs, backup, restauração e proteção da economia.
 - Desenhar o CMS no-code, isolamento do painel, provisioning de administradores, fluxo draft/validate/publish/rollback, versionamento do catálogo e threat model, conforme `ADMIN_PANEL_SPEC.md` e `TECH_ARCHITECTURE.md`.
 - Revisar e aprovar a arquitetura, os componentes, os estados e as dependências da HUD documentados em `HUD_UX_SPEC.md` antes de implementar a interface; definir UX responsiva, acessibilidade, protótipos navegáveis e teste de usabilidade.
-- Definir plano de privacidade, retenção, moderação, suporte e revisão legal/plataformas para pagamentos, VIP e caixas.
-- **Entregáveis:** arquitetura Supabase/Vercel aprovada, threat model, desenho do painel administrativo, protótipos, plano de QA/observabilidade, pipeline de assets/documentação técnica.
-- **Gate:** revisão técnica/segurança e aceite de experiência antes de produção em escala.
+- Definir plano de privacidade, retenção, suporte e revisão legal antes de qualquer beta público; monetização/moderação de recursos sociais só se aplicam a fases futuras.
+- **Entregáveis:** especificações-base Supabase/Vercel e painel (já documentadas), schemas/migrações, threat model, decisões de MFA/RLS, protótipo UX, QA/observabilidade, pipeline de assets e documentação técnica.
+- **Situação:** nenhum serviço Supabase/Vercel foi provisionado e nenhuma interface ou proteção foi implementada/testada.
+- **Gate:** revisão técnica/segurança e aceite UX antes de G3/produção.
 
 ### Etapa 3 — Vertical slice e prova de diversão (G3)
 
@@ -66,13 +67,13 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 
 - Criar guia visual, naming e manifestos. Produzir os assets originais em lotes de 10, com revisão de consistência, transparência, tamanho, atribuição/origem e QA.
 - Criar/preencher conteúdo usando o painel administrativo, sem editar código, para os tipos de dados já suportados; novos comportamentos continuam dependendo de implementação.
-- Tabelar personagens/classes, skills, inimigos, andares, equipamentos, características, drops, economia e tutorial.
-- Balancear curvas de XP/nível/loot e validar que equipamento inferior pode ser útil sem tornar raridade irrelevante.
+- Criar e publicar pelo Admin Panel os registros de personagens/classes, skills, inimigos, andares, equipamentos, características, drops, economia e tutorial conforme baseline `MVP_DECISIONS.md`.
+- Balancear curvas de XP/nível/loot via playtests e validar que equipamento inferior pode ser útil sem tornar raridade irrelevante; qualquer alteração numérica é registrada.
 - **Gate:** cobertura de conteúdo do MVP, localização e testes de assets aprovados; odds documentadas.
 
 ### Etapa 6 — Social, atividades compartilhadas e economia (G4 → G5)
 
-- Implementar por prioridade: amigos/chat, guildas/chat, market da comunidade e diamantes, arena, batalhas de guilda, boss individual/em equipe/guilda/global.
+- Implementar por prioridade: amigos/chat, guildas/chat, market da comunidade e Diamonds, arena, batalhas de guilda e expansões de boss em equipe/guilda/global (o boss solo do MVP é Etapa 4/5).
 - Desenvolver moderação, denúncias/bloqueio, filtros, rate limits, matchmaking, logs, operação atômica do market e ferramentas administrativas auditáveis.
 - Testar transações concorrentes, retries, desconexões, abuso, fraude, inflação, bots e last-hit de boss.
 - **Gate:** segurança e moderação revisadas; comércio e competição não duplicam recursos nem premiam exploits críticos.
@@ -104,9 +105,9 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 - Atualizar roadmap com conteúdo sazonal, novas caixas/personagens/bosses, balanceamento e expansão; revisar documentação e AI_State em toda etapa.
 - **Sucesso:** serviço estável e sustentável, comunidade segura, retenção saudável e ciclos de conteúdo com QA.
 
-## Escopo recomendado para lançamento inicial
+## Escopo fechado para o MVP
 
-Priorizar uma experiência completa e pequena antes do MMO completo: lobby, progressão individual, uma seleção reduzida de personagens/skills/equipamentos/andares, bot, drops/lojas essenciais, tutorial e contas/saves seguros. Social síncrono completo, guild wars, market de diamantes, boss global e monetização devem ser fases separadas, por alto risco técnico/econômico. A composição final do MVP será decidida em G1, não presumida aqui.
+O escopo final já foi decidido e está detalhado em [`MVP_DECISIONS.md`](MVP_DECISIONS.md): RPG individual PvE, 3 classes, progressão compartilhada até nível 20, 10 andares e boss solo, combate automático, equipamento/loot, loja NPC/bot, sessão sem offline, cliente desktop-first em PT-BR e CMS isolado. Não presumir funcionalidades não listadas como parte do MVP. Social, mercado, monetização, caixas e conteúdo multiplayer são pós-MVP. O baseline foi escolhido pelo agente sob a autorização do usuário, sem afirmar validação por playtest.
 
 ## Riscos e mitigação
 
@@ -117,7 +118,7 @@ Priorizar uma experiência completa e pequena antes do MMO completo: lobby, prog
 | Mercado de diamantes/itens vulnerável a fraude | Servidor autoritativo, transações atômicas, rate limit, audit log, ferramentas operacionais e revisão externa. |
 | VIP e caixas aleatórias podem ser pay-to-win/reguladas | Odds explícitas, revisão legal/plataforma, controles por região e balanceamento competitivo. |
 | Conteúdo social traz abuso/moderação e custo operacional | Denúncia/bloqueio/filtros, equipe e política de operação antes de ativar. |
-| Desconexões e automação duplicam recompensas | Persistência idempotente, testes de retry/offline e limites de farm. |
+| Desconexões e automação duplicam recompensas | Persistência idempotente, testes de retry/reconexão e regra de pausa sem recompensa offline. |
 | IA/arte inconsistente ou direitos incertos | Guia, lotes de dez, QA humano, registro de origem e política de uso. |
 | Buffs/VIP distorcem arena e economia | Buffs definidos com precisão, filas/regras apropriadas e testes de impacto. |
 

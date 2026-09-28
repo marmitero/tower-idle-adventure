@@ -1,25 +1,26 @@
 # Especificação de sistemas — Tower Idle Adventure
 
-**Versão:** 0.1 — base para decisões de design
-**Estado:** baseline de combate/armas v0.1 aprovado pelo usuário; implementação e playtests pendentes.
+**Versão:** 0.2 — referência de sistemas para MVP e backlog pós-MVP
+**Estado:** baseline de combate aprovado pelo usuário; decisões de produto do MVP fechadas pelo agente sob autorização explícita do usuário. Nada foi implementado ou validado em runtime.
 
-Esta especificação traduz as regras aprovadas e pendências abertas em fórmulas e invariantes testáveis. Decisões novas não devem ser assumidas em silêncio: marcar como **PENDENTE** até aprovação.
+`MVP_DECISIONS.md` é a fonte de verdade para roster, progressão, stats-base, catálogo, nota/poder, loot, loja e comportamento do bot no MVP. `COMBAT_DESIGN.md` é a fonte de verdade para as regras universais de combate e armas. Este arquivo conecta os contratos e identifica sistemas intencionalmente adiados; itens pós-MVP não são dependências da primeira entrega.
 
 ## 1. Equipamentos e atributos
 
-### Slots
+### Slots e fórmula
 
-**Arma**, Peitoral, Elmo, Calça, Bota, Luva (armadura), Colar, Aura, Asa e Pet. Arma é um slot oficial. Seus subtipos são Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas e Garras. “Luvas” como arma não é o mesmo que o slot de armadura “Luva”. Qualquer personagem pode equipar qualquer arma; afinidades são bônus/eficiências futuras, ainda sem fórmula e sem restrição de uso.
+Dez slots: **Arma**, Peitoral, Elmo, Calça, Bota, Luva (armadura), Colar, Aura, Asa e Pet. Subtipos de arma: Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas (arma) e Garras. Luvas como arma e Luva como armadura são IDs distintos. Qualquer personagem pode equipar qualquer arma.
 
-### Atributos da ficha de equipamento
+Todo item tem Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, Chance Crítica, Velocidade de Ataque e Velocidade; cada atributo recebe `x_i` inteiro e independente de 1 a 50. Para item de nível `N`:
 
-Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, Chance Crítica, Velocidade de Ataque e Velocidade. Todo equipamento, inclusive qualquer arma, possui todos esses oito atributos e uma rolagem `x_i` independente para cada atributo. Os atributos percentuais devem ser armazenados e apresentados sem misturar pontos percentuais e frações (ex.: 10% = 0,10 internamente, se essa for a convenção escolhida).
+```text
+Base_i(N) = Base_i(1) × [1 + 0,08 × (N − 1)]
+ValorFinal_i = Base_i(N) × MultiplicadorRaridade × (x_i / 10)
+```
 
-**Observação:** espada é um subtipo de arma oficial. O exemplo “Espada Draco” não define por si só seu traço; Contracorte foi posteriormente sugerido e validado pelo usuário. Os números e regras-base constam abaixo e em [COMBAT_DESIGN.md](COMBAT_DESIGN.md).
+Crítico e IAS são frações internamente (por exemplo, 10% = 0,10) e exibidos em percentual. Valores-base dos 18 templates MVP estão tabelados em `MVP_DECISIONS.md`. Precisão decimal é mantida internamente; UI pode arredondar sem alterar a rolagem. Exemplo de tooltip: `Rolagem x: 37; fator aplicado: ×3,7`; x fracionário, como 4,72, nunca é permitido.
 
-### Multiplicadores
-
-| Raridade | Multiplicador R |
+| Raridade | Multiplicador |
 |---|---:|
 | Comum | 1,0 |
 | Incomum | 1,2 |
@@ -28,129 +29,112 @@ Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, Chance Crítica, Velocid
 | Lendário | 2,5 |
 | Celestial | 3,0 |
 
-Para cada atributo `i`:
+Drop MVP: nível do item `min(nível compartilhado da conta, nível mínimo do andar + 2)`. Os dez itens do kit inicial são Comuns nível 1. Requisito para equipar: nível da conta igual ou maior ao nível do item.
 
-- `Base_i`: valor-base tabulado para aquele item/slot/nível.
-- `x_i`: rolagem gerada aleatoriamente **e independentemente para cada atributo** do equipamento; nunca há obrigação de um único x compartilhado pelo item.
-- Regra confirmada pelo usuário: `x_i` é sempre inteiro de 1 a 50 (inclusive); `MultiplicadorX_i = x_i / 10`, intervalo 0,1–5,0 em passos de 0,1. Não gerar nem exibir x fracionário, como 4,72.
-- `ValorFinal_i = Base_i × R × MultiplicadorX_i`.
+### Características e traços
 
-Exemplo do pedido, sem x (ou com x=10, portanto multiplicador x = 1): Base de Ataque 30 resulta em 30 Comum, 45 Raro e 90 Celestial. Para Ataque Especial base 22: 22, 33 e 66. Cálculos mantêm precisão decimal internamente e arredondam apenas na apresentação. Para evitar confusão entre rolagem e fator, tooltip pode mostrar ambos: `Rolagem x: 37` e `Fator aplicado: ×3,7`.
+Somente itens Lendários/Celestiais recebem exatamente uma característica aleatória adicional, sorteada com chances iguais no pool MVP; seus efeitos não escalam com raridade ou x. Pool, magnitudes e limites constam em `MVP_DECISIONS.md` (Roubo Vital, Ruptura de Guarda, Foco Crítico e Concentração). Essa característica pode coexistir com o traço intrínseco da arma.
 
-### Característica única de raridade
-
-Somente Lendário e Celestial recebem uma característica adicional sorteada da lista configurada. É independente de x e do multiplicador de raridade. A raridade pode determinar o pool elegível, mas não amplifica diretamente o valor da característica. Exemplo de estrutura: `id`, descrição, gatilho, efeito e parâmetros. Lista e magnitudes permanecem pendentes; evitar efeitos vagos como “+chance crítica” sem limite e unidade definidos.
-
-### Traço intrínseco do tipo de arma
-
-Todo subtipo de arma possui seu traço de tipo, independentemente de o item ser Comum ou Celestial. Este traço não é a característica aleatória adicional de raridade; os dois efeitos podem coexistir em Lendário/Celestial.
-
-| Tipo | Baseline aprovado | Integrações / referência |
+| Tipo | Traço aprovado | Limite principal |
 |---|---|---|
-| Espada | **Contracorte:** 20% de chance de contra-atacar por ataque direto de alvo único recebido, com dano físico de 50% do Ataque; sem recursão ou proc por DoT. | Usa fórmula física e chance crítica do personagem; ver COMBAT_DESIGN. |
-| Adaga | 20% por ação para aplicar veneno: 3 pulsos de 10% do Ataque, 1 por segundo; não acumula, reaplicar renova. | Pulsos mitigados por Defesa física, sem crítico; resistência por boss/PvP configurada em conteúdo. |
-| Machado | +15% de dano físico final em ataques básicos e skills físicas. | Não aumenta dano mágico, cura nem DoT. |
-| Maça | +10 pontos percentuais de chance crítica. | Teto crítico 75%; multiplicador de crítico 1,5×. |
-| Besta | +20% de Velocidade de Ataque aditiva. | Sujeita ao cap global de IAS; não reduz cooldowns. |
-| Cajado | Ataque Especial atinge todos os inimigos; coeficiente 1,0 em alvo único e 0,70 por alvo quando há múltiplos. | Cada alvo tem mitigação/crítico próprios; ver COMBAT_DESIGN. |
-| Livro Arcano | Ataque Especial; ataque básico que acerta cura o portador em 10% do Ataque Especial. | Uma cura por ação, limitada ao HP faltante; não cura aliados no baseline. |
-| Luvas (arma) | 15% por ação de arma para atordoar e fazer o alvo perder a próxima ação. | Não acumula; exceções de boss/PvP são configuradas por conteúdo. |
-| Garras | Dois golpes de 0,60 cada contra o mesmo alvo (120% no total); cada golpe pode critar. | Conta como uma ação; outros procs por acerto disparam uma vez por ação. |
+| Espada | Contracorte: 20% de chance após receber ataque direto de alvo único; contra-ataca o agressor com dano físico de coeficiente 0,50 do Ataque atual. | Não recursa nem ativa por DoT. |
+| Adaga | 20% por ação para aplicar Veneno: 3 pulsos de 10% do Ataque, 1/s. | Não acumula; reaplicar renova; pulsos não critam nem disparam procs. |
+| Machado | +15% de dano físico final em ataques básicos e skills físicas. | Não beneficia dano mágico, cura ou DoT. |
+| Maça | +10 pontos percentuais de chance crítica. | Teto crítico de 75%; crítico 1,5×. |
+| Besta | +20% de IAS aditivo. | Sujeito a cap; não reduz cooldowns. |
+| Cajado | Ataque Especial contra todos; coeficiente 1,0 em alvo único e 0,70 por alvo em grupos. | Mitigação e crítico independentes por alvo. |
+| Livro Arcano | Ataque básico de Ataque Especial cura portador em 10% do Ataque Especial. | Uma vez por ação; limitado ao HP faltante. |
+| Luvas (arma) | 15% por ação para Atordoar e fazer o alvo perder a próxima ação agendada. | Não acumula; imunidades são dados de conteúdo. |
+| Garras | Dois golpes de coeficiente 0,60 no mesmo alvo, cada um podendo critar. | Uma ação; outros procs por acerto rolam uma vez. |
 
-Qualquer personagem pode equipar qualquer tipo; afinidade não bloqueia o uso. Baseline aprovado: afinidade dá +5% multiplicativo ao atributo ofensivo principal final (Ataque ou Ataque Especial, conforme arma); personagens específicos são definidos no roster. Detalhes em [COMBAT_DESIGN.md](COMBAT_DESIGN.md). A luva do slot de armadura e o tipo de arma Luvas devem ser IDs distintos.
+Afinidade MVP: Guerreiro/Espada, Arcanista/Cajado e Ladino/Adaga. Com afinidade, +5% multiplicativo no atributo ofensivo principal final da arma. Afinidade nunca bloqueia equipamento. Baseline completo e aprovado está em `COMBAT_DESIGN.md`; aplicação por inimigo/boss no MVP está em `MVP_DECISIONS.md` (Sentinela imune a stun, sem resistência a veneno). Valores podem ser reajustados com evidência de playtest, mantendo registro.
 
-## 2. Nota e poder do item
+## 2. Nota e poder
 
-São duas métricas diferentes:
+Nota e Poder são métricas distintas e informativas; nenhuma delas equipa item automaticamente nem substitui comparação da build.
 
-- **Nota de qualidade:** estima se as rolagens foram altas para aquele item, nível e raridade. Proposta: média ponderada de `x_i / 50` dos atributos presentes; exibir como percentagem/escala legível. Característica não entra na nota e bônus de raridade fica separado, para a nota não confundir qualidade da rolagem com nível de raridade.
-- **Poder total:** estimativa da contribuição do item para combate, com pesos de atributo calibrados por testes. Proposta de fórmula parametrizada: `Poder = Σ (ValorFinal_i × Peso_i) + PoderCaracterística`. Os pesos devem normalizar unidades (HP, chance %, velocidade) e podem variar por classe ou ser globais.
+```text
+QualidadePct = média(x_i / 50) × 100
+```
 
-Essas fórmulas são propostas, não balanceamento aprovado. Não usar soma simples de HP com percentuais. UI deve mostrar a nota, poder e diferenças de cada atributo ao comparar; nenhuma pontuação deve decidir automaticamente o melhor item sem considerar a build.
+Peso igual para os oito atributos; raridade e traços não alteram Nota. Faixas: S ≥90; A ≥80; B ≥70; C ≥60; D ≥50; E ≥40; F <40.
+
+```text
+CritPP = ChanceCrítica × 100
+IASPP  = VelocidadeDeAtaque × 100
+Poder = Ataque + AtaqueEspecial + 0,75×Defesa + 0,75×DefesaEspecial
+        + 0,02×Vida + 1,5×CritPP + IASPP + 0,5×Velocidade
+```
+
+A mesma soma dos oito stats finais calcula o poder total de personagem/equipe. Características condicionais e traços de arma não entram no número; devem ficar visíveis em texto separado no tooltip para não sugerir previsão de combate que a métrica não oferece.
 
 ## 3. Loot e geração
 
-A geração de item é lógica aleatória com tabelas explícitas, reprodutível por seed para debug/testes. Isso não significa gerar arte procedural: identidade e arte vêm de assets estáticos aprovados.
+Pipeline canônico do servidor: identificar recompensa de encontro; rolar a chance de drop; escolher raridade conforme tabela do andar/boss; escolher template elegível uniformemente; definir nível de item; sortear oito `x_i` inteiros independentes de 1–50; se Lendário/Celestial, sortear uma característica do pool; persistir seed/versão/origem e calcular Nota/Poder. Tabelas e probabilidades completas estão em `MVP_DECISIONS.md`; resultados precisam ser reprodutíveis para seed e versão iguais.
 
-Pipeline conceitual do drop:
-
-1. Determinar tabela de loot do andar/encontro/caixa.
-2. Sortear tipo/identidade e raridade segundo chances documentadas.
-3. Buscar atributos-base definidos para item, slot e nível.
-4. Sortear x conforme modelo aprovado e calcular valores finais.
-5. Se Lendário/Celestial, sortear característica elegível.
-6. Calcular nota/poder; persistir rolagens e origem para auditoria.
-
-Toda caixa deve declarar chances completas (soma = 100%), itens possíveis, nível/raridade, duplicatas e proteção contra conteúdo inválido; odds precisam ser visíveis ao jogador. Caixas do mercado e drops devem usar o mesmo gerador canônico.
+**Não há caixas/gacha no MVP.** Caixas de equipamento/personagem e seus odds completos, duplicatas, proteção e transparência são pós-MVP, não endpoints ou interface a serem entregues na primeira versão. Arte não é procedimental: identidade visual usa assets estáticos aprovados; apenas rolagens e seleção de dados são aleatórias no servidor.
 
 ## 4. Personagens e estrelas
 
-- Estrelas possíveis: 1 a 5.
-- Slots de skill: `{1:2, 2:3, 3:4, 4:5, 5:5}`.
-- Bônus 5★: +20% dano em todas as skills.
-- Proposta para fusão: dois personagens de mesma identidade e mesma estrela consomem-se e geram um da estrela seguinte; duas unidades 5★ não podem evoluir além de 5★. **PENDENTE:** requisitos extras, custo, itens bloqueados/à venda e proteção por confirmação.
-- O mercado precisa guardar identidade, estrela, skills/atributos e estado de vinculação. Compra/venda não deve duplicar o mesmo personagem nem permitir vender a unidade ativa sem confirmação explícita.
+MVP contém Guerreiro, Arcanista e Ladino, todos 1★, dois slots/skills cada, nível compartilhado da conta 1–20 e desbloqueios garantidos na primeira vitória comum dos andares 3 e 6. Cada conta começa escolhendo um personagem; roster, crescimento, skills, valores e kit inicial estão em `MVP_DECISIONS.md`. Sem energia, upgrade de skill, duplicatas ou fusão no MVP.
 
-## 5. Combate automático
+Estrelas 2★–5★, slots adicionais, bônus de 5★ e fusão de duplicatas pertencem a uma fase posterior. Referência histórica de design para eventual evolução: 1★=2, 2★=3, 3★=4, 4★=5, 5★=5 slots e +20% dano de skills; proposta de fusão seria duas unidades idênticas na mesma estrela consumidas para criar a seguinte, limitada a 5★. Nenhuma dessas regras está habilitada no MVP; custo, UX, confirmação e proteção contra perda terão de ser revisados antes dessa fase.
 
-### Ordem e ciclo
+## 5. Combate automático e bot
 
-A proposta de iniciativa/recorrência já está registrada em [COMBAT_DESIGN.md](COMBAT_DESIGN.md): Velocidade determina a ordem inicial; Velocidade de Ataque define o intervalo entre ações, com desempates estáveis. É uma decisão de design proposta para G1, ainda aguardando validação e playtest.
+### Resolução
 
-Cada ação seleciona alvo automaticamente, executa skill/ataque elegível, calcula acerto, crítico, dano, mitigação e efeitos, aplica HP/cooldowns e emite evento visual/log. Baseline aprovado para dano, ordem, alvos, limites e traços está em [COMBAT_DESIGN.md](COMBAT_DESIGN.md). Valores podem ser ajustados com evidência de playtest; não reabrir a aprovação silenciosamente. Afinidade nunca restringe quem equipa a arma.
+Usar o baseline aprovado em `COMBAT_DESIGN.md`: dano físico/mágico `PoderOfensivo × coeficiente × 100/(100+Defesa)`, crítico efetivo limitado a 75% e multiplicador 1,5×, Velocidade para ordem inicial, IAS para intervalo `2,0/(1+IAS)` com cap −50% a +100%, alvo automático por menor percentual de HP e desempates determinísticos. Cálculos do servidor são autoridade; o cliente apenas apresenta eventos confirmados.
 
-Encontros têm 1–3 inimigos. Vitória encerra o encontro, recompensa a run e inicia o próximo encontro no andar enquanto hunt estiver ativa. Derrota total encerra hunt e retorna ao lobby. A HUD solicita uma opção de retorno após derrota; regra candidata é curar gratuitamente no lobby e reiniciar o mesmo andar se o jogador tiver ativado a opção. Isso ainda requer confirmação, e não autoriza autoavanço de andar (exclusivo VIP). Sem automação aprovada/ativa, reinício não ocorre após derrota.
+O MVP tem encontros de 1–3 inimigos, combate encadeado no mesmo andar selecionado, 3 personagens no máximo e boss individual recorrente no andar 10. Entre grupos, HP dos sobreviventes persiste, cooldowns ficam prontos, efeitos expiram e personagem caído sem revive permanece caído até a cura no Lobby. XP/Coins são creditados por inimigo derrotado; equipamento só é rolado após vitória do grupo. Stats/níveis/papéis de inimigos estão definidos em `MVP_DECISIONS.md`. O servidor emite eventos para dano, crítico, procs, status, morte e recompensa. Não há PvP, combate cooperativo ou jogador visível no cenário pessoal.
 
-### Bot e consumíveis
+### Skills e consumíveis
 
-- Configuração proposta: ativar/desativar poções; limiar de HP; escolher raridades elegíveis; ativar/desativar revive e tipos elegíveis (30%/50%/total); ligar/desligar cada skill equipada na automação; toggle de retorno após derrota solicitado; auto subir andar VIP.
-- Prioridade/ordem de skills pode ser acrescentada futuramente (ex.: buff, ofensiva, controle, ultimate), mas a ordem, cooldowns e critérios de uso ainda não estão definidos.
-- Poção é consumida quando a condição for verdadeira e houver item no inventário. Proposta: consumir no máximo um consumível por evento de decisão e respeitar cooldown; regras exatas pendentes. Se o estoque elegível acabar, HUD informa que a regra não pode operar e oferece loja.
-- Revive consome item elegível e restaura a percentagem configurada ao alvo derrotado, ou pode levantar o grupo conforme regra final. Momento e ordem do revive devem evitar consumir vários itens no mesmo tick.
-- A automação de retorno após derrota é solicitada, mas default, condição e relação com cura grátis/reinício do mesmo andar precisam ser aprovados; não presume subida de andar.
-- Loja acessada na tela de batalha é uma camada modal/painel da HUD, mantendo o contexto e mostrando a batalha. Proposta é o combate continuar ao fundo; comportamento de pausa precisa ser aprovado.
+Skills usam prioridade fixa crescente pelo número do slot; se nenhuma estiver pronta e habilitada, personagem usa ataque básico. As duas skills e cooldowns de cada classe estão na tabela MVP; não há energia nem prioridade configurável no primeiro corte.
 
-## 6. Progressão e recursos
+- Poções ligadas por padrão; limiar padrão 50%, configurável de 10% a 90% em passos de 5. Usar item permitido de menor raridade que satisfaça o limiar; se nenhum satisfizer, usar o mais forte permitido. No máximo uma poção por decisão, cooldown compartilhado de 5 s.
+- Revive desligado por padrão; consumir quando um membro cair, antes de declarar derrota total, prioridade por slot esquerda→direita e máximo de um revive por personagem por encontro. Restaura a fração do HP máximo indicada pelo consumível.
+- Retorno automático desligado por padrão. Quando ligado, equipe toda derrotada volta ao Lobby, cura gratuitamente, espera 5 s e recomeça o mesmo andar; nunca avança automaticamente.
+- Sem revive/retorno, volta ao Lobby para cura manual; recompensas já concedidas por inimigos derrotados persistem; encontro interrompido não rola equipamento.
+- Loja rápida é modal e não pausa combate. Compra só é considerada concluída após confirmação do servidor.
+- Sem progresso offline: desconexão/fechamento congela no último evento confirmado; nenhum XP, Coins ou loot pode ser gerado pelo relógio do cliente.
+- Saída manual encerra hunt em qualquer momento; inimigos já derrotados mantêm XP/Coins, encontro incompleto não rola equipamento e Lobby cura gratuitamente. Inventário máximo de 300 itens não equipados; cheio, retorna ao Lobby após grupo atual.
 
-Andares definem nível mínimo e faixas de loot/XP/moedas. Nível do jogador não aumenta acesso de forma automática: cada novo andar precisa ser selecionado manualmente, salvo toggle VIP. Derrota devolve ao lobby; cura no lobby é gratuita.
+As configurações exatas e mensagens de UI também estão em `MVP_DECISIONS.md`; sua implementação, idempotência e testes continuam pendentes de produção.
 
-VIP: +30% XP e +15% farm. **PENDENTE:** fórmula (multiplicativo ou aditivo), conteúdo abrangido por farm, arredondamento, limites e interação com bônus temporários. Registrar fonte e expiração de cada buff para evitar empilhamento duplicado.
+## 6. Progressão, economia e escopo do produto
 
-## 7. Market da comunidade
+MVP: uma moeda (Coins); XP de inimigo `30 + 15×andar`; Coins `15 + 5×andar`; XP para subir de `L` para `L+1` igual a `100×L`; cap nível 20; loja NPC vende somente seis poções e três revives. Preços, cura, odds, boss, login por convite e kit inicial são especificados integralmente em `MVP_DECISIONS.md`. Sem materiais, Diamonds, pagamentos, VIP, passe, caixas, market ou transferências entre contas.
 
-Invariantes propostos para backend:
+VIP e pass, bônus de XP/farm, moedas premium, lojas pagas, mercado e recursos competitivos são pós-MVP. Qualquer conteúdo desse grupo só entra após escopo explícito, modelo econômico, privacidade/conformidade e proteção técnica aprovados. Não supor que proposta antiga no GDD equivale a sistema ativo.
 
-- Operação de compra atômica: verificar anúncio ativo, saldo e propriedade; debitar/creditar; transferir item; marcar anúncio vendido em uma única transação idempotente.
-- Nunca aceitar saldo, preço final ou propriedade informados como verdade pelo cliente; o servidor valida cada campo.
-- Anúncios de diamantes por coins seguem mesma atomicidade, trilha de auditoria e regras contra wash trading/contas automatizadas.
-- Catálogo, taxas, limites, expiração e itens negociáveis configurados no servidor.
-- Proteção contra duplicação em retries/desconexão, logs de fraude, limites de taxa, fluxo de denúncia e recuperação administrativa auditada.
+## 7. Market comunitário (pós-MVP)
 
-## 8. Conta, sessão e recursos online
+Não pertence ao MVP. Para eventual implementação futura, preservam-se estes invariantes técnicos: compra atômica (validar anúncio/saldo/propriedade, debitar/creditar, transferir item e marcar vendido numa transação idempotente); servidor não confia em preço/saldo/propriedade enviados pelo cliente; catálogo, taxas, limites e expiração são validados no servidor; retries/desconexões não duplicam; fraude, bots e ações administrativas têm logs e rate limits. Diamantes negociáveis exigem controles adicionais de fraude e inflação.
 
-Como o jogo inclui moeda negociável, VIP, PvP, chat e drops, resultados e inventários que têm valor devem ser autoritativos no servidor. A stack aprovada é **Game Web na Vercel** e **servidor Supabase** (Auth, PostgreSQL, Edge Functions e serviços selecionados), separados por API autenticada. O cliente é apresentação e envia intenções; não define dano, loot, cooldown, moeda nem transação. O desenho e seus limites estão em [TECH_ARCHITECTURE.md](TECH_ARCHITECTURE.md).
+## 8. Conta, sessão e backend
 
-O CMS administrativo será uma aplicação Vercel separada, sem acesso público para jogadores, com roles checadas pelo servidor e RLS/Edge Functions. Escrita de conteúdo nunca usa permissões do cliente comum. Ver [ADMIN_PANEL_SPEC.md](ADMIN_PANEL_SPEC.md). Detalhes de schema, privacidade, moderação, jobs e recuperação serão fechados na pré-produção técnica.
+Stack aprovada: Game Web e Admin Web separados na Vercel; Supabase Auth, PostgreSQL, Edge Functions e Storage no backend/servidor, Realtime se necessário. O cliente envia intenções, nunca determina dano, cooldown, loot, XP, saldo, consumo ou propriedade. RLS, roles, segredo de serviço e APIs administrativas seguem `TECH_ARCHITECTURE.md` e `ADMIN_PANEL_SPEC.md`.
 
-## 9. Interface e autoridade dos dados
+Jogadores não podem ver/acessar o Admin Web nem suas APIs. O CMS no-code cria e publica, sem editar código, os tipos de conteúdo MVP suportados; validações, versionamento, auditoria e rollback permanecem requisitos, não implementação concluída. Detalhes de schema, migrações, limites, jobs, MFA, backups, recuperação e custos são trabalho de G2.
 
-A composição da HUD e seus estados/dependências estão em [HUD_UX_SPEC.md](HUD_UX_SPEC.md). A HUD apresenta um snapshot/view-model de estado confirmado e emite intenções; ela não decide combate, loot, consumo, preços ou propriedade de itens. Ex.: configurar uma skill automática deve persistir/receber confirmação da camada de domínio; abrir um painel não deve reiniciar nem abandonar a hunt.
+## 9. HUD e autoridade
 
-## 10. Contratos de teste futuros
+`HUD_UX_SPEC.md` define estrutura visual e view-model. No MVP, a interface prioriza lobby, perfil/nível/Coins, equipe, inventário/equipamentos, skills, torre, hunt, loja NPC/modal e log da última hunt (até 100 eventos, persistido até começar outra). Abas sociais, VIP, Diamonds, market, guilda, arena e chat ficam ocultas até suas respectivas fases pós-MVP. A UI só comunica sucesso após confirmação do serviço autoritativo.
 
-- Raridade aplica-se antes de x; com x=10, exemplos da tabela calculam exatamente.
-- Cada atributo recebe sua própria rolagem x, independente das demais; x assume apenas inteiros de 1 a 50, nunca casas decimais, e cada valor final corresponde a `Base × R × x/10`.
-- Personagem pode equipar qualquer subtipo de arma; afinidade não bloqueia equipar.
-- Cada subtipo ativa seu traço documentado; Contracorte validado tem 20% de chance e 50% de Ataque, sem recursão nem proc por dano periódico.
-- Apenas Lendário/Celestial podem receber característica adicional de raridade conforme pool configurado, além do traço de tipo da arma.
-- Nota/poder são reproduzíveis para mesmo item e mesma versão de pesos.
-- Chances de cada loot table totalizam 100% e não incluem resultados não configurados.
-- Fusão nunca supera 5★ e nunca consome sem confirmação/validação do servidor.
-- Ordem e dano de combate são reproduzíveis com estado/seed iguais.
-- Uma compra de mercado, mesmo repetida por retry, transfere saldo/item uma única vez.
-- VIP não é aplicado em duplicidade e expirado não concede buff.
-- Desconexão/retorno não duplica recompensas ou revive/consumíveis.
+## 10. Contratos para testes futuros
 
-## 11. Registro de decisões
+- Cada stat de item é `Base(1) × fator nível × raridade × x/10`, com oito x inteiros independentes em 1–50.
+- Personagem pode equipar qualquer subtipo; afinidade não bloqueia e concede +5% ao atributo ofensivo principal.
+- Contracorte tem 20%/50% do Ataque e não recursa/não ativa em DoT; os outros oito traços respeitam seus gatilhos e limites em `COMBAT_DESIGN.md`.
+- Só Lendário/Celestial recebe uma característica, independente de raridade/x; só uma escolha do pool igualitário.
+- Nota, Poder, XP, loot e combate são reproduzíveis para mesmo estado, seed e versão de conteúdo.
+- Tabelas configuradas totalizam 100%; retries não duplicam recompensa, consumo, progressão ou transação.
+- Batalha encerra/pausa de forma idempotente ao perder conexão e não gera reward offline.
+- Jogador comum não carrega Admin Web nem executa API administrativa.
 
-Decisões aprovadas devem ser adicionadas a este documento com data, motivo, versão e impacto em dados/testes. Revisar este arquivo e [AI_State](AI_STATE.md) no início e no fim de cada etapa.
+Nenhum teste de runtime foi executado porque o jogo ainda não foi implementado. Implementação, testes automatizados e playtests são saídas futuras dos Gates G2/G3/G4.
+
+## 11. Registro e manutenção
+
+Atualizar este documento apenas junto às decisões-fonte. Alterações de escopo/valores MVP devem ser refletidas em `MVP_DECISIONS.md`, `GDD.md`, `ROADMAP.md` e `AI_STATE.md`; alterações universais de combate também em `COMBAT_DESIGN.md`. Ler `AI_STATE.md` antes de cada etapa e fechar cada etapa com commit e push na branch obrigatória, registrando testes reais e limitações.

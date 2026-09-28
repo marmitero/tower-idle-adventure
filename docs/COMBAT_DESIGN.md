@@ -1,9 +1,9 @@
 # Combate automático e balanceamento de armas
 
-**Versão:** 0.1 — proposta de design para G1
-**Estado:** baseline de combate e valores de armas aprovados pelo usuário. Contracorte também validado. Os valores podem ser ajustados futuramente com evidência de playtest; esta aprovação não significa que o combate foi implementado.
+**Versão:** 0.2 — baseline de combate para o MVP
+**Estado:** núcleo de combate e parâmetros de armas aprovados pelo usuário; roster, stats-base, skills e políticas MVP complementados em [MVP_DECISIONS.md](MVP_DECISIONS.md). Ainda não implementado nem validado em runtime/playtest. O baseline poderá ser reequilibrado no futuro mediante evidência e registro.
 
-Este documento registra o baseline aprovado para o núcleo de combate automático e os nove tipos de arma. Onde o briefing já decidiu algo, está marcado como **confirmado**; os demais parâmetros foram aprovados pelo usuário como ponto de partida de design e podem ser revistos somente com evidência de balanceamento/playtest. Nada aqui significa implementação pronta.
+Este documento é a referência para regras universais de combate automático. Decisões de aplicação específica do MVP ficam no documento de escopo; decisões para modos pós-MVP (PvP, bosses adicionais) permanecem explicitamente fora do lançamento inicial. Aprovação documental não significa implementação pronta.
 
 ## 1. Princípios e convenções
 
@@ -11,7 +11,7 @@ Este documento registra o baseline aprovado para o núcleo de combate automátic
 - Atributo **Ataque** escala dano físico; **Ataque Especial** escala dano mágico. Defesa física e Defesa Especial mitigam o tipo correspondente.
 - Equipamentos fornecem seus oito atributos através da fórmula aprovada de raridade e rolagem x inteiro independente para cada atributo. Traços do tipo de arma são um efeito separado, fixo por subtipo e não multiplicado pelo x do item nem pela raridade.
 - Todos podem usar qualquer arma. Afinidade dá uma vantagem moderada, nunca é requisito para equipar.
-- Resultados são reprodutíveis para estado e seed iguais; empates usam uma ordem estável. As propostas devem ser simuladas em encontros com 1, 2 e 3 inimigos antes de congelar G1.
+- Resultados são reprodutíveis para estado e seed iguais; empates usam uma ordem estável. O baseline de design está fechado para G1; encontros com 1, 2 e 3 inimigos devem ser simulados e playtestados na vertical slice antes de qualquer declaração de balanceamento final.
 
 ## 2. Fórmulas-base aprovadas
 
@@ -42,7 +42,7 @@ Separar os dois atributos para que tenham funções claras:
 
 - **Velocidade:** define a ordem inicial de ação no começo de cada encontro; maior valor age primeiro. Empate: desempate estável por formação/slot e, se ainda necessário, seed de combate.
 - **Velocidade de Ataque:** define a recorrência depois da primeira ação: `intervalo = T0 / (1 + IAS)`, com `T0 = 2,0 s` e `IAS` convertido de percentual para fração. IAS efetivo limitado a `-50%…+100%`, dando intervalo de `4…1 s` e evitando loops extremos. Ações de skills usam o mesmo intervalo; cooldowns são medidos em tempo de simulação e não são reduzidos por IAS.
-- A unidade que age recebe seu próximo horário pelo intervalo próprio; quando vários eventos empatam, Velocidade e a ordem estável decidem. O tempo real/pausado e a forma de simular tempo ocioso serão fechados na arquitetura técnica.
+- A unidade que age recebe seu próximo horário pelo intervalo próprio; quando vários eventos empatam, Velocidade e a ordem estável decidem. Para o MVP, o servidor só avança enquanto existe sessão de jogo conectada: perder a conexão/fechar o cliente congela no último evento confirmado, sem rewards offline. O modelo de relógio e reconexão será detalhado tecnicamente no G2, sem mudar essa regra de produto.
 
 Os valores (`T0` e caps) fazem parte do baseline aprovado; o balanceamento pode ajustá-los futuramente após medir duração/legibilidade junto às bases de atributos por nível.
 
@@ -61,13 +61,13 @@ Os valores abaixo são o **baseline de design aprovado** pelo usuário, não uma
 | Arma | Atributo usado e efeito proposto | Regras para evitar abuso |
 |---|---|---|
 | **Espada — Contracorte** | **Validado pelo usuário:** ao receber um ataque direto de alvo único, 20% de chance de contra-atacar o agressor com dano físico de coeficiente 0,50 (50% do Ataque atual). | Reação não consome nem reinicia o intervalo de ataque; não ativa contra si própria e não dispara por dano ao longo do tempo. Usa a fórmula física e pode critar conforme a chance do personagem. |
-| **Adaga — Veneno** | Ataque físico; 20% de chance por ação de arma de aplicar veneno: 3 pulsos, um por segundo, cada um com coeficiente 0,10 de Ataque físico (antes da mitigação). | Veneno não acumula; reaplicar renova a duração. Pulsos não critam e não acionam outros efeitos “ao acertar”. A resistência de chefes/PvP ainda precisa de regra própria. |
+| **Adaga — Veneno** | Ataque físico; 20% de chance por ação de arma de aplicar veneno: 3 pulsos, um por segundo, cada um com coeficiente 0,10 de Ataque físico (antes da mitigação). | Veneno não acumula; reaplicar renova a duração. Pulsos não critam e não acionam outros efeitos “ao acertar”. MVP: Sentinela da Torre recebe o efeito sem resistência; resistência para bosses futuros/PvP é conteúdo pós-MVP. |
 | **Machado — Dano aumentado** | Ataque físico; +15% de dano físico final em ataques básicos e skills físicas. | Não aumenta dano mágico, cura nem dano periódico; bônus é multiplicativo com a fórmula da ação. |
 | **Maça — Crítico aumentado** | Ataque físico; +10 pontos percentuais de chance crítica efetiva. | Respeita teto de 75%; não aumenta dano crítico (permanece 1,5×). |
 | **Besta — Velocidade de ataque** | Ataque físico à distância; +20% de IAS aditivo antes do limite global de IAS. | Não muda Velocidade/iniciativa nem reduz cooldown de skill. |
 | **Cajado — Área** | Ataque Especial/Defesa Especial; atinge todos os inimigos. Contra um único alvo, coeficiente 1,0; havendo 2 ou mais, cada alvo recebe coeficiente 0,70. | Todos os alvos resolvem mitigação/crítico separadamente; sem multiplicar eventos de proc por alvo. O valor AoE deve ser testado com grupos de 1–3. |
 | **Livro Arcano — Sifão Arcano** | Ataque Especial; após ataque básico mágico que acerta, cura o próprio portador em `floor(0,10 × Ataque Especial)`, limitado ao HP faltante. | Uma cura por ação, não por alvo/skill/instância de dano; não cura aliados nesta proposta. Nome é provisório. |
-| **Luvas — Atordoamento** | Ataque físico; 15% de chance por ação de arma de atordoar o alvo, fazendo-o perder a próxima ação agendada. | Uma rolagem por ação; stun não acumula. Duração/imunidade de boss, PvP e resistência a controle requerem configuração de conteúdo. |
+| **Luvas — Atordoamento** | Ataque físico; 15% de chance por ação de arma de atordoar o alvo, fazendo-o perder a próxima ação agendada. | Uma rolagem por ação; stun não acumula. MVP: Sentinela da Torre é imune; inimigos comuns não têm resistência. Configuração de bosses futuros/PvP é pós-MVP. |
 | **Garras — Golpe duplo** | Ataque físico; faz dois golpes consecutivos de coeficiente 0,60 cada contra o mesmo alvo (120% total antes de crítico). Cada golpe pode critar separadamente. | Conta como uma ação para cooldown/IAS; outros procs “ao acertar” rolam uma vez por ação, evitando dobrar veneno/efeitos acessórios. |
 
 **Por que a Espada:** Contracorte cria uma identidade reativa e confiável no auto-combate, recompensa permanecer lutando e não se confunde com veneno da Adaga, dano do Machado, crítico da Maça, área do Cajado ou ataque duplo das Garras. Os valores de 20%/50% foram confirmados junto com o conceito pelo usuário; ainda podem ser ajustados futuramente por balanceamento sem mudar a identidade.
@@ -77,7 +77,7 @@ Os valores abaixo são o **baseline de design aprovado** pelo usuário, não uma
 - Afinidade não bloqueia equipamento. Personagem pode ter **uma afinidade de arma ou nenhuma**; esse dado fica na ficha do personagem.
 - Com a arma correspondente equipada, recebe **+5% multiplicativo no atributo ofensivo principal** final: Ataque para Espada/Adaga/Machado/Maça/Besta/Luvas/Garras; Ataque Especial para Cajado/Livro Arcano.
 - Afinidade não altera os rolls x, bases, raridade, chances de proc, número de alvos ou número de golpes. Como aumenta o atributo principal, melhora indiretamente dano (e cura do Livro Arcano, quando pertinente).
-- A regra e o bônus de 5% estão aprovados. A atribuição de afinidades a personagens específicos depende do roster inicial.
+- A regra e o bônus de 5% estão aprovados. Afinidades MVP: Guerreiro/Espada, Arcanista/Cajado e Ladino/Adaga; roster detalhado em `MVP_DECISIONS.md`.
 
 ## 6. Interações e estados
 
@@ -85,16 +85,14 @@ Os valores abaixo são o **baseline de design aprovado** pelo usuário, não uma
 - Efeitos de dano periódico resolvem dano usando o tipo/defesa documentados, não causam crítico e seguem regra explícita de acumular/renovar (veneno não acumula; nova aplicação renova).
 - Atordoamento pula uma única ação agendada do alvo e então expira. Aplicações consecutivas não estendem a duração.
 - Quando um alvo morre, ações/cooldowns do alvo são cancelados e seus efeitos periódicos expiram.
-- Resistência/imunidade de bosses e conteúdo PvP a controle/DoT é definida por configuração de conteúdo, não por exceção codificada; valores por boss/modo são dados a preencher.
+- Resistência/imunidade é definida por configuração de conteúdo, não por exceção codificada. Aplicação MVP fechada: Sentinela da Torre é imune a Atordoamento e recebe Veneno sem resistência; PvP e outros bosses não fazem parte do MVP.
 
-## 7. Próximas validações de implementação e balanceamento
+## 7. Implementação e validação ainda necessárias
 
-O baseline desta especificação está aprovado; os itens abaixo são trabalho de conteúdo/implementação e validação, não pendências para reaprovar o conceito:
+O baseline de design MVP está fechado nos documentos `COMBAT_DESIGN.md` e `MVP_DECISIONS.md`; os itens abaixo são tarefas futuras de produção, não decisões abertas para iniciar o MVP:
 
-1. Atribuir afinidades a personagens quando o roster inicial for definido.
-2. Tabelar bases de atributos por nível e testar se caps de IAS, crítico e defesa mantêm lutas legíveis e rápidas.
-3. Configurar resistência de chefes/PvP a veneno e stun, cooldowns e interação de efeitos Lendários com golpes múltiplos.
-4. Definir por conteúdo os alvos de cada skill, buffs, curas de grupo, desempates e persistência/reconexão.
-5. Simular e playtestar os parâmetros na vertical slice; eventuais ajustes serão registrados com evidências e versão, sem desconsiderar a aprovação atual silenciosamente.
+1. Implementar fórmulas/estados, rotação de skills, buffs, curas, procs e eventos visuais em servidor autoritativo.
+2. Criar testes determinísticos de dano, mitigação, crítico, IAS, alvo, contra-ataque, veneno, stun, cooldown, morte/revive e reconexão.
+3. Simular e playtestar os parâmetros na vertical slice; medir duração/clareza e registrar qualquer ajuste com evidência e versão, sem reabrir decisões silenciosamente.
 
 O usuário aprovou o baseline deste documento, incluindo Contracorte (20% / 50% Ataque), os demais traços, fórmulas-base e afinidade de +5%. A implementação e validação de runtime ainda não aconteceram.

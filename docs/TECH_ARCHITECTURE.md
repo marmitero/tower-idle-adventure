@@ -1,8 +1,8 @@
 # Arquitetura técnica — Vercel + Supabase
 
-**Versão:** 0.1 — direção tecnológica aprovada
+**Versão:** 0.2 — direção tecnológica e limites do MVP
 **Decisão confirmada pelo usuário:** usar **Vercel + Supabase**, separando o cliente do jogo do servidor.
-**Estado:** arquitetura proposta para detalhamento técnico; nenhuma infraestrutura/código foi implementado.
+**Estado:** arquitetura proposta para detalhamento técnico; nenhuma infraestrutura/código foi implementado. Política de produto MVP: sem rewards offline; desconexão pausa no último evento confirmado (detalhes em `MVP_DECISIONS.md`).
 
 ## 1. Separação de responsabilidades
 
@@ -42,7 +42,7 @@ Ambientes **dev**, **staging** e **production** devem ter projetos/configuraçõ
 
 1. O cliente autentica por Supabase Auth e obtém sessão/JWT.
 2. Catálogo publicado (itens, personagens, inimigos, andares e dados públicos) pode ser lido por views/endpoints de somente leitura com RLS.
-3. Operações que mudam estado passam por Edge Functions com JWT: iniciar hunt, resolver lote de combate, consumir poção/revive, equipar/fundir, comprar/vender, receber recompensa e demais comandos.
+3. Operações que mudam estado passam por Edge Functions com JWT: iniciar/pausar/retomar hunt, avançar lote de combate, consumir poção/revive, equipar item, comprar consumível NPC e receber recompensa. Fusão, venda/compra entre jogadores e demais economia complexa são pós-MVP.
 4. A função valida sessão, propriedade, requisitos do andar, saldo, inventário, versão de conteúdo e idempotência; calcula o resultado e persiste a transação no PostgreSQL.
 5. A resposta confirmada atualiza a HUD. Retry/desconexão não pode duplicar ação, moeda, loot ou consumível.
 
@@ -50,14 +50,14 @@ O navegador nunca informa como verdade HP/dano final, raridade/x de drop, saldo,
 
 ### Combate idle e trabalhos longos
 
-Edge Functions são endpoints de execução curta, não um processo de game server sempre ligado. A simulação de uma hunt deve avançar em lotes determinísticos/idempotentes no servidor, persistindo cursor/seed/versão de conteúdo e recompensas sem depender de uma aba do navegador manter autoridade. Jobs agendados/filas, limites de execução, estratégia de catch-up/offline, custo e throughput precisam ser validados na prova técnica antes de habilitar progresso desconectado.
+Edge Functions são endpoints de execução curta, não um processo de game server sempre ligado. No MVP, lotes determinísticos/idempotentes avançam no servidor apenas enquanto uma sessão autenticada está ativa; a conexão/cliente pode sinalizar continuidade, mas nunca tem autoridade sobre simulação. Cursor/seed/versão/rewards são persistidos no servidor. Em desconexão/fechamento, congelar no último lote confirmado e, ao reconectar, retomar sem catch-up e sem recompensa offline. G2 deve testar viabilidade/custo desse modelo; não há autorização de produto para mudar a política de no-offline.
 
-Supabase Realtime pode avisar clientes sobre chat, presença e eventos de grupo, mas uma mensagem Realtime nunca prova que uma transação/combate aconteceu. Boss global, arena e mercado usam comando validado no servidor e gravação transacional; broadcast vem depois da confirmação.
+Supabase Realtime pode avisar sobre estado de sessão no MVP; chat, presença, grupos, boss global, arena e market são pós-MVP. Mensagem Realtime nunca prova que uma transação/combate aconteceu; futuras operações competitivas/comerciais exigem comando validado e persistência transacional antes do broadcast.
 
 ## 4. Supabase: componentes e limites de segurança
 
 - **Auth:** conta e sessão; papel de admin é concedido somente por procedimento confiável (allowlist/tabela protegida ou `app_metadata` gerenciada no servidor). Não confiar em `user_metadata` editável pelo próprio jogador.
-- **PostgreSQL:** estado persistente de conta/jogador, inventário, hunts, carteira, guilda, market, chat e versões de conteúdo, com schema e migrações controlados.
+- **PostgreSQL:** estado persistente MVP de conta/jogador, inventário, hunts, Coins, equipe e versões de conteúdo. Guildas, market e chat são extensões pós-MVP, não tabelas/requisitos iniciais.
 - **RLS:** habilitada em tabelas expostas; política padrão negar escrita pública. Jogadores só acessam o próprio estado e conteúdo publicado permitido. Escritas sensíveis ocorrem em endpoint validado.
 - **Edge Functions:** API server-side para ações de jogo e operações de administrador. Validar JWT/role, schema, autorização, limite de taxa, idempotência e transação em cada comando.
 - **Storage:** PNGs e dados publicados; assets aprovados podem ter leitura pública. Upload/escrita e substituição são administrativos, passam por autorização, validação de arquivo e trilha de auditoria.
@@ -77,10 +77,10 @@ Eventos de servidor devem gerar logs sem expor segredos ou dados pessoais excess
 ## 7. Pontos a validar em G2
 
 - Limites atuais de duração, memória e chamadas de Edge Functions para simulação por lotes.
-- Modelo de jobs/cron/filas e comportamento ao voltar de desconexão, sem prometer offline antes de teste.
+- Modelo de chamadas/lotes/heartbeat e comportamento ao voltar de desconexão, implementando a regra já decidida de não conceder progresso/rewards offline (G2 valida viabilidade, não reabre política de produto).
 - RLS, isolamento de ambientes, quotas, custos Supabase/Vercel, backup e plano de incidentes.
 - Estratégia de versão/cache de conteúdo e assets, migração, rollback e compatibilidade com sessões ativas.
-- Serviço de chat/Realtime, bosses globais, arena e concorrência no market.
+- Uso de Realtime para sessão/avisos, necessidades futuras de chat/bosses/arena/market (estes módulos não bloqueiam MVP).
 - Domínios finais, identidade visual, fluxo MFA/admin e política de preview deployment.
 
 A escolha Vercel + Supabase e a separação client/server estão aprovadas. Os detalhes de implantação e limites ainda são critérios da pré-produção técnica, não pressupostos de que a infraestrutura já existe.

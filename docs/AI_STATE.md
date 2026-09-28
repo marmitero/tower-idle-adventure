@@ -17,63 +17,59 @@ Este arquivo é a passagem de contexto do projeto **Tower Idle Adventure**. Deve
 
 - **Data:** 2026-09-28.
 - **Branch obrigatória da sessão:** `arena/01a0e5e1-tower-idle-adventure`.
-- **Fase:** Etapa 1 — fechamento de escopo e design (G1), em andamento.
-- **Marco atual:** baseline completo de combate aprovado; direção Vercel + Supabase e requisito do Painel Administrativo aprovados e documentados. G1 continua em andamento por decisões restantes de roster, progressão, economia e MVP. Nenhuma implementação iniciada.
-- **Estado inicial do repositório:** somente `README.md` inicial; sem código de jogo e sem AI_State prévio.
-- **Documentação atual:** README e oito arquivos em `docs/`: GDD, sistemas, combate, HUD/UX, arquitetura técnica, painel administrativo, Roadmap e este AI_State.
-- **Validação:** nenhuma execução de jogo; 9 arquivos Markdown e links locais verificados, `git diff --check` passou. O baseline de combate ainda precisa ser medido em playtests.
+- **Fase:** Etapa 1/G1 concluída documentalmente; G2 é o próximo marco. Esta atualização continua sendo trabalho documental e não implementa gameplay/painel.
+- **Marco atual:** baseline de escopo MVP registrado em `MVP_DECISIONS.md` sob autorização explícita do usuário para o agente decidir pendências. As escolhas do agente não são atribuídas como decisões individuais do usuário. MVP ainda sem implementação/playtest. Arquitetura-base Supabase + Vercel e Admin CMS estão documentadas, não provisionadas.
+- **Documentação atual:** README e nove arquivos Markdown em `docs/`, incluindo o novo `MVP_DECISIONS.md`.
+- **Validação desta etapa:** revisão documental concluída; links locais em 10 Markdown e `git diff --cached --check` passaram. Nenhum jogo/teste de runtime existe. Branch sincronizada com o remoto antes das alterações; commit e push desta etapa ainda pendentes.
 
 ## Resumo confiável do projeto
 
-RPG idle 2D para navegador, **Tower Idle Adventure**. Jogador prepara até três personagens no lobby, escolhe manualmente um andar e deixa a equipe lutar automaticamente contra encontros de 1–3 inimigos. Vitórias encadeiam novas lutas e dão XP/moedas/loot. Derrota retorna ao lobby, onde a equipe cura gratuitamente. Autoavançar andares é um recurso VIP opcional. Conta VIP também tem passe/recompensas diárias, +30% XP e +15% farm. Social e atividades compartilhadas (chat, guilda, amigos, PvP, market e bosses) não colocam jogadores no espaço pessoal de hunt.
+**Tower Idle Adventure** é um RPG idle 2D para navegador. O MVP fechado é PvE individual, desktop-first, PT-BR e alpha por convite. Conta escolhe Guerreiro, Arcanista ou Ladino, monta equipe de até três, faz hunt individual em 10 andares, ganha XP/Coins/loot e retorna ao lobby; companheiros desbloqueiam nos andares 3 e 6. Nível compartilhado vai de 1–20. Há um boss solo recorrente no andar 10. A especificação numérica completa e critérios de aceite vivem em `MVP_DECISIONS.md`.
 
-A equipe usa dez slots: **Arma, Peitoral, Elmo, Calça, Bota, Luva (armadura), Colar, Aura, Asa e Pet**. Todo item possui Ataque, Ataque Especial, Defesa, Defesa Especial, Vida, Chance Crítica, Velocidade de Ataque e Velocidade. Multiplicadores de raridade: Comum 1,0; Incomum 1,2; Raro 1,5; Épico 2,0; Lendário 2,5; Celestial 3,0. Fórmula base: `valorFinal = base × multiplicadorRaridade × (x/10)`. **Confirmado pelo usuário: x é rolado aleatoriamente e independentemente para cada atributo do equipamento, sempre como inteiro de 1–50.** O fator aplicado é `x/10`, de 0,1x a 5,0x em passos de 0,1; `x=37` significa fator `×3,7`. O exemplo `x=4,72` foi descartado: nenhum x fracionário é permitido. Lendário/Celestial podem ter uma característica aleatória extra independente da raridade/x.
+**Status importante:** escopo baseline foi decidido pelo agente após autorização explícita do usuário. Não tratar cada valor de `MVP_DECISIONS.md` como decisão individualmente escolhida ou aprovada pelo usuário. Pode ser adaptado futuramente por solicitação. Nada foi implementado; fórmulas/valores precisam de playtest na vertical slice.
 
-Armas podem ser equipadas por qualquer personagem; afinidades nunca restringem o uso. Os traços dos nove tipos e o bônus de afinidade estão aprovados como baseline v0.1 em `COMBAT_DESIGN.md`; Contracorte foi validado com 20% de chance e 50% do Ataque após ataque direto de alvo único. O documento define dano, crítico, Velocidade/IAS, alvos, automação, os outros oito traços e afinidade de +5% ao atributo ofensivo principal. Valores podem ser revisitados com evidências de playtest. Traço de tipo é separado da característica aleatória adicional Lendária/Celestial. Arma `Luvas` não é a armadura do slot `Luva`.
+O MVP tem 10 slots (Arma, Peitoral, Elmo, Calça, Bota, Luva (armadura), Colar, Aura, Asa e Pet), oito stats por item, seis raridades e notas/poder definidos. Regra explicitamente confirmada pelo usuário: `x` independente por atributo, inteiro de 1–50; fator `x/10`, em passos de 0,1. `x=4,72` foi rejeitado. Qualquer personagem pode equipar qualquer arma. O baseline completo de combate/armas foi aprovado pelo usuário; Contracorte tem 20% de chance após ataque direto de alvo único e causa 50% do Ataque atual, sem recursão nem ativação por DoT. Valores podem mudar com evidência de playtest.
 
-`COMBAT_DESIGN.md` propõe fórmula de mitigação `PoderOfensivo × coeficiente × 100/(100+Defesa)`, crítico de 1,5× com teto de 75%, Velocidade para ordem inicial e IAS para intervalo, alvos automáticos, skills por ordem de slot, traços numéricos e afinidade +5% ao atributo ofensivo principal. Esse baseline foi aprovado pelo usuário; validação de runtime/playtest ainda não ocorreu.
+**Stack aprovada:** Game Web e Admin Web separados na Vercel; Supabase Auth/PostgreSQL/Edge Functions/Storage no backend. Cliente não decide combate, economia ou conteúdo. Painel CMS no-code de conteúdo fica isolado; jogadores comuns não veem sua interface nem acessam APIs administrativas. Docs de arquitetura e segurança estão em `TECH_ARCHITECTURE.md` e `ADMIN_PANEL_SPEC.md`; nada foi provisionado/implementado.
 
-**Arquitetura aprovada:** Vercel hospeda Game Web e Admin Web separados; Supabase é o servidor/backend (Auth, PostgreSQL, Edge Functions e Storage; Realtime conforme necessidade). O navegador não é autoridade do jogo. O painel no-code de conteúdo será deployment separado, sem link na experiência de jogadores, com roles autorizadas, validação server-side/RLS, auditoria e publicação versionada. Detalhes em `TECH_ARCHITECTURE.md` e `ADMIN_PANEL_SPEC.md`.
+MVP exclui VIP/monetização, Diamonds, caixas/gacha, market/transações entre jogadores, social/chat/guildas, PvP, bosses compartilhados, eventos live, skills/upgrades avançados e rewards offline. Jogadores nunca compartilham espaço da hunt pessoal; qualquer social futuro usa serviços compartilhados/instanciados. Assets de jogo são PNGs autorais estáticos em lotes de dez; arte procedural não é permitida; efeitos podem ser implementados em código.
 
-A HUD desktop proposta mantém perfil no topo esquerdo, equipe abaixo, navegação superior central, automação no topo direito, gameplay no centro, log inferior, chat compacto embaixo à direita e overlays/painéis secundários. O documento `docs/HUD_UX_SPEC.md` descreve componentes, fluxo de dados, estados e dependências. O jogador configura poções/revives e pode ligar/desligar cada skill equipada na automação; prioridade de skills pode vir depois. A HUD também pede opção de retorno após derrota; regra exata (curar no lobby e reiniciar mesmo andar?) segue pendente. Loja rápida mantém contexto de batalha; pausa/continuação da batalha ao abrir a loja requer confirmação. Não assumir recompensas offline.
+`HUD_UX_SPEC.md` define proposta desktop-first, gameplay central prioritário, equipe lateral e painéis recolhíveis em telas menores. No MVP não há chat; loja rápida não pausa combate; desconexão congela no último evento confirmado, sem reward offline. Valores/regra de bot constam no MVP Decisions. A especificação da HUD permanece design, sem implementação.
 
-## Decisões registradas e pendências
+## Decisões registradas e trabalho restante
 
-### Confirmadas
+### Confirmadas diretamente pelo usuário
 
-- x independente por atributo e sempre inteiro de 1–50; fator `x/10` em passos de 0,1; x fracionário como `4,72` não é permitido.
-- Slot Arma oficial; qualquer personagem pode usar qualquer arma.
-- **Contracorte validado:** 20% de chance, dano de 50% do Ataque após ataque direto de alvo único; sem recursão/DoT.
-- **Baseline completo de `COMBAT_DESIGN.md` aprovado:** fórmulas de dano/crítico/velocidade, alvos e automação, traços de todas as armas e afinidade de +5%; ajuste futuro somente com teste/registro.
-- **Stack aprovada:** Vercel para Game Web/Admin Web em deployments separados; Supabase como backend/servidor.
-- **Painel Administrativo aprovado:** CMS no-code para conteúdo suportado; usuários comuns não veem nem acessam painel/APIs; autorização server-side, RLS, auditoria e publicação versionada.
-- HUD documentada antes da implementação; protocolo de checkpoint exige commit e push ao fim de toda etapa, mesmo parcial.
+- x independente para cada atributo e sempre inteiro de 1–50; fator `x/10`, passos de 0,1; exemplo `4,72` rejeitado.
+- Slot Arma oficial; qualquer personagem pode equipar qualquer tipo.
+- **Contracorte:** 20% de chance após ataque direto de alvo único, dano físico de 50% do Ataque atual; sem recursão nem ativação por DoT.
+- Baseline completo de `COMBAT_DESIGN.md` aprovado (fórmulas, armas, alvos e afinidade +5%); revisão futura só com teste/evidência registrada.
+- **Stack:** Vercel + Supabase, Game Web separado do servidor.
+- **Admin:** CMS no-code para tipos suportados; jogadores comuns sem acesso à aplicação/APIs; segurança server-side/RLS, auditoria e versão/rollback.
+- Assets estáticos autorais em lotes de dez; sem arte procedural. HUD modular, centralidade do gameplay, desktop-first e painéis recolhíveis. Hunts pessoais não são compartilhadas; social futuro em sistemas compartilhados/instanciados.
 
-### A resolver antes de G1
+### Baseline MVP decidido pelo agente sob delegação explícita (adaptável pelo usuário)
 
-1. Roster inicial/classes, distribuição de afinidades, skills e regras finais de slots/progressão.
-2. Nota/poder de itens/equipe: escala, pesos, normalização de percentuais e influência de características.
-3. Default e regra do toggle “voltar após derrota”, cura/reentrada e se a loja pausa combate.
-4. Bases por slot/nível, progressão/XP/materiais, valores de consumíveis, odds/preços das caixas e definição do bônus de farm.
-5. Escopo de simulação offline, resumo da sessão e retenção de eventos.
-6. Arena/PvP, market/fees/diamantes, bosses e escopo do MVP.
-7. Arte final, responsividade/suporte mobile e idiomas.
-8. Conformidade, privacidade, pagamentos e plano de moderação.
+`MVP_DECISIONS.md` fecha objetivo, roster (Guerreiro/Arcanista/Ladino), afinidades, nível compartilhado 1–20, 10 andares, boss solo, stats e skills, catálogo/base stats de itens, nota/poder, raridades/loot, XP/Coins, consumíveis/preços, bot/revive/retorno, login convidado, desktop/PT-BR e critérios de aceite. MVP exclui VIP/pagamentos, caixas, Diamonds/market, social, PvP, bosses compartilhados, events runtime, mobile completo e progresso offline. Não atribuir essas escolhas do agente ao usuário como decisões individualmente feitas por ele.
 
-### Para G2 — pré-produção técnica
+### Para G2 — pré-produção técnica/UX
 
-- Refinar a arquitetura escolhida, limites/jobs/Edge Functions, schemas/migrations, RLS, MFA, backup, threat model, cache/versionamento e custos.
-- Implementação e teste de isolamento do painel, provisioning do Owner e RBAC; detalhes em `ADMIN_PANEL_SPEC.md`.
-- Nenhuma dessas decisões deve ser inventada silenciosamente no código.
+- Refinar arquitetura em schemas/migrações, contratos API/eventos, autoridade do simulador, RLS, roles/MFA, threat model, rate limits, backup/recuperação, cache/versionamento e custos.
+- Fechar desenho/protótipo UX e detalhar provisioning/isolamento do Owner/Admin; implementar e testar segurança só nos marcos autorizados do Roadmap.
+- Definir instrumentação/QA e pipeline de assets, sem iniciar gameplay na etapa documental atual.
+
+### Pós-MVP (backlog, não bloqueia G1/G2)
+
+- Regras efetivas de VIP/passe/pagamentos, odds de caixas/gacha, mercado e moderação social, PvP/guildas/bosses cooperativos, eventos em runtime, stars 2–5/fusão, conteúdo adicional e localização/mobile completa só são reabertos quando fase futura for autorizada.
 
 Não preencher essas lacunas silenciosamente no código; registrar decisão, motivo e impacto nos documentos relevantes.
 
 ## Próximos passos
 
-1. Fechar as decisões restantes de G1 (roster, progressão, economia, offline, MVP) sem reabrir o baseline de combate aprovado, exceto por evidência de playtest.
-2. Em G2, detalhar e validar tecnicamente a arquitetura Vercel + Supabase e a segurança/fluxo do painel administrativo.
-3. Somente após os gates de design/pré-produção, começar a vertical slice; antes da HUD, revisar estados/dependências documentados.
-4. Em cada checkpoint, atualizar este estado, rodar validações aplicáveis e fazer commit + push mesmo se a etapa estiver parcial.
+1. Conferir diffs/Git status e revisar consistência do MVP com GDD, Sistemas, Combate, HUD, Roadmap e arquitetura; validar links Markdown e `git diff --check`.
+2. Registrar atualização final do AI_State; criar commit e push na branch obrigatória e confirmar hash.
+3. Próxima etapa: G2 — schemas/API, threat model, isolamento/Admin, UX/protótipo e planejamento técnico. Não implementar gameplay ou painel antes dos gates G2/G3 no Roadmap.
+4. Em cada checkpoint, ler AI_State no início, atualizar documentos e fazer commit + push mesmo que a etapa termine parcial.
 
 ## Histórico de etapas
 
@@ -113,4 +109,12 @@ Não preencher essas lacunas silenciosamente no código; registrar decisão, mot
 - **Decisão de stack:** Vercel + Supabase, com Game Web separado do servidor/backend.
 - **Requisito de produto:** painel administrativo no-code para criar/editar/publicar conteúdo suportado; isolamento de jogadores comuns e controle de acesso obrigatório em UI, servidor e banco.
 - **Entregue:** `TECH_ARCHITECTURE.md` e `ADMIN_PANEL_SPEC.md`; README, GDD, SYSTEMS_SPEC, COMBAT_DESIGN, HUD_UX_SPEC, Roadmap e AI_State sincronizados. Nenhuma implementação foi iniciada.
-- **Próximo passo:** fechar decisões restantes de G1; em seguida detalhar tecnicamente a arquitetura e segurança no G2.
+- **Próximo passo à época:** fechar decisões restantes de G1; em seguida detalhar tecnicamente a arquitetura e segurança no G2.
+
+### 2026-09-28 — G1: baseline de MVP e sincronização documental
+
+- **Autorização do usuário:** o agente pode resolver decisões pendentes necessárias ao MVP; usuário poderá pedir adaptações. As escolhas de escopo foram feitas pelo agente e não são atribuídas como decisões individuais do usuário.
+- **Entregue:** `MVP_DECISIONS.md` detalha produto, roster/progressão/combate/itens/loot/economia/bot, exclusões pós-MVP e critérios de aceite; incluídos vetores-base de 18 templates e estatísticas/papéis de inimigos.
+- **Sincronizados:** README, GDD, SYSTEMS_SPEC, COMBAT_DESIGN, HUD_UX_SPEC, ROADMAP e AI_STATE. G1 fechado documentalmente; G2 é próxima etapa.
+- **Limites:** nenhum jogo/painel/HUD foi implementado; sem playtest/balanceamento de runtime. As escolhas numéricas são baseline revisável e não indicação de prontidão.
+- **Validação:** links locais em 10 arquivos Markdown e `git diff --cached --check` passaram; nenhum teste de runtime aplicável/possível sem implementação. Branch local alinhada ao remoto `2fd98d3`; checkpoint desta atualização documental ainda será commitado e enviado.

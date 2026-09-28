@@ -47,6 +47,10 @@ Navegação do painel por módulos com busca, filtro, paginação, estado (rascu
 
 Estrutura de módulos deve permitir adicionar novas categorias de dados sem reconstruir a navegação inteira. Adicionar suporte a um novo tipo de mecânica requer código/schema, mas instanciar um novo personagem/boss/andar dentro dos campos suportados é feito pela UI.
 
+### Recorte funcional do MVP
+
+Na primeira entrega, expor CRUD/publicação para os tipos que alimentam o escopo em `MVP_DECISIONS.md`: templates de equipamento/armas, personagens, skills, inimigos/boss individual, andares/encontros, loot, consumíveis/loja e assets. Eventos podem ser criados/editados como rascunho, mas não há runtime de evento no Game Web. Caixas, Diamonds, mercado, guildas, PvP e progressão de estrelas permanecem desligados/pós-MVP; módulos não usados não precisam aparecer no Admin Web inicial.
+
 ## 5. Fluxo editorial sem código
 
 1. **Listar/criar:** formulários tipados com defaults seguros, ajuda contextual e preview de asset.
@@ -79,7 +83,7 @@ Alterações de conteúdo já publicado não sobrescrevem uma sessão de combate
 
 - Usuário Free/VIP sem role admin não consegue entrar, obter dados de painel ou chamar diretamente qualquer endpoint de escrita/admin.
 - Link/atalho do painel não aparece no cliente do jogo; aplicação administrativa é deployment separado.
-- Admin autorizado consegue criar/editar/publicar ao menos equipamentos, personagens, inimigos, bosses, eventos e andares só pela UI, sem editar código nem redeployar aplicação.
+- Admin autorizado consegue criar/editar/publicar os dados de conteúdo do MVP listados no recorte acima só pela UI, sem editar código nem redeploy; registro de evento pode ficar como draft sem runtime no Game Web. O suporte às demais áreas da lista geral pode ser entregue em fases posteriores.
 - Conteúdo inválido (por exemplo, tabela de drop que não soma 100% ou item sem atributo exigido) não pode ser publicado.
 - Alteração publicada fica versionada; rollback restaura versão anterior e sessão ativa preserva sua referência de conteúdo.
 - Assets e dados de rascunho não vazam para clientes comuns.
