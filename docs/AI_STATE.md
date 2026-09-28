@@ -19,8 +19,8 @@ Este arquivo é a passagem de contexto do projeto **Tower Idle Adventure**. Deve
 - **Branch obrigatória da sessão:** `arena/01a0e5e1-tower-idle-adventure`.
 - **Fase:** Etapa 2/G2 em andamento. Criados blueprints técnicos/ameaças/UX, click-through e migration-base de schema com harness PGlite. Não há gameplay, HUD real, Admin Web, Edge Functions ou serviço Supabase provisionado.
 - **Marco atual:** G1 foi fechado documentalmente na etapa anterior. Baseline MVP continua como decisão do agente sob delegação explícita do usuário (adaptável), sem atribuir escolhas individuais ao usuário. G2 requer prova no Supabase CLI, revisão de segurança e usabilidade com participantes. O usuário confirmou que abriu e validou visualmente o protótipo; isso não substitui teste de usabilidade com 5–8 convidados.
-- **Documentação atual:** README e treze arquivos Markdown em `docs/`, incluindo `DEPLOYMENT_GUIDE.md` (plano ainda não ativado); protótipo local em `prototypes/g2-hud/index.html` (dados fictícios, sem APIs/backend); migration-base em `supabase/migrations/` e teste PGlite em `supabase/tests/`.
-- **Validação desta etapa:** `npm ci --prefix supabase` + `npm test --prefix supabase` passaram (9/9) em PGlite 0.5.8/PostgreSQL 18.3; `npm audit` encontrou 0 vulnerabilidades conhecidas no harness. Config Supabase propõe PG15 (diferença de versão explícita). Nesta atualização documental, links relativos em 14 arquivos Markdown (59 destinos) e `git diff --check` passaram; sem validar serviço externo. TOML, parser HTML/sintaxe JS do protótipo e smoke tests já haviam passado. PGlite simula roles/Auth e não valida Supabase CLI/PostgREST/Edge/Storage/concorrência/custos; CLI/Docker ausentes. Sem teste de segurança em serviço real nem estudo UX.
+- **Documentação atual:** README e quatorze arquivos Markdown em `docs/`, incluindo `PROJECT_STRUCTURE.md` e `DEPLOYMENT_GUIDE.md`; estrutura segue proposta, sem apps criados. Protótipo local `prototypes/g2-hud/index.html` (dados fictícios, sem APIs/backend) está sendo servido na porta 4173 para revisão; migration-base em `supabase/migrations/` e testes PGlite em `supabase/tests/`.
+- **Validação desta etapa:** `npm ci --prefix supabase` + `npm test --prefix supabase` passaram (9/9) em PGlite 0.5.8/PostgreSQL 18.3; `npm audit` encontrou 0 vulnerabilidades conhecidas no harness. Config Supabase propõe PG15 (diferença de versão explícita). Nesta atualização, preview HTTP local respondeu 200; link-check em 15 arquivos Markdown/65 links relativos e `git diff --check` passaram. Sem validar serviço externo. PGlite simula roles/Auth e não valida Supabase CLI/PostgREST/Edge/Storage/concorrência/custos; CLI/Docker ausentes. Sem teste de segurança em serviço real nem estudo UX.
 
 ## Resumo confiável do projeto
 
@@ -48,6 +48,7 @@ MVP exclui VIP/monetização, Diamonds, caixas/gacha, market/transações entre 
 - Baseline completo de `COMBAT_DESIGN.md` aprovado (fórmulas, armas, alvos e afinidade +5%); revisão futura só com teste/evidência registrada.
 - **Stack:** Vercel + Supabase, Game Web separado do servidor.
 - **Deploy confirmado:** merge em `main` do GitHub deve iniciar automaticamente um deploy de produção na Vercel, após build/checks (não literalmente instantâneo). Previews de PR são desejáveis; migrations Supabase têm fluxo separado. Integrações ainda não configuradas.
+- **Sequência confirmada nesta etapa:** primeiro estruturar o projeto e revisar previews locais; deixar Vercel e Supabase (serviços externos) para uma etapa posterior. A interpretação atual de “preview” é o protótipo local de UX, não Preview Deployment Vercel.
 - **Admin:** CMS no-code para tipos suportados; jogadores comuns sem acesso à aplicação/APIs; segurança server-side/RLS, auditoria e versão/rollback.
 - Assets estáticos autorais em lotes de dez; sem arte procedural. HUD modular, centralidade do gameplay, desktop-first e painéis recolhíveis. Hunts pessoais não são compartilhadas; social futuro em sistemas compartilhados/instanciados.
 
@@ -58,7 +59,7 @@ MVP exclui VIP/monetização, Diamonds, caixas/gacha, market/transações entre 
 ### G2 — documentação e prova técnica parcial; gate aberto
 
 - Baselines propostos em `G2_TECHNICAL_BLUEPRINT.md`: TypeScript/Next.js em projetos Vercel separados; Supabase; modelo de dados, contratos, rate limits iniciais, sessão Admin e lote fixo sem catch-up. Valores técnicos são propostas do agente a validar, não escolhas individualmente feitas pelo usuário.
-- `DEPLOYMENT_GUIDE.md` documenta para iniciante GitHub PR → Preview Vercel → merge em `main` → Production Deployment; também separa migrations Supabase, variáveis por ambiente, proteção, rollback e pré-requisitos. Requisito de deploy automático em `main` confirmado pelo usuário, mas a integração não existe ainda. Recomendação de processo do agente (não decisão individual do usuário): Supabase local na G2; Vercel Preview após o gate e app esqueleto seguro/buildável; staging Supabase quando iniciar integração backend; produção/domínio antes do alpha fechado após hardening.
+- `PROJECT_STRUCTURE.md` propõe a organização futura dos apps, contracts, Supabase, protótipos e docs sem criar código de produção. `DEPLOYMENT_GUIDE.md` documenta o fluxo automático futuro. O usuário decidiu revisar a estrutura e o preview local primeiro; nenhuma Vercel/Supabase remota está configurada. Após a revisão, retomar os critérios técnicos G2; Vercel Preview só quando houver app seguro/buildável.
 - `supabase/migrations/20260928000000_g2_core_schema.sql` cria schema-base com 17 tabelas, RLS/grants, constraints e view pública restrita ao release ativo. `supabase/tests/schema-smoke.test.mjs` aplica o SQL em PGlite; 9/9 smoke tests passaram. Isto não é validação Supabase CLI/Data API.
 - `THREAT_MODEL.md` registra 20 ameaças prioritárias; somente propriedades limitadas de schema/RLS foram exercitadas no harness local, sem serviço real.
 - `G2_UX_BLUEPRINT.md` define wireframes/flows/acessibilidade/plano; o usuário confirmou que abriu e validou visualmente `prototypes/g2-hud/index.html`. Não houve estudo com 5–8 testers.
@@ -73,9 +74,9 @@ Não preencher essas lacunas silenciosamente no código; registrar decisão, mot
 
 ## Próximos passos
 
-1. Guia de deploy e referências oficiais revisados; link-check de 14 arquivos Markdown/59 destinos relativos e `git diff --check` passaram. O guia é plano documental, não implantação executada.
-2. G2 permanece aberta: instalar/disponibilizar Supabase CLI + Docker e executar `supabase start`/`db reset` contra stack local real; depois testar Auth/Data API, transações concorrentes, idempotência/reconexão e revisão de segurança/custo/backup. UX ainda requer 5–8 testers apesar da aprovação visual do protótipo pelo usuário.
-3. Não criar/implantar gameplay ou Admin Web antes do gate G2. Durante G2, priorizar Supabase CLI local; depois do gate, iniciar apps e conectar Vercel/Previews assim que o esqueleto estiver seguro e compilável; criar Supabase staging quando começar a integração backend; reservar produção/domínio para antes do alpha fechado com checks, migrations, segurança e backup validados. A migration-base é só fundação de schema, não um jogo/backend funcional.
+1. `PROJECT_STRUCTURE.md` registra a proposta de organização; o preview estático local de UX em `prototypes/g2-hud/index.html` está servido na porta 4173 e retornou HTTP 200. Link-check de 15 arquivos Markdown/65 destinos relativos e `git diff --check` passaram.
+2. Aguardar/recolher feedback do preview local; depois retomar as provas G2 com Supabase CLI + Docker local (`supabase start`/`db reset`), Auth/Data API e testes transacionais, de segurança/custo/backup. Não configurar serviços hospedados por enquanto. UX ainda requer 5–8 testers apesar da aprovação visual individual prévia.
+3. Não criar/implantar gameplay ou Admin Web antes do gate G2. Após G2, iniciar apps e conectar Vercel/Previews quando o esqueleto estiver seguro e compilável; criar Supabase staging quando começar integração backend; reservar produção/domínio para antes do alpha fechado com checks, migrations, segurança e backup validados. A migration-base é só fundação de schema, não um jogo/backend funcional.
 4. Só avançar G3/vertical slice quando os critérios G2 forem executados e o gate revisado; em cada etapa ler AI_State primeiro e fazer checkpoint mesmo se parcial.
 
 ## Histórico de etapas
@@ -155,3 +156,11 @@ Não preencher essas lacunas silenciosamente no código; registrar decisão, mot
 - **Recomendação registrada:** integração progressiva, não deixar tudo para o final nem provisionar produção agora. Durante G2, Supabase CLI local; após G2 e com skeleton seguro/buildável, previews Vercel; staging remoto quando começar Auth/API; produção/domínio e deploy de `main` antes do alpha fechado após hardening.
 - **Natureza:** recomendação de processo do agente, não escolha individualmente confirmada pelo usuário. G2 permanece aberta; nenhum código de jogo ou serviço foi criado/configurado nesta etapa.
 - **Validação:** link-check cobriu 14 arquivos Markdown e 60 links relativos; todos os destinos existem. `git diff --check` passou. Nenhum app foi compilado nem serviço externo testado.
+
+### 2026-09-28 — Estrutura local e preview antes de serviços externos
+
+- **Direção confirmada pelo usuário:** deixar Vercel e Supabase para mais adiante; estruturar o projeto e testar previews primeiro.
+- **Interpretação adotada:** neste estágio, “preview” é a prévia local estática de UX, não um Vercel Preview Deployment. Integração e serviços externos permanecem adiados; depois da revisão local, retomar testes restantes de G2.
+- **Entregue:** `docs/PROJECT_STRUCTURE.md` com árvore e fronteiras propostas; atualizado guia de deploy/arquitetura/Roadmap/README. Servidor estático do protótipo existente iniciado na porta 4173; HTTP 200.
+- **Limites:** não criados `game-web/`/`admin-web/`, gameplay, APIs ou novos serviços. O protótipo continua com dados fictícios e não é a aplicação.
+- **Validação:** 15 arquivos Markdown e 65 links relativos verificados; todos os destinos existem. `git diff --check` passou. HTTP local do protótipo respondeu 200; sem serviços externos.

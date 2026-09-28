@@ -40,16 +40,17 @@ Até 28/09/2026:
 
 Portanto, neste momento não é possível ativar o deploy automático neste repositório. Primeiro as aplicações e os projetos externos precisam existir e passar pelos gates técnicos/de segurança.
 
-### Minha recomendação: integrar aos poucos, não só no final
+### Sequência que vamos seguir
 
-Esta é uma **recomendação de sequência**, não uma decisão que o usuário tenha escolhido separadamente:
+O usuário orientou deixar as integrações Vercel/Supabase para mais adiante, estruturar o projeto e testar os previews primeiro. Vou interpretar **“previews” agora como a prévia local estática de UX**, sem conta ou deploy na Vercel; ela não equivale a um Vercel Preview Deployment nem valida o backend.
 
-1. **Agora, durante G2:** priorizar Supabase CLI + Docker local para validar a migration-base e continuar o desenho/teste técnico. Não criar Supabase de produção nem publicar o jogo/painel, pois não há aplicações e o gate G2 segue aberto. Regras de proteção da branch `main` podem ser preparadas, mas os checks só podem ser exigidos quando existirem.
-2. **Logo após G2, quando houver um esqueleto seguro que compile:** conectar os projetos Game Web e Admin Web à Vercel/GitHub para começar a receber Previews de PR. Não espere o jogo inteiro ficar pronto: Previews ajudam a encontrar erros de build e revisar cada pedaço. Antes de disponibilizar URL do Admin, ele já precisa bloquear jogadores no servidor; para o Game Web, manter o acesso em modo fechado/teste. Proteger `main` e exigir os checks disponíveis.
-3. **Quando o código começar a usar Auth/API/banco remoto:** criar um Supabase de staging separado com dados sintéticos e configurar as variáveis Preview para esse ambiente. Continuar usando Supabase local para desenvolvimento diário. Nunca apontar Preview ao banco de produção.
-4. **Antes de alpha fechado com usuários reais:** provisionar Supabase de produção, testar migrations, RLS, secrets, backup/restore e alertas; configurar variáveis Production. Só então associar o domínio público e confirmar que `main` está protegido e que o merge automático produz deployments saudáveis. Depois de habilitado, cada merge em `main` poderá atualizar a produção — não será necessário esperar o jogo inteiro acabar para testar o deploy.
+1. **Agora:** documentar a estrutura proposta e abrir a prévia local existente `prototypes/g2-hud/index.html` para revisão. Não configurar Vercel, projeto Supabase remoto ou produção nesta etapa.
+2. **Depois da revisão do preview:** retomar as provas restantes de G2, incluindo Supabase CLI + Docker local para validar migrations. Isso ainda não cria nem conecta um projeto Supabase hospedado.
+3. **Após G2, quando existir um esqueleto de Game Web/Admin que compile e esteja seguro:** conectar os apps à Vercel/GitHub e começar os Vercel Previews de PR. Não é preciso esperar o jogo completo, mas o Admin deve ter verificação server-side antes de disponibilizar seu endereço.
+4. **Quando o backend precisar de Auth/API remotos:** criar um Supabase de staging separado, com dados sintéticos; Previews nunca usam credenciais ou dados de produção.
+5. **Antes do alpha fechado:** criar o ambiente Supabase de produção, revisar migrations/RLS/segredos/backups, proteger `main` e habilitar o fluxo de merge em `main` → build/checks → Production Deployment Vercel. Associar o domínio público depois de validar o release.
 
-**Resumo:** primeiro ferramentas locais; depois Previews e staging assim que houver código seguro para testar; produção e domínio por último, perto do alpha. Assim evitamos custos/risco cedo demais sem adiar a integração até o fim do desenvolvimento.
+**Resumo:** preview local primeiro; provas G2 depois; integrações de Preview/staging quando houver apps seguros; produção por último. Assim podemos revisar a interface sem iniciar cedo demais serviços externos, mas também não deixamos a integração para quando o jogo inteiro estiver pronto.
 
 ## 4. Configuração futura, passo a passo
 

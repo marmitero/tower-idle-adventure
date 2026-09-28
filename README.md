@@ -12,7 +12,8 @@
 - [Proposta de combate e balanceamento das armas](docs/COMBAT_DESIGN.md)
 - [Arquitetura visual da HUD e UX](docs/HUD_UX_SPEC.md)
 - [Arquitetura técnica Vercel + Supabase](docs/TECH_ARCHITECTURE.md)
-- [Guia de deploy GitHub → Vercel + Supabase](docs/DEPLOYMENT_GUIDE.md) — fluxo planejado de Preview e deploy automático em `main`; integrações externas ainda não configuradas.
+- [Guia de deploy GitHub → Vercel + Supabase](docs/DEPLOYMENT_GUIDE.md) — fluxo planejado e sequência escolhida: preview local primeiro; integrações externas mais adiante.
+- [Estrutura proposta do projeto](docs/PROJECT_STRUCTURE.md) — separação planejada de apps, contratos, backend e protótipos; não são pastas/apps prontos.
 - [Blueprint técnico detalhado do G2](docs/G2_TECHNICAL_BLUEPRINT.md)
 - [Migration-base e smoke tests PostgreSQL/PGlite](supabase/migrations/20260928000000_g2_core_schema.sql) — 9 testes locais; não equivale a validar Supabase CLI/Data API. Veja também [`supabase/README.md`](supabase/README.md) para escopo e comandos.
 - [Threat model do MVP](docs/THREAT_MODEL.md)
