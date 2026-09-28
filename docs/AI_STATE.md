@@ -17,20 +17,20 @@ Este arquivo é a passagem de contexto do projeto **Tower Idle Adventure**. Deve
 
 - **Data:** 2026-09-28.
 - **Branch obrigatória da sessão:** `arena/01a0e5e1-tower-idle-adventure`.
-- **Fase:** Etapa 2/G2 em andamento, estritamente pré-produção. Criados blueprints técnicos/ameaças/UX e um protótipo navegável isolado, sem implementar gameplay, HUD real, Admin Web ou infraestrutura.
-- **Marco atual:** G1 foi fechado documentalmente na etapa anterior. Baseline MVP continua como decisão do agente sob delegação explícita do usuário (adaptável), sem atribuir escolhas individuais ao usuário. G2 ainda requer prova técnica e avaliação de usabilidade; nenhum serviço foi provisionado e não houve teste real de segurança/infra/usuários.
-- **Documentação atual:** README e doze arquivos Markdown em `docs/`; protótipo local em `prototypes/g2-hud/index.html` (dados fictícios, sem APIs/backend).
-- **Validação desta etapa:** 13 arquivos Markdown passaram no link-check local; protótipo serviu HTTP 200, foi lido pelo parser HTML e passou `node --check` no JavaScript embutido; `git diff --check` passou. A sandbox não tem Supabase CLI nem Docker, então não foi possível testar migrations/RLS/transações. Nenhum teste real de segurança, infraestrutura de backend ou usabilidade foi executado.
+- **Fase:** Etapa 2/G2 em andamento. Criados blueprints técnicos/ameaças/UX, click-through e migration-base de schema com harness PGlite. Não há gameplay, HUD real, Admin Web, Edge Functions ou serviço Supabase provisionado.
+- **Marco atual:** G1 foi fechado documentalmente na etapa anterior. Baseline MVP continua como decisão do agente sob delegação explícita do usuário (adaptável), sem atribuir escolhas individuais ao usuário. G2 requer prova no Supabase CLI, revisão de segurança e usabilidade com participantes. O usuário confirmou que abriu e validou visualmente o protótipo; isso não substitui teste de usabilidade com 5–8 convidados.
+- **Documentação atual:** README e doze arquivos Markdown em `docs/`; protótipo local em `prototypes/g2-hud/index.html` (dados fictícios, sem APIs/backend); migration-base em `supabase/migrations/` e teste PGlite em `supabase/tests/`.
+- **Validação desta etapa:** `npm ci --prefix supabase` + `npm test --prefix supabase` passaram (9/9) em PGlite 0.5.8/PostgreSQL 18.3; `npm audit` encontrou 0 vulnerabilidades conhecidas no harness. Config Supabase propõe PG15 (diferença de versão explícita). TOML, links locais em 14 Markdown, parser HTML/sintaxe JS do protótipo e `git diff --check` passaram. PGlite simula roles/Auth e não valida Supabase CLI/PostgREST/Edge/Storage/concorrência/custos; CLI/Docker ausentes. Sem teste de segurança em serviço real nem estudo UX.
 
 ## Resumo confiável do projeto
 
 **Tower Idle Adventure** é um RPG idle 2D para navegador. O MVP fechado é PvE individual, desktop-first, PT-BR e alpha por convite. Conta escolhe Guerreiro, Arcanista ou Ladino, monta equipe de até três, faz hunt individual em 10 andares, ganha XP/Coins/loot e retorna ao lobby; companheiros desbloqueiam nos andares 3 e 6. Nível compartilhado vai de 1–20. Há um boss solo recorrente no andar 10. A especificação numérica completa e critérios de aceite vivem em `MVP_DECISIONS.md`.
 
-**Status importante:** escopo baseline foi decidido pelo agente após autorização explícita do usuário. Não tratar cada valor de `MVP_DECISIONS.md` como decisão individualmente escolhida ou aprovada pelo usuário. Pode ser adaptado futuramente por solicitação. Nada foi implementado; fórmulas/valores precisam de playtest na vertical slice.
+**Status importante:** escopo baseline foi decidido pelo agente após autorização explícita do usuário. Não tratar cada valor de `MVP_DECISIONS.md` como decisão individualmente escolhida ou aprovada pelo usuário. Pode ser adaptado futuramente por solicitação. Nenhuma feature/gameplay do produto foi implementada; fórmulas/valores precisam de playtest na vertical slice. A migration-base técnica é somente uma fundação G2 e não muda esse status.
 
 O MVP tem 10 slots (Arma, Peitoral, Elmo, Calça, Bota, Luva (armadura), Colar, Aura, Asa e Pet), oito stats por item, seis raridades e notas/poder definidos. Regra explicitamente confirmada pelo usuário: `x` independente por atributo, inteiro de 1–50; fator `x/10`, em passos de 0,1. `x=4,72` foi rejeitado. Qualquer personagem pode equipar qualquer arma. O baseline completo de combate/armas foi aprovado pelo usuário; Contracorte tem 20% de chance após ataque direto de alvo único e causa 50% do Ataque atual, sem recursão nem ativação por DoT. Valores podem mudar com evidência de playtest.
 
-**Stack aprovada:** Game Web e Admin Web separados na Vercel; Supabase Auth/PostgreSQL/Edge Functions/Storage no backend. Cliente não decide combate, economia ou conteúdo. Painel CMS no-code fica isolado; jogadores comuns não veem sua interface nem acessam APIs administrativas. Especificações em `TECH_ARCHITECTURE.md`, `ADMIN_PANEL_SPEC.md`, `G2_TECHNICAL_BLUEPRINT.md` e `THREAT_MODEL.md`; nada foi provisionado/implementado.
+**Stack aprovada:** Game Web e Admin Web separados na Vercel; Supabase Auth/PostgreSQL/Edge Functions/Storage no backend. Cliente não decide combate, economia ou conteúdo. Painel CMS no-code fica isolado; jogadores comuns não veem sua interface nem acessam APIs administrativas. Existe migration-base de schema ainda não aplicada no Supabase; nenhum serviço, endpoint, gameplay ou aplicação web foi provisionado/implementado. Ver `TECH_ARCHITECTURE.md`, `ADMIN_PANEL_SPEC.md`, `G2_TECHNICAL_BLUEPRINT.md` e `THREAT_MODEL.md`.
 
 **G2 UX:** `HUD_UX_SPEC.md` e `G2_UX_BLUEPRINT.md` definem estados/flows e critérios; `prototypes/g2-hud/index.html` é um click-through sem backend, sem combate e com dados fictícios. Não equivale a HUD real nem a teste de usabilidade concluído.
 
@@ -54,13 +54,14 @@ MVP exclui VIP/monetização, Diamonds, caixas/gacha, market/transações entre 
 
 `MVP_DECISIONS.md` fecha objetivo, roster (Guerreiro/Arcanista/Ladino), afinidades, nível compartilhado 1–20, 10 andares, boss solo, stats e skills, catálogo/base stats de itens, nota/poder, raridades/loot, XP/Coins, consumíveis/preços, bot/revive/retorno, login convidado, desktop/PT-BR e critérios de aceite. MVP exclui VIP/pagamentos, caixas, Diamonds/market, social, PvP, bosses compartilhados, events runtime, mobile completo e progresso offline. Não atribuir essas escolhas do agente ao usuário como decisões individualmente feitas por ele.
 
-### G2 — documentação-base entregue; gate aberto
+### G2 — documentação e prova técnica parcial; gate aberto
 
-- Baselines propostos em `G2_TECHNICAL_BLUEPRINT.md`: TypeScript/Next.js em projetos Vercel separados; Supabase; modelo de dados MVP, endpoints, revisões/idempotência, RLS/grants, rate limits iniciais, sessão Admin e lote de simulação fixo sem catch-up. Valores técnicos são propostas do agente a validar, não escolhas individualmente feitas pelo usuário.
-- `THREAT_MODEL.md` registra atores/fronteiras, 20 ameaças prioritárias, mitigações e evidências necessárias; nenhum controle foi testado em ambiente real.
-- `G2_UX_BLUEPRINT.md` define wireframes, fluxos, estados, acessibilidade e plano de teste. `prototypes/g2-hud/index.html` é protótipo somente local/fictício.
-- G2 continua aberto até prova local de migrations/RLS/transações/retry/reconexão, revisão de custo/backup, testes de isolamento admin e teste de usabilidade com 5–8 testers; conferir critérios em `G2_TECHNICAL_BLUEPRINT.md` e `ROADMAP.md`.
-- Nenhum gameplay, Admin Web ou serviço foi implementado/provisionado nesta atualização.
+- Baselines propostos em `G2_TECHNICAL_BLUEPRINT.md`: TypeScript/Next.js em projetos Vercel separados; Supabase; modelo de dados, contratos, rate limits iniciais, sessão Admin e lote fixo sem catch-up. Valores técnicos são propostas do agente a validar, não escolhas individualmente feitas pelo usuário.
+- `supabase/migrations/20260928000000_g2_core_schema.sql` cria schema-base com 17 tabelas, RLS/grants, constraints e view pública restrita ao release ativo. `supabase/tests/schema-smoke.test.mjs` aplica o SQL em PGlite; 9/9 smoke tests passaram. Isto não é validação Supabase CLI/Data API.
+- `THREAT_MODEL.md` registra 20 ameaças prioritárias; somente propriedades limitadas de schema/RLS foram exercitadas no harness local, sem serviço real.
+- `G2_UX_BLUEPRINT.md` define wireframes/flows/acessibilidade/plano; o usuário confirmou que abriu e validou visualmente `prototypes/g2-hud/index.html`. Não houve estudo com 5–8 testers.
+- G2 continua aberto até migration testada via Supabase CLI, transações/idempotência/retry/reconexão, limites/custos, isolamento Admin/MFA, backup/restore, revisão de segurança e teste UX planejado; ver `G2_TECHNICAL_BLUEPRINT.md` e `ROADMAP.md`.
+- Nenhum gameplay, Admin Web, Edge Function ou serviço foi implementado/provisionado nesta atualização; somente schema-base técnico parcial.
 
 ### Pós-MVP (backlog, não bloqueia G1/G2)
 
@@ -70,10 +71,10 @@ Não preencher essas lacunas silenciosamente no código; registrar decisão, mot
 
 ## Próximos passos
 
-1. Checagens documentais concluídas: links locais, consistência cruzada, smoke test estático (HTTP 200, parse HTML e sintaxe JS) e `git diff --check`; o checkpoint desta atualização preserva o estado parcial.
-2. G2 permanece aberta. A próxima fatia precisa de toolchain Supabase CLI + Docker disponível para testar migrations/RLS/grants/transações/idempotência/desconexão-reconexão; depois, avaliação UX com 5–8 testers e revisão de segurança/custo/backup. Esta sandbox não tem CLI nem Docker.
-3. Não implementar gameplay ou Admin Web nesta etapa sem o gate; especificações e click-through não significam que funcionalidades estejam prontas.
-4. Só avançar a G3/vertical slice quando os critérios G2 forem executados e o gate revisado; em cada etapa ler AI_State primeiro e fazer checkpoint mesmo se parcial.
+1. Links, configuração, parser HTML/JS do protótipo, `npm ci`/PGlite (9/9), `npm audit` e `git diff --check` validados nesta fatia; este checkpoint preserva o estado técnico parcial.
+2. G2 permanece aberta: instalar/disponibilizar Supabase CLI + Docker e executar `supabase start`/`db reset` contra stack local real; depois testar Auth/Data API, transações concorrentes, idempotência/reconexão e revisão de segurança/custo/backup. UX ainda requer 5–8 testers apesar da aprovação visual do protótipo pelo usuário.
+3. Não implementar gameplay ou Admin Web antes do gate G2. A migration-base é só fundação de schema, não um jogo/backend funcional.
+4. Só avançar G3/vertical slice quando os critérios G2 forem executados e o gate revisado; em cada etapa ler AI_State primeiro e fazer checkpoint mesmo se parcial.
 
 ## Histórico de etapas
 
@@ -128,4 +129,13 @@ Não preencher essas lacunas silenciosamente no código; registrar decisão, mot
 - **Escopo seguido:** Etapa 2 do Roadmap; não implementar gameplay, Admin Web ou infraestrutura. G2 autoriza detalhamento e protótipo de UX não funcional.
 - **Entregue:** `G2_TECHNICAL_BLUEPRINT.md` (dados, APIs, RLS, idempotência, simulação por lote, ambientes); `THREAT_MODEL.md` (20 ameaças e evidências); `G2_UX_BLUEPRINT.md` (wireframes/flows/a11y/plano de teste); `prototypes/g2-hud/index.html` (click-through local com dados fictícios). Specs de Tech/Admin/HUD, README, Roadmap e AI_State sincronizados.
 - **Estado:** etapa parcial; nenhum serviço, migration, API, HUD ou painel criado. Sem prova técnica, testes de segurança ou teste de usabilidade com participantes; Gate G2 aberto.
-- **Validação realizada:** link-check local passou em 13 Markdown; servidor estático retornou HTTP 200; parser HTML e `node --check` no JavaScript embutido passaram; `git diff --check` passou. Preview estático ficou disponível na porta 4173. Supabase CLI/Docker não estão disponíveis; nenhuma prova backend ou de segurança foi executada, então G2 segue parcial.
+- **Validação realizada:** link-check local passou em 13 Markdown; servidor estático retornou HTTP 200; parser HTML e `node --check` no JavaScript embutido passaram; `git diff --check` passou. Preview estático ficou disponível na porta 4173. Supabase CLI/Docker não estavam disponíveis; G2 seguiu parcial.
+
+### 2026-09-28 — G2: migration-base e smoke test PostgreSQL (parcial)
+
+- **Feedback do usuário:** conseguiu abrir o protótipo e confirmou que está tudo certo visualmente. Isso é revisão individual do click-through, não teste de usabilidade com a amostra de 5–8 pessoas do plano.
+- **Escopo:** avançar G2 com uma fundação de schema autorizada pelo Roadmap, sem criar gameplay, Edge Functions, Admin Web ou provisionar serviço.
+- **Entregue:** `supabase/config.toml`, migration `20260928000000_g2_core_schema.sql`, seed vazio/desabilitado e harness PGlite 0.5.8 com dependência de desenvolvimento fixada. Schema de 17 tabelas, RLS/grants, view de conteúdo ativo, segregação de seed/snapshot e constraints para rolls/equipe/sessões.
+- **Teste executado:** `npm test --prefix supabase` — 9/9 passaram no PGlite 0.5.8/PostgreSQL 18.3, cobrindo aplicação do SQL, isolamento A/B, negação de escrita direta, catálogo ativo, dados privados/admin, constraints, idempotency key, append-only e cascata de exclusão de conta. `npm audit --prefix supabase` reportou zero vulnerabilidades conhecidas no harness.
+- **Limites:** PGlite simula roles/Auth, executa PostgreSQL 18.3 (a config Supabase proposta mira PG15) e não é Supabase. Sem Supabase CLI/Docker, não houve teste de migration via Supabase, Auth/PostgREST, Edge Functions, Storage, transações reais de compra/combate, concorrência, RLS em serviço real, custo ou backup.
+- **Estado:** G2 continua aberta; schema é fundação técnica, não backend/gameplay. Próxima prova depende de Supabase CLI + Docker ou ambiente Supabase local equivalente, e continua pendente o estudo de usabilidade com 5–8 convidados.

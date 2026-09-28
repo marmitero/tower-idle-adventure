@@ -1,7 +1,7 @@
 # Threat model — MVP (G2)
 
-**Versão:** 0.1 — análise documental inicial
-**Estado:** modelagem preventiva; nenhum serviço, controle ou teste de segurança foi implementado. Complementa [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md), [`TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md) e [`ADMIN_PANEL_SPEC.md`](ADMIN_PANEL_SPEC.md).
+**Versão:** 0.2 — evidência parcial de schema/RLS
+**Estado:** modelo preventivo. Uma migration-base contém grants/RLS e passou smoke tests PostgreSQL limitados em PGlite; não há serviço Supabase nem teste de segurança em stack real. As demais mitigações são propostas, não controles ativos. Complementa [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md), [`TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md) e [`ADMIN_PANEL_SPEC.md`](ADMIN_PANEL_SPEC.md).
 
 ## 1. Escopo, ativos e premissas
 
@@ -92,7 +92,7 @@ Severidade inicial qualitativa: **Crítica / Alta / Média**. Risco residual só
 
 ## 4. Critérios de risco aceito antes de G3/beta
 
-Nenhuma ameaça Crítica fica sem teste reproduzível. Ameaças Altas devem ter controle implementado/testado ou risco aceito formalmente pelo responsável, com limitação/mitigação temporária. Os itens acima são plano; a etapa atual não realizou pentest, teste de RLS, load test, restore nem teste MFA.
+Nenhuma ameaça Crítica fica sem teste reproduzível. Ameaças Altas devem ter controle implementado/testado ou risco aceito formalmente pelo responsável, com limitação/mitigação temporária. Os itens acima são plano; houve apenas smoke test de schema/RLS em PGlite. Não houve teste de RLS na stack Supabase, pentest, load test, restore nem teste MFA.
 
 ## Referências oficiais
 

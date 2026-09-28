@@ -1,7 +1,7 @@
 # G2 — blueprint técnico do MVP
 
-**Versão:** 0.1 — especificação de pré-produção
-**Status:** baseline técnico proposto/selecionado pelo agente para orientar validação G2; nenhuma migração, função, aplicação ou serviço foi implementado ou provisionado. Não equivale ao gate G2 aprovado.
+**Versão:** 0.2 — migration-base e evidência PGlite parcial
+**Status:** baseline técnico proposto pelo agente. A migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` foi criada e passou 9 smoke tests PostgreSQL via PGlite (RLS/grants/constraints), mas não foi aplicada/validada pelo Supabase CLI: esta sandbox não tem Supabase CLI nem Docker. Nenhum serviço, Edge Function, jogo ou painel foi provisionado/implementado. G2 continua aberta.
 
 Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md) para o MVP de [`MVP_DECISIONS.md`](MVP_DECISIONS.md). Regras de produto do MVP não são reabertas aqui. Decisões técnicas dependentes de plano, custo e uma prova técnica ainda precisam de verificação antes de G2 ser encerrada.
 
@@ -24,8 +24,8 @@ Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`]
 | Admin Web | execução local com usuário/roles seed não produtivos | deployment protegido; sem conteúdo/segredo de produção | projeto Vercel/domínio separados; middleware exige sessão admin válida |
 | Conteúdo | fixtures versionadas e sem dados pessoais | cópia sintética do release aprovado | release imutável publicado pelo Admin autorizado |
 
-- Usar os diretórios/projetos `game-web`, `admin-web` e `supabase/` como convenção futura; não criar estas aplicações durante a etapa documental.
-- `supabase/migrations/` contém SQL versionado; `seed.sql` contém somente fixtures sintéticas. Mudanças de schema passam por review, aplicam-se primeiro no local e staging e só então production.
+- Os projetos/aplicações `game-web` e `admin-web` continuam futuras. `supabase/` contém agora `config.toml`, a migration-base de schema e um harness PGlite somente de desenvolvimento; não há app, endpoint ou Edge Function.
+- `supabase/migrations/` contém SQL versionado. O seed está intencionalmente desabilitado e não há catálogo/contas de produção. Mudanças futuras passam por review, Supabase local e staging antes de production; ainda não ocorreu `supabase start`/`db reset`.
 - Vercel Preview nunca recebe segredo de produção. Por padrão, preview do Game Web usa ambiente dev/sintético; Preview do Admin Web deve ter Vercel Deployment Protection e não consegue publicar no banco de produção.
 - Produção usa variáveis separadas por projeto/environment. Segredos do Supabase ficam apenas em funções/servidor; nenhuma chave secreta ou `service_role`/`sb_secret` pode aparecer em bundle `NEXT_PUBLIC_*`, source map ou log.
 - Habilitar verificação de migration status e backup antes de qualquer release de schema; não executar reset destrutivo contra staging/production.
@@ -36,18 +36,19 @@ Nomes abaixo são conceituais até revisão de schema; `auth.users.id` é a iden
 
 | Entidade | Conteúdo e invariantes principais |
 |---|---|
-| `player_profiles` | `user_id` PK/FK de Auth, nível 1–20, XP não negativo, Coins não negativos/revision, `created_at`; sem e-mail público ou perfil social. |
-| `player_roster` | Personagens desbloqueados (ID de classe, `unlocked_at`, posição opcional 1–3); `UNIQUE(user_id, class_id)` e no máximo três posições únicas. Nível é compartilhado, não duplicado por personagem. |
-| `player_items` | Instância não negociável: dono, template/release, nível, raridade, oito colunas `x_* SMALLINT CHECK (x_* BETWEEN 1 AND 50)`, característica elegível, origem e timestamps. Máximo 300 instâncias não equipadas por conta; descarte é tombstone, sem transferência. |
-| `equipment_loadouts` | `user_id`, personagem, slot, `item_id`; PK por `(user_id, character_id, slot)` e `UNIQUE(item_id)`. Função transacional valida que slot e dono do item correspondem ao template/perfil. |
-| `consumable_stacks` | Uma linha por conta/tipo: poção ou revive, quantidade entre 0 e 99; compra/consumo atualiza estoque e ledger na mesma transação. |
-| `coin_ledger` | Lançamentos append-only com valor assinado, motivo, referência/idempotency key e saldo resultante; não aceitar saldo calculado pelo cliente. |
+| `player_profiles` | `user_id` PK/FK de Auth, nível 1–20, XP/Coins não negativos/revision, sem e-mail público. Migration inicia saldo em 0; os 300 Coins iniciais do MVP dependem de futura transação atômica de provisionamento com ledger, ainda inexistente. |
+| `player_roster` | Personagens desbloqueados (IDs estáveis `warrior`, `arcanist`, `rogue`, posição opcional 1–3); `UNIQUE(user_id, class_id)` e posições únicas. Escolha inicial/kit/equipamento ainda não é provisionado. Nível é compartilhado, não duplicado por personagem. |
+| `player_items` | Instância não negociável: dono, template/release, nível, raridade, oito colunas `x_* SMALLINT CHECK (x_* BETWEEN 1 AND 50)`, característica elegível, origem e timestamps. Cap de 300 não equipados é regra transacional do servidor e ainda não está implementado na migration; descarte é tombstone, sem transferência. |
+| `equipment_loadouts` | `user_id`, personagem, slot, `item_id`; PK por `(user_id, character_id, slot)` e `UNIQUE(item_id)`. Migration prova FKs de dono/personagem e unicidade; validação de compatibilidade slot/template ainda cabe à função transacional futura. |
+| `consumable_stacks` | Uma linha por conta/tipo: poção ou revive, quantidade entre 0 e 99. Estoque inicial (3 Poções Comuns + 1 Revive) não é seed; provisionamento, compra e consumo ainda precisam atualizar estoque/ledger na mesma transação. |
+| `coin_ledger` | Lançamentos append-only com valor assinado, motivo, referência/idempotency key não nula e saldo resultante; migration não garante atomicidade nem igualdade com o saldo do perfil. |
 | `bot_settings` | Limiar, lista de raridades, toggles de poção/revive/skills e retorno pós-derrota; schema fechado e limites conferidos server-side. |
-| `hunt_sessions` | Uma sessão ativa por conta (índice único parcial), andar, status, `content_release_id`, `engine_version`, cursor/revision e snapshot serializado com versão. Seed/estado sensível não é exposto ao cliente. |
-| `hunt_events` | Eventos de combate/recompensa ordenados por sequência; API devolve apenas os últimos 100 da hunt mais recente. Não é log de analytics livre. |
-| `idempotency_records` | `(user_id, request_id)` único, rota, hash do corpo, status e resposta mínima. Mesmo ID/corpo retorna resultado original; mesmo ID com corpo diferente é conflito. TTL operacional proposto: 30 dias, sujeito a revisão de retenção. |
+| `hunt_sessions` | Metadados seguros da sessão, andar/status, `content_release_id`, `engine_version`, cursor/revision e índice único parcial para uma ativa por conta; leitura própria limitada. |
+| `hunt_session_private_state` | Seed, snapshot versionado, sim_time e controle `batch_incomplete`; tabela separada sem grants para navegador. Migration não implementa simulação nem segredo rotativo. |
+| `hunt_events` | Eventos de combate/recompensa ordenados por sequência; API futura devolve apenas os últimos 100 da hunt mais recente. Não é log de analytics livre. |
+| `idempotency_records` | `(user_id, request_id)` único, rota, hash do corpo, status e resposta mínima. Migration garante unicidade do ID; replay da resposta e conflito para body hash diferente ainda dependem de lógica transacional futura. TTL operacional proposto: 30 dias, sujeito a revisão de retenção. |
 | `content_drafts` | Entradas tipadas editáveis (JSON validado por `kind`), autor e revisão; invisíveis a jogadores. |
-| `content_releases` / `release_entries` | Release imutável, publicação atômica, checksum, autor/motivo e entradas congeladas. Hunt fixa release ao iniciar; rollback muda apenas o ponteiro ativo. |
+| `content_releases` / `release_entries` | Release imutável, checksum e entradas congeladas. `active_content_release` mantém um único ponteiro ativo; a view `published_content` expõe somente esse release. Fluxo publish/rollback transacional ainda não implementado. |
 | `admin_memberships` | `user_id`, role, estado, concedido/revogado por; tabela não editável por jogador nem exposta em leitura pública. |
 | `admin_audit_log` | Ação, ator, entidade, diff antes/depois, release, motivo, data e resultado; append-only para administradores. Nunca registrar token, senha ou segredo. |
 
@@ -78,7 +79,7 @@ Nomes abaixo são conceituais até revisão de schema; `auth.users.id` é a iden
 3. Edge Function valida assinatura/expiração do JWT e extrai `user_id` do token. Ignorar qualquer `user_id` de body/query para autorização.
 4. Funções SQL transacionais ficam em schema de aplicação controlado, com `EXECUTE` revogado de `PUBLIC`, `anon` e `authenticated`; somente identidade server-side autorizada pode chamá-las. Funções `SECURITY DEFINER` fixam `search_path`, validam argumentos e não montam SQL dinâmico.
 5. Para endpoints de jogador, derivar dono do JWT verificado e passar esse ID à transação. Para Admin API, consultar `admin_memberships` em cada request; não confiar em `user_metadata`, role cacheável do browser nem rota escondida.
-6. Views públicas de conteúdo incluem somente release ativo e campos aprovados; draft, auditoria, seed e configuração interna não são legíveis no Game Web.
+6. `published_content` é a única superfície de leitura pública, como view security-barrier fixa no release ativo e sem tabelas draft/audit. Tabelas-base de release não têm grants browser; revisar a propriedade `security_invoker=false`/owner privilegiado na prova Supabase real, pois a view é um acesso deliberado e estreito a conteúdo já publicado.
 7. Game API e Admin API usam allowlist CORS por origem exata (prod + local dev apenas; Preview é explicitamente configurado), `Vary: Origin` e métodos/headers mínimos. CORS não é autorização: JWT/role e validação server-side valem para curl e qualquer cliente.
 8. Testar cada tabela/função com usuário A, usuário B, `anon`, editor, auditor e owner. RLS não substitui validação de domínio nem idempotência.
 
@@ -168,17 +169,24 @@ Roles finais recomendadas para MVP:
 - Backup: alvo mínimo de snapshot diário e retenção de 7 dias, mais exercício de restauração em staging antes do beta. Validar plano/preço Supabase, export e PITR disponíveis; não declarar backup ativo antes de testar restore.
 - Observabilidade: métricas agregadas de erro/latência/duplicação/uso, sem conteúdo de request com e-mail/token. Alertar falhas de release, taxa anormal de compra/recompensa, revision conflicts e abuso de API.
 
-## 9. Critérios de saída G2 (ainda não executados)
+## 9. Critérios de saída G2 (abertos; evidência parcial abaixo)
 
-- Prova local que inicia Supabase CLI, aplica migrations do zero, carrega seeds sintéticas e restaura banco sem ação manual fora do roteiro.
-- Testes automatizados de RLS/grants para anon, jogador A/B e roles Admin; tentativa direta de escrita falha.
-- Rate limits cumprem os valores aprovados ou revisados no ambiente-alvo, compartilham contadores entre instâncias, retornam `429/retry_after` e não podem ser evitados por `X-Forwarded-For` forjado; custo/latência ficam medidos.
-- Requisição duplicada de compra/lote com mesmo `request_id` não duplica Coins, item, XP, uso de poção ou cursor; body diferente sob mesmo ID retorna conflito.
-- Reconexão não gera lote de catch-up; função não confia em tempo/client state.
-- Release inválido não publica; publish/rollback registra actor/diff e sessões mantêm release fixado.
-- Player comum recebe negação sem Admin shell/dados/API, inclusive em preview/domínio conhecido; Owner MFA consegue workflow previsto.
-- Protótipo UX foi revisado com usuários de teste conforme plano de `G2_UX_BLUEPRINT.md`; achados de severidade alta tratados.
-- Revisão de segurança, custos e backup aprovada antes do Gate G2. Nenhum destes critérios foi executado por esta atualização documental.
+- Prova no Supabase CLI/local que aplica migrations do zero, carrega seeds sintéticas e restaura banco sem ação manual fora do roteiro. **Pendente:** CLI e Docker indisponíveis nesta sandbox.
+- Testes de RLS/grants executados contra Supabase local e Data API para anon, jogador A/B e roles Admin. **Parcial:** smoke tests PGlite exercitam PostgreSQL, grants, RLS e constraints sob roles simulados; não validam stack Supabase.
+- Rate limits compartilham contador entre instâncias, retornam `429/retry_after`, resistem a `X-Forwarded-For` forjado e têm custo/latência medidos. **Pendente.**
+- Compra/lote concorrente e repetido com mesmo `request_id` não duplica saldo/itens/XP/consumível/cursor; body diferente gera conflito. **Parcial:** unicidade de request key está modelada; não há transações de comando nem teste de concorrência.
+- Reconexão não gera catch-up; função não confia em tempo/client state. **Pendente:** nenhuma Edge Function/simulação criada.
+- Release inválido não publica; publish/rollback é auditável e sessões mantêm release fixado. **Parcial:** tabelas de release e append-only são exercitadas, mas fluxo publish/rollback não foi implementado.
+- Jogador comum não recebe Admin shell/dados/API; Owner MFA completa workflow. **Pendente:** nenhum Admin Web/endpoint/MFA implementado ou testado.
+- Protótipo revisado com 5–8 convidados segundo o plano UX, com achados críticos tratados. **Parcial:** usuário confirmou que abriu e validou visualmente o click-through; isso não substitui a amostra de usabilidade definida.
+- Revisão de segurança, custo e backup aprovada antes do Gate G2. **Pendente.**
+
+### Evidência da fatia de schema (2026-09-28)
+
+- `supabase/migrations/20260928000000_g2_core_schema.sql` cria 17 tabelas com RLS + `FORCE ROW LEVEL SECURITY`, grants explícitos, view pública apenas do release ativo, separação do seed/snapshot privado, invariantes para oito `x` inteiros 1–50, propriedade de equipamento e sessão única ativa. Ledger/histórico recusam update/delete avulso; cascata controlada de remoção da conta apaga dados de gameplay, enquanto auditoria Admin permanece sujeita à retenção definida.
+- `npm test --prefix supabase`: 9/9 testes passaram usando PGlite 0.5.8 (PostgreSQL 18.3); exercitam aplicação da migration, isolamento próprio A/B via role, escrita direta negada, publicação ativa, estado privado, constraints/uniqueness, append-only, cascata de exclusão da conta e papel trusted backend. `npm audit --prefix supabase` reportou 0 vulnerabilidades conhecidas nas dependências do harness.
+- **Limite de evidência:** PGlite é um harness PostgreSQL/WASM com `auth.users`, `auth.uid()` e roles simulados; a config Supabase local proposta mira PostgreSQL 15, portanto há diferença de major version. Não é Supabase CLI nem valida Auth real, Data API/PostgREST, Storage, Edge Functions, grants/versão do provedor, latência, concorrência de produção, backup ou custo. Não declarar RLS/Supabase prontos com base apenas neste smoke test.
+- Migration é fundação de schema, não implementa endpoints, transações econômicas, gameplay, Admin Web, migração de produção ou cadastro/provisionamento. Não avançar G3 com estes resultados isolados.
 
 ## Referências técnicas oficiais
 

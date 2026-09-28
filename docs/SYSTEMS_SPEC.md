@@ -1,6 +1,6 @@
 # Especificação de sistemas — Tower Idle Adventure
 
-**Versão:** 0.3 — referência de sistemas e alinhamento técnico G2
+**Versão:** 0.4 — alinhamento com prova de schema G2
 **Estado:** baseline de combate aprovado pelo usuário; decisões de produto do MVP fechadas pelo agente sob autorização explícita do usuário. Nada foi implementado ou validado em runtime.
 
 `MVP_DECISIONS.md` é a fonte de verdade para roster, progressão, stats-base, catálogo, nota/poder, loot, loja e comportamento do bot no MVP. `COMBAT_DESIGN.md` é a fonte de verdade para as regras universais de combate e armas. Este arquivo conecta os contratos e identifica sistemas intencionalmente adiados; itens pós-MVP não são dependências da primeira entrega.
@@ -116,7 +116,7 @@ Não pertence ao MVP. Para eventual implementação futura, preservam-se estes i
 
 Stack aprovada: Game Web e Admin Web separados na Vercel; Supabase Auth, PostgreSQL, Edge Functions e Storage no backend/servidor, Realtime se necessário. O cliente envia intenções, nunca determina dano, cooldown, loot, XP, saldo, consumo ou propriedade. RLS, roles, segredo de serviço e APIs administrativas seguem `TECH_ARCHITECTURE.md` e `ADMIN_PANEL_SPEC.md`.
 
-Jogadores não podem ver/acessar o Admin Web nem suas APIs. O CMS no-code cria e publica, sem editar código, os tipos de conteúdo MVP suportados; validações, versionamento, auditoria e rollback permanecem requisitos, não implementação concluída. Baseline de schema, contratos/API, idempotência, ambientes, RLS e operação consta em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) e [`THREAT_MODEL.md`](THREAT_MODEL.md); prova técnica, backup/restore, limites, MFA e custos continuam pendentes de G2.
+Jogadores não podem ver/acessar o Admin Web nem suas APIs. O CMS no-code cria e publica, sem editar código, os tipos de conteúdo MVP suportados; ainda não foi implementado. A migration-base de schema e RLS passou smoke tests limitados via PGlite, mas não foi aplicada no Supabase CLI nem testada contra Data API/Auth reais. Versionamento, APIs, transações, Admin, backup/restore, limites, MFA, custos e segurança continuam pendentes de G2; ver evidências/limitações em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) e [`THREAT_MODEL.md`](THREAT_MODEL.md).
 
 ## 9. HUD e autoridade
 

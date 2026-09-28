@@ -2,7 +2,7 @@
 
 **Tower Idle Adventure** é um RPG idle automático 2D para navegador, centrado em uma torre de andares, progressão de equipe e batalhas PvE automáticas.
 
-> **Fase atual: G2 em andamento.** Há documentação técnica e um click-through UX sem backend; jogo, gameplay, HUD de produção, Admin Web e infraestrutura não foram implementados. O baseline de MVP foi decidido pelo agente sob autorização explícita do usuário e pode ser ajustado por ele; os números ainda não foram validados em playtest.
+> **Fase atual: G2 em andamento.** Há documentação técnica, click-through UX sem backend e uma migration-base de schema testada apenas com PGlite; Supabase, jogo, gameplay, HUD de produção e Admin Web não foram provisionados/implementados. O baseline de MVP foi decidido pelo agente sob autorização explícita do usuário e pode ser ajustado por ele; os números ainda não foram validados em playtest.
 
 ## Documentação do projeto
 
@@ -13,6 +13,7 @@
 - [Arquitetura visual da HUD e UX](docs/HUD_UX_SPEC.md)
 - [Arquitetura técnica Vercel + Supabase](docs/TECH_ARCHITECTURE.md)
 - [Blueprint técnico detalhado do G2](docs/G2_TECHNICAL_BLUEPRINT.md)
+- [Migration-base e smoke tests PostgreSQL/PGlite](supabase/migrations/20260928000000_g2_core_schema.sql) — 9 testes locais; não equivale a validar Supabase CLI/Data API. Veja também [`supabase/README.md`](supabase/README.md) para escopo e comandos.
 - [Threat model do MVP](docs/THREAT_MODEL.md)
 - [Blueprint UX e plano de usabilidade G2](docs/G2_UX_BLUEPRINT.md)
 - [Protótipo HUD clicável (dados fictícios, sem backend)](prototypes/g2-hud/index.html)
@@ -32,4 +33,4 @@
 
 ## Próximos passos
 
-G2 segue em andamento: provar migrations/RLS/idempotência/reconexão com Supabase local, revisar segurança do Admin e avaliar o click-through com testers. Não há serviço ou interface de produção. A vertical slice (G3) começa somente após o gate G2 do [Roadmap](docs/ROADMAP.md).
+G2 segue em andamento: a migration-base passou somente no harness PGlite; falta executá-la pelo Supabase CLI e validar Data API/Auth, transações, rate limits, reconexão, segurança/Admin, backup e usabilidade com testers. Não há serviço ou interface de produção. A vertical slice (G3) começa somente após o gate G2 do [Roadmap](docs/ROADMAP.md).

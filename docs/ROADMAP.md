@@ -1,7 +1,7 @@
 # Roadmap — Tower Idle Adventure
 
-**Versão:** 0.3 — estado G2 parcial e critérios sincronizados
-**Status atual:** Etapa 1/G1 concluída documentalmente; Etapa 2/G2 em andamento. Blueprints técnico/ameaças/UX e click-through sem backend foram preparados. Gate G2 segue aberto: sem prova técnica, teste de segurança ou usabilidade com participantes. Nenhum produto, gameplay, HUD real, Admin Web ou infraestrutura foi implementado.
+**Versão:** 0.4 — prova de schema parcial e gate G2 aberto
+**Status atual:** Etapa 1/G1 concluída documentalmente; Etapa 2/G2 em andamento. Blueprints, click-through e migration-base estão preparados; smoke tests PGlite passaram, mas não são prova Supabase. Gate G2 segue aberto sem validação Supabase real, revisão de segurança/infra ou estudo com 5–8 participantes. Nenhum produto jogável, gameplay, HUD real, Admin Web ou serviço foi provisionado.
 **Princípio:** cada etapa começa lendo [AI_State](AI_STATE.md), altera a documentação antes do código quando houver decisão de design e termina atualizando AI_State e evidências.
 
 ## Marcos de aprovação
@@ -43,8 +43,9 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 - Revisar e aprovar a arquitetura, os componentes, os estados e as dependências da HUD documentados em `HUD_UX_SPEC.md` antes de implementar a interface; definir UX responsiva, acessibilidade, protótipos navegáveis e teste de usabilidade.
 - Definir plano de privacidade, retenção, suporte e revisão legal antes de qualquer beta público; monetização/moderação de recursos sociais só se aplicam a fases futuras.
 - **Entregues nesta fatia documental:** `G2_TECHNICAL_BLUEPRINT.md` (modelo conceitual, contratos, grants/RLS, idempotência e operação de sessão), `THREAT_MODEL.md` e `G2_UX_BLUEPRINT.md`, além do protótipo local `prototypes/g2-hud/index.html`. Baselines/frameworks são propostas do agente para validação, não sistemas prontos.
-- **Entregáveis ainda pendentes:** migrations/seed reais e prova local; teste RLS/idempotência/reconexão; prova de limites/custo; teste automatizado do isolamento Admin; review de MFA, restore, segurança e plano; sessões de usabilidade com 5–8 convidados e incorporação dos achados; decisão visual final.
-- **Situação:** nenhum serviço Supabase/Vercel foi provisionado; protótipo é estático e sem dados reais, gameplay ou Admin. Esta sandbox não tem Supabase CLI nem Docker, então migrations/RLS/transações locais não foram executadas. Nenhuma segurança/backup foi implementada/testada.
+- **Entregues nesta fatia técnica:** migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` (17 tabelas, RLS/grants e constraints) e 9 smoke tests com PGlite, mais configuração/harness de desenvolvimento. Não inclui Edge Functions, endpoints ou gameplay.
+- **Entregáveis ainda pendentes:** aplicar migration/seed via Supabase CLI local e testar contra Supabase Auth/Data API; validar transações de gameplay/idempotência/concorrência/reconexão; rate limits/custos; isolamento real do Admin/MFA; backup/restore/revisão de segurança; usabilidade com 5–8 convidados e decisão visual final.
+- **Situação:** nenhum serviço Supabase/Vercel foi provisionado; protótipo segue estático. PGlite passou os testes modelados, mas não representa Supabase. Esta sandbox não tem Supabase CLI nem Docker, portanto `supabase start`/migration/Storage/Auth reais não foram executados. Nenhuma segurança/backup de produção foi implementada/testada.
 - **Gate G2:** manter aberto até critérios de `G2_TECHNICAL_BLUEPRINT.md` executados/revistos, ameaça crítica sem lacuna, UX validada e limitações/custos aprovados. Somente então iniciar G3.
 
 ### Etapa 3 — Vertical slice e prova de diversão (G3)

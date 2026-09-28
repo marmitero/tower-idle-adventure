@@ -1,8 +1,8 @@
 # Arquitetura técnica — Vercel + Supabase
 
-**Versão:** 0.3 — arquitetura Vercel + Supabase e contratos G2
+**Versão:** 0.4 — foundation schema G2 e limites de validação
 **Decisão confirmada pelo usuário:** usar **Vercel + Supabase**, separando o cliente do jogo do servidor.
-**Estado:** especificação-base detalhada; nenhuma infraestrutura, migration ou aplicação foi implementada/testada. Ver [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) para schemas/APIs propostos e [`THREAT_MODEL.md`](THREAT_MODEL.md) para riscos. G2 ainda não passou no gate.
+**Estado:** infraestrutura e aplicações ainda não existem. A migration-base de schema foi criada e tem smoke tests PostgreSQL/PGlite limitados; não foi aplicada/testada pelo Supabase CLI nem contra Auth/Data API reais. Ver [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) para evidências/limites e [`THREAT_MODEL.md`](THREAT_MODEL.md) para riscos. G2 permanece aberta.
 
 ## 1. Separação de responsabilidades
 
@@ -28,13 +28,13 @@ A separação do cliente e servidor é uma fronteira de segurança, não apenas 
 
 ## 2. Aplicações e ambientes
 
-Estrutura sugerida para o repositório/entregas (nomes ajustáveis na etapa técnica):
+Estrutura planejada para o repositório/entregas:
 
-- `game-web`: cliente do jogo, projeto Vercel próprio.
-- `admin-web`: CMS/painel administrativo, outro projeto Vercel e domínio restrito por autenticação.
-- `supabase/`: migrations SQL, políticas RLS, Edge Functions, tipos e seeds de desenvolvimento.
+- `game-web`: cliente do jogo, projeto Vercel próprio (ainda não criado).
+- `admin-web`: CMS/painel administrativo, outro projeto Vercel e domínio restrito por autenticação (ainda não criado).
+- `supabase/`: config, uma migration-base e harness PGlite de desenvolvimento. Ainda não há Edge Functions ou catálogo de produção.
 
-Ambientes **dev**, **staging** e **production** devem ter projetos/configurações Supabase e Vercel isolados. O fluxo proposto usa Supabase CLI local, migrations revisadas e seeds sintéticas; Preview deployments usam somente dev e nunca recebem segredo de produção nem podem publicar conteúdo real. Em staging valida-se migration/release antes de production; não executar reset destrutivo remoto. O blueprint técnico registra escopos de environment e responsabilidades.
+Ambientes **dev**, **staging** e **production** devem ter projetos/configurações Supabase e Vercel isolados. A migration foi executada pelo harness PGlite, não pelo Supabase CLI; Preview deployments continuam planejados para usar somente dev e nunca segredo de produção. Em staging valida-se migration/release antes de production; não executar reset destrutivo remoto. O blueprint técnico registra escopos de environment e responsabilidades.
 
 ## 3. Contrato cliente-servidor
 
@@ -58,7 +58,7 @@ Supabase Realtime pode avisar sobre estado de sessão no MVP; chat, presença, g
 
 - **Auth:** conta e sessão; papel de admin é concedido somente por procedimento confiável (allowlist/tabela protegida ou `app_metadata` gerenciada no servidor). Não confiar em `user_metadata` editável pelo próprio jogador.
 - **PostgreSQL:** estado persistente MVP de conta/jogador, inventário, hunts, Coins, equipe e versões de conteúdo. Guildas, market e chat são extensões pós-MVP, não tabelas/requisitos iniciais.
-- **RLS:** habilitada em tabelas expostas; política padrão negar escrita pública. Jogadores só acessam o próprio estado e conteúdo publicado permitido. Escritas sensíveis ocorrem em endpoint validado.
+- **RLS:** a migration-base habilita e força RLS nas 17 tabelas; grants de browser são limitados a leituras próprias de estado sem escrita direta e à view de catálogo publicado. Smoke tests PGlite cobrem um subconjunto de isolamento/constraints; Supabase real ainda não foi validado. Escritas sensíveis exigirão endpoint validado, ainda não implementado.
 - **Edge Functions:** API server-side para ações de jogo e operações de administrador. Validar JWT/role, schema, autorização, limite de taxa, idempotência e transação em cada comando.
 - **Storage:** PNGs e dados publicados; assets aprovados podem ter leitura pública. Upload/escrita e substituição são administrativos, passam por autorização, validação de arquivo e trilha de auditoria.
 - **Realtime:** somente canais apropriados, com regras de acesso; não substituir transação de banco nem validação server-side.
