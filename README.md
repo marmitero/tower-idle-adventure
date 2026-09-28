@@ -8,6 +8,7 @@
 
 - [GDD — visão e regras do jogo](docs/GDD.md)
 - [Especificação dos sistemas e fórmulas](docs/SYSTEMS_SPEC.md)
+- [Proposta de combate e balanceamento das armas](docs/COMBAT_DESIGN.md)
 - [Arquitetura visual da HUD e UX](docs/HUD_UX_SPEC.md)
 - [AI_State — estado e passagem de contexto entre etapas](docs/AI_STATE.md)
 - [Roadmap — etapas até lançamento e divulgação](docs/ROADMAP.md)

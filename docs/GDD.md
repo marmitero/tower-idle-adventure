@@ -53,17 +53,19 @@ Combates curtos, leitura visual imediata e encadeamento automático entre encont
 
 ## 5. Torre e combate
 
+As fórmulas-base de dano, velocidade, alvos e a tabela de valores propostos para os traços de armas estão em [Combate e balanceamento](COMBAT_DESIGN.md). Esses valores, exceto Contracorte já validado, são candidatos de G1 e precisam de análise/playtest antes de serem congelados.
+
 - Cada andar tem requisito mínimo de nível, inimigos e faixas próprias de recompensa; andares mais altos oferecem recompensas potencialmente maiores/mais raras.
 - O jogador seleciona manualmente o andar. Conta VIP pode ativar opção de subir para o próximo andar após cumprir as condições de progressão; é desligada por padrão e não remove a escolha manual do jogador.
 - No andar, encontros repetidos contêm equipes de 1 a 3 inimigos. Ao encerrar um encontro com vitória, outro começa automaticamente enquanto a hunt continuar.
-- Ordem de ação é determinada por velocidade efetiva, considerando personagem, equipamento e efeitos. Regras de empate, cooldown, alvo e efeitos de status precisam ser especificadas no balanceamento.
+- A proposta inicial separa Velocidade (ordem inicial e desempates) de Velocidade de Ataque (intervalo entre ações); dano, alvos, críticos e efeitos estão especificados em `COMBAT_DESIGN.md`, aguardando validação de balanceamento.
 - Bot configurável pelo jogador: usar poção abaixo de um limite percentual de HP, escolher poções/revives elegíveis e ligar/desligar regras; cada skill equipada também pode ser ativada/desativada para uso automático. Uma prioridade de skills pode ser adicionada futuramente, ainda sem regra definida. Automação também prevê uma opção solicitada de retorno após derrota; comportamento exato está pendente. Itens são adquiridos no lobby/market e há atalho para loja rápida durante a batalha.
 - Se a equipe for derrotada, a hunt termina e retorna ao lobby; o lobby recupera HP gratuitamente. A opção de retornar automaticamente depois da derrota pode reiniciar o mesmo andar após cura, mas essa regra precisa ser aprovada; não deve subir de andar automaticamente. Revive pode evitar o fim da luta se houver item e a automação estiver ativa, conforme regra de alvo/tempo ainda a definir.
 - Classes e inimigos podem ter resistências/status; roster e balanceamento estão pendentes.
 
 ### Armas e afinidades
 
-Além dos nove slots de equipamento, todo personagem possui um slot **Arma**. Tipos: Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas e Garras. Qualquer personagem pode equipar qualquer tipo; certos personagens terão afinidades, cujos efeitos ainda serão definidos. Cada tipo possui um traço próprio: Adaga pode envenenar; Machado causa dano aumentado; Maça aumenta chance crítica; Besta aumenta velocidade de ataque; Cajado ataca todos os inimigos; Livro Arcano recupera vida por ataque conforme Ataque Especial; Luvas podem atordoar temporariamente; Garras atacam duas vezes. **Sugestão para a Espada — Contracorte:** ao receber um ataque direto de alvo único, há chance de contra-atacar imediatamente o agressor com dano físico baseado no Ataque do personagem. Proposta inicial para playtest: 20% de chance, causando 50% do Ataque atual. O contra-ataque não pode ativar a si próprio, não dispara por dano ao longo do tempo e seus valores finais dependem do balanceamento/aprovação. Os parâmetros dos demais traços também precisam ser definidos.
+Além dos nove slots de equipamento, todo personagem possui um slot **Arma**. Tipos: Espada, Adaga, Machado, Maça, Besta, Cajado, Livro Arcano, Luvas e Garras. Qualquer personagem pode equipar qualquer tipo; há uma proposta de afinidade documentada em `COMBAT_DESIGN.md`, pendente de validação do roster. Cada tipo possui um traço próprio: Adaga pode envenenar; Machado causa dano aumentado; Maça aumenta chance crítica; Besta aumenta velocidade de ataque; Cajado ataca todos os inimigos; Livro Arcano recupera vida por ataque conforme Ataque Especial; Luvas podem atordoar temporariamente; Garras atacam duas vezes. **Espada — Contracorte (validado):** ao receber um ataque direto de alvo único, há 20% de chance de contra-atacar imediatamente o agressor com dano físico de 50% do Ataque atual. O contra-ataque não pode ativar a si próprio nem disparar por dano ao longo do tempo. Esses valores iniciais foram validados pelo usuário; ajustes posteriores só por balanceamento/playtest. Os parâmetros dos demais traços estão na proposta de combate e aguardam validação.
 
 A característica intrínseca do tipo de arma é separada da característica aleatória adicional de itens Lendários/Celestiais; um efeito não substitui o outro. O subtipo de arma também é distinto do slot de armadura Luva.
 
@@ -156,8 +158,8 @@ O MVP deve provar primeiro: seleção inicial simples, lobby, equipe, slots, atr
 ## 14. Decisões pendentes prioritárias
 
 1. Nome e quantidade de classes/personagens iniciais, skills e papéis.
-2. Progressão de nível, XP, materiais, custos, bases por slot/nível e fórmulas de ataque/defesa.
-3. Aprovar/ajustar a proposta da Espada (Contracorte) e definir valores/gatilhos/limites finais dos traços de armas e efeitos das afinidades.
+2. Progressão de nível, XP, materiais, custos e bases por slot/nível; revisar e aprovar as fórmulas de ataque/defesa propostas em `COMBAT_DESIGN.md`.
+3. Contracorte está validado (20% / 50% Ataque); revisar por playtest se necessário. Aprovar/ajustar as propostas de parâmetros das outras armas e o bônus/distribuição das afinidades.
 4. Definição numérica e pesos para nota/poder total; tratamento de percentuais e limites.
 5. Regras de morte/revive para equipe de três e valor de recuperação (máximo vs. perdido).
 6. Auto-retorno após derrota (default, cura e reinício do mesmo andar) e se abrir a loja pausa o combate.

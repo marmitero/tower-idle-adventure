@@ -1,7 +1,7 @@
 # Roadmap — Tower Idle Adventure
 
 **Versão:** 0.1 — plano macro
-**Status atual:** Etapa 0 concluída no escopo da documentação inicial; documentação entregue para revisão, G1 ainda pendente e nenhum produto implementado.
+**Status atual:** Etapa 1 (G1 — fechamento de escopo e design) em andamento; proposta de combate/armas documentada, aguardando revisão das pendências; nenhum produto implementado.
 **Princípio:** cada etapa começa lendo [AI_State](AI_STATE.md), altera a documentação antes do código quando houver decisão de design e termina atualizando AI_State e evidências.
 
 ## Marcos de aprovação
@@ -26,12 +26,12 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 - **Critério:** requisitos rastreáveis; nenhum código apresentado como jogo pronto.
 - **Situação:** concluída nesta entrega como primeira versão, aguardando revisão/decisões para fechar G0.
 
-### Etapa 1 — Fechamento de escopo e design (G1)
+### Etapa 1 — Fechamento de escopo e design (G1, em andamento)
 
-- Resolver decisões prioritárias: roster/classe; x individual por atributo e inteiro de 1–50 já confirmado; validar/ajustar a proposta Contracorte e definir parâmetros dos traços/afinidades das armas; fórmula de combate, atributos-base por slot/nível, nota/poder, loot odds e preços, regras de revive/retorno após derrota/estrelas, VIP, offline, market e PvP.
+- Decisões já fechadas: x individual por atributo, inteiro de 1–50; Contracorte da Espada (20% / 50% Ataque). Revisar a proposta de parâmetros das outras armas e afinidades em `COMBAT_DESIGN.md`, validar fórmulas de combate e resolver o restante do G1: roster/classe, bases por nível, nota/poder, loot/preços, revive/retorno, estrelas, VIP, offline, market e PvP.
 - Definir experiência de onboarding, wireframes, condições de vitória/derrota e instrumentação de testes.
 - Priorizar MVP, itens fora do lançamento inicial e critérios de sucesso; criar registro de decisões.
-- **Entregáveis:** GDD aprovado, especificações de conteúdo/economia, backlog e critérios de aceite.
+- **Entregáveis:** GDD aprovado, especificações de conteúdo/economia/combate, proposta de combate validada ou revisada, backlog e critérios de aceite.
 - **Gate:** nenhuma ambiguidade crítica que force reescrita do núcleo; escopo e política de monetização aprovados.
 
 ### Etapa 2 — Pré-produção técnica, segurança e UX (G2)
