@@ -1,6 +1,6 @@
 # Arquitetura técnica — Vercel + Supabase
 
-**Versão:** 0.5 — fluxo de deploy GitHub/Vercel/Supabase documentado
+**Versão:** 0.6 — onboarding Supabase/Vercel e entrega de assets estáticos documentados
 **Decisão confirmada pelo usuário:** usar **Vercel + Supabase**, separando o cliente do jogo do servidor.
 **Estado:** infraestrutura e aplicações ainda não existem. A migration-base de schema foi criada e tem smoke tests PostgreSQL/PGlite limitados; não foi aplicada/testada pelo Supabase CLI nem contra Auth/Data API reais. Ver [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) para evidências/limites e [`THREAT_MODEL.md`](THREAT_MODEL.md) para riscos. G2 permanece aberta.
 
@@ -30,8 +30,9 @@ A separação do cliente e servidor é uma fronteira de segurança, não apenas 
 
 Estrutura planejada para o repositório/entregas:
 
-- `game-web`: cliente do jogo, projeto Vercel próprio (ainda não criado).
-- `admin-web`: CMS/painel administrativo, outro projeto Vercel e domínio restrito por autenticação (ainda não criado).
+- `apps/game-web/`: cliente do jogo, projeto Vercel próprio (ainda não criado).
+- `apps/admin-web/`: CMS/painel administrativo, outro projeto Vercel protegido (ainda não criado).
+- `sprites/`: pack estático inicial de autoria externa com licenças/avisos preservados e manifesto; a seleção final de sprites para cada tela ainda não está integrada.
 - `supabase/`: config, uma migration-base e harness PGlite de desenvolvimento. Ainda não há Edge Functions ou catálogo de produção.
 
 Ambientes **dev**, **staging** e **production** devem ter projetos/configurações Supabase e Vercel isolados. A migration foi executada pelo harness PGlite, não pelo Supabase CLI; Preview deployments continuam planejados para usar somente dev e nunca segredo de produção. Em staging valida-se migration/release antes de production; não executar reset destrutivo remoto. O blueprint técnico registra escopos de environment e responsabilidades.
@@ -60,7 +61,7 @@ Supabase Realtime pode avisar sobre estado de sessão no MVP; chat, presença, g
 - **PostgreSQL:** estado persistente MVP de conta/jogador, inventário, hunts, Coins, equipe e versões de conteúdo. Guildas, market e chat são extensões pós-MVP, não tabelas/requisitos iniciais.
 - **RLS:** a migration-base habilita e força RLS nas 17 tabelas; grants de browser são limitados a leituras próprias de estado sem escrita direta e à view de catálogo publicado. Smoke tests PGlite cobrem um subconjunto de isolamento/constraints; Supabase real ainda não foi validado. Escritas sensíveis exigirão endpoint validado, ainda não implementado.
 - **Edge Functions:** API server-side para ações de jogo e operações de administrador. Validar JWT/role, schema, autorização, limite de taxa, idempotência e transação em cada comando.
-- **Storage:** PNGs e dados publicados; assets aprovados podem ter leitura pública. Upload/escrita e substituição são administrativos, passam por autorização, validação de arquivo e trilha de auditoria.
+- **Assets estáticos:** o subset aprovado do pack inicial poderá ser copiado, com créditos/manifesto, para um diretório público incluído no build do Game Web (por exemplo, `apps/game-web/public/assets/`). O `sprites/` na raiz permanece como fonte; paths relativos a ele no protótipo local não devem ser tratados como paths de produção dos projetos Vercel com Root Directory próprio. Não é necessário enviar o pack inteiro a um bucket Supabase. **Storage** fica para uploads/conteúdo gerenciado pelo Admin ou assets publicados com versionamento; leitura pública só quando aprovada, escrita/substituição administrativas com autorização, validação e auditoria.
 - **Realtime:** somente canais apropriados, com regras de acesso; não substituir transação de banco nem validação server-side.
 - **Segredos:** chaves privilegiadas Supabase (legacy `service_role`/`sb_secret`) existem apenas em ambientes server-side/Edge Functions; ignoram RLS e são tratadas como credencial crítica. Nunca no bundle Vercel do navegador nem em variável `NEXT_PUBLIC_*`. Grants, RLS e prova de não exposição estão em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md).
 
@@ -91,6 +92,6 @@ O requisito confirmado é que PRs recebam Preview e que merge/commit em `main` i
 
 O deploy Git da Vercel não executa migrations Supabase. Configurar separadamente a integração GitHub/branching do Supabase ou um workflow com Supabase CLI. Se os dois fluxos iniciam no mesmo merge, não há garantia de ordem entre eles: preferir migrations aditivas e compatíveis (`expandir → migrar aplicação → limpar em alteração posterior`). A integração do Supabase aplica migrations/itens suportados, mas Auth/API e outras configurações não são automaticamente atualizadas por padrão; verificar cada projeto real antes de produção.
 
-**Sequência atual confirmada pelo usuário:** estruturar o projeto e testar primeiro o preview local de UX; deixar Vercel e Supabase hospedado para depois. Após revisar a prévia, retomar provas G2 (incluindo Supabase CLI local, sem projeto remoto); depois do gate e com um esqueleto seguro/buildável, conectar Vercel para Previews; staging Supabase quando iniciar integração com Auth/API; produção/domínio antes do alpha fechado, após revisar segurança, migrations, backup e checks de `main`. Ver [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md) e [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md).
+**Sequência atual confirmada pelo usuário:** iniciar agora o processo Supabase + Vercel, preservando os gates de segurança. Primeiro, instalar CLI/runtime local e validar a migration; em seguida, criar um projeto Supabase dev/staging com dados sintéticos e conectar GitHub depois da prova local. A autorização da Vercel/GitHub pode começar agora, mas a importação dos dois projetos aguarda apps seguros/buildáveis em `apps/game-web/` e `apps/admin-web/`. Produção, domínio e credenciais de produção continuam adiados até antes do alpha, após revisar segurança, migrations, backup e checks de `main`. A direção anterior de esperar antes de qualquer integração remota foi explicitamente superada. Ver [`PROJECT_STRUCTURE.md`](PROJECT_STRUCTURE.md) e [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md).
 
 **Estado em 2026-09-28:** nenhum app `game-web`/`admin-web`, projeto Vercel/Supabase, domínio, secret ou integração existe. Logo o auto-deploy é um requisito planejado, não uma automação ativa; G2 permanece aberta.

@@ -1,9 +1,10 @@
 # Guia de deploy — GitHub + Vercel + Supabase
 
-**Status: plano documentado; integração ainda não configurada.**
-**Requisito confirmado pelo usuário:** depois que um PR for integrado à branch `main` do GitHub, a Vercel deve publicar automaticamente a nova versão em produção. O deploy só fica disponível depois do build e das verificações; não acontece no mesmo milissegundo do merge.
+**Status: onboarding passo a passo documentado; nenhuma integração/conta/projeto externo foi configurado por esta sessão.**
+**Pedido atual do usuário:** iniciar já o processo Supabase + Vercel e orientar em detalhe. Iniciaremos pelo ambiente Supabase de desenvolvimento e autorização GitHub; a importação de projetos na Vercel aguarda as aplicações em `apps/game-web/` e `apps/admin-web/`. Produção não será ativada neste onboarding.
+**Requisito confirmado:** depois que um PR for integrado à branch `main` do GitHub, a Vercel deve publicar automaticamente a nova versão em produção, após build e verificações (não instantaneamente no merge).
 
-Este guia explica a configuração futura em linguagem simples. Ele não significa que o jogo, o painel, serviços ou deploys já estejam prontos.
+Este guia separa claramente as ações que podem começar agora das que dependem de aplicações/gates. Não significa que o jogo, painel, serviços ou deploys já estejam prontos.
 
 ## 1. A ideia em uma frase
 
@@ -33,61 +34,80 @@ A Vercel e o Supabase observam o mesmo merge, mas são dois deploys independente
 
 Até 28/09/2026:
 
-- `game-web/` e `admin-web/` ainda não existem; não há app web para importar na Vercel.
+- `apps/game-web/` e `apps/admin-web/` ainda não existem; não há app web para importar na Vercel. O pack de sprites estático fica em `sprites/`; um subset final poderá ser servido pelo app/Vercel, sem exigir upload imediato para Supabase Storage.
 - Há uma migration-base em `supabase/migrations/`, mas ela **não foi aplicada** via Supabase CLI nem em um projeto Supabase real. Os 9 testes existentes usam PGlite e não substituem essa validação.
 - Não há projeto Supabase, projeto Vercel, domínio, credenciais de deploy, integração GitHub/Vercel/Supabase ou pipeline automático configurados.
 - A G2 continua aberta. O plano deste documento não fecha o gate nem inicia implementação de gameplay/Admin.
 
 Portanto, neste momento não é possível ativar o deploy automático neste repositório. Primeiro as aplicações e os projetos externos precisam existir e passar pelos gates técnicos/de segurança.
 
-### Sequência que vamos seguir
+### Sequência atual confirmada
 
-O usuário orientou deixar as integrações Vercel/Supabase para mais adiante, estruturar o projeto e testar os previews primeiro. Vou interpretar **“previews” agora como a prévia local estática de UX**, sem conta ou deploy na Vercel; ela não equivale a um Vercel Preview Deployment nem valida o backend.
+O usuário mudou explicitamente a direção: **iniciar agora o processo Supabase + Vercel**. A orientação anterior de adiar todas as integrações remotas foi superada. Ainda assim, iniciar onboarding não significa abrir produção nem afirmar que algum serviço já esteja conectado.
 
-1. **Agora:** documentar a estrutura proposta e abrir a prévia local existente `prototypes/g2-hud/index.html` para revisão. Não configurar Vercel, projeto Supabase remoto ou produção nesta etapa.
-2. **Depois da revisão do preview:** retomar as provas restantes de G2, incluindo Supabase CLI + Docker local para validar migrations. Isso ainda não cria nem conecta um projeto Supabase hospedado.
-3. **Após G2, quando existir um esqueleto de Game Web/Admin que compile e esteja seguro:** conectar os apps à Vercel/GitHub e começar os Vercel Previews de PR. Não é preciso esperar o jogo completo, mas o Admin deve ter verificação server-side antes de disponibilizar seu endereço.
-4. **Quando o backend precisar de Auth/API remotos:** criar um Supabase de staging separado, com dados sintéticos; Previews nunca usam credenciais ou dados de produção.
-5. **Antes do alpha fechado:** criar o ambiente Supabase de produção, revisar migrations/RLS/segredos/backups, proteger `main` e habilitar o fluxo de merge em `main` → build/checks → Production Deployment Vercel. Associar o domínio público depois de validar o release.
+1. **Agora — Supabase local:** instalar um runtime Docker compatível e Supabase CLI na máquina de desenvolvimento. O repo já tem `supabase/config.toml`; não rodar `supabase init` novamente. Em seguida executar `supabase start` e `supabase db reset` para validar a migration localmente. A sandbox desta sessão não tem CLI/Docker, então esta validação depende de uma máquina com as ferramentas.
+2. **Agora — Supabase de desenvolvimento:** criar apenas um projeto remoto dev/staging com dados sintéticos. Após a prova local, ligar o CLI ao projeto, revisar `supabase db push --dry-run` e aplicar a migration com `supabase db push`. Não usar produção ou dados reais.
+3. **Agora — contas e autorização GitHub:** criar/usar contas Supabase e Vercel, autorizar os apps GitHub para o repositório, confirmar MFA e guardar credenciais em gerenciador de senhas. Isso ainda não cria um deploy.
+4. **Quando os apps existirem:** criar dois projetos Vercel com raízes `apps/game-web/` e `apps/admin-web/`, `main` como branch de produção e Preview apontado a dados de teste. Hoje essas pastas/apps não existem; importar a raiz do repositório daria um deploy vazio/inválido.
+5. **Staging e produção:** testar Auth/Data API/RLS, app/Admin, migrations, backups e rollback em dev/staging. Criar um projeto Supabase de produção separado e ativar migration/deploy automático somente após os gates de segurança, antes do alpha fechado. O domínio público vem após validar release.
 
-**Resumo:** preview local primeiro; provas G2 depois; integrações de Preview/staging quando houver apps seguros; produção por último. Assim podemos revisar a interface sem iniciar cedo demais serviços externos, mas também não deixamos a integração para quando o jogo inteiro estiver pronto.
+**Resumo:** começar Supabase dev/CLI e autorizações agora; a Vercel ainda não pode importar apps ausentes; production/deploy público permanece adiado até implementação segura. O preview local continua disponível, mas não substitui Vercel Preview.
 
 ## 4. Configuração futura, passo a passo
 
 ### Etapa A — preparar o GitHub
 
 1. Manter `main` como branch de produção do produto. Trabalhar em branches curtas e abrir Pull Requests; evitar enviar alterações diretamente para `main`.
-2. Configurar uma regra de proteção para `main`: exigir PR aprovado e os checks importantes (build/testes da Vercel e validação de migration do Supabase, quando ativada). Assim um erro detectado não entra silenciosamente na branch de produção.
+2. Configurar proteção para `main`: exigir PR aprovado; tornar obrigatórios os checks de build/testes Vercel e migration Supabase quando eles existirem e estiverem passando. Não selecionar um check ainda inexistente, pois isso pode bloquear todos os merges até o primeiro pipeline funcionar.
 3. O agente desta sessão trabalha na branch `arena/01a0e5e1-tower-idle-adventure`, não em `main`. A publicação descrita aqui só começa quando alguém com permissão revisar e integrar um PR em `main`.
 
 ### Etapa B — criar ambientes Supabase separados
 
-1. Criar a organização e os projetos Supabase quando chegar a hora de provisionar a infraestrutura. Nunca usar o mesmo banco para testes e produção.
-2. Manter dados sintéticos no desenvolvimento e staging. O projeto de produção recebe apenas dados reais e não deve ser usado para experimentar.
-3. A arquitetura planejada separa **dev**, **staging** e **production**. Para Previews, usar um banco isolado de testes (ou branches de banco Supabase se o recurso estiver disponível no plano). Não colocar chaves nem dados de produção em Preview.
-4. Confirmar plano, região, limites e custos antes de habilitar recursos que dependam de plano, incluindo branching, backups/PITR e proteção de deployments.
+**Primeiro projeto a criar agora: desenvolvimento, não produção.**
 
-### Etapa C — versionar e revisar migrations
+1. Entre no Dashboard Supabase usando uma conta protegida com MFA; crie/seleciona uma organização e escolha **New project**. Nome sugerido: `tower-idle-adventure-dev`. O nome é uma sugestão operacional do agente, não um hostname decidido pelo usuário.
+2. Selecione a região mais próxima dos jogadores de teste; confira a disponibilidade de São Paulo no Dashboard sem presumir que ela exista em todo plano. Escolha plano/limites após revisar preço e recursos.
+3. Crie uma senha forte e única para o banco. Guarde-a no gerenciador de senhas; não cole em issue, commit, variável pública nem nesta conversa. Anote o `project-ref` mostrado no Dashboard, que não é senha.
+4. Mantenha somente dados sintéticos nesse ambiente. Não importe contas/segredos reais e não use um projeto de produção para experimentos.
+5. Depois da prova local e do `db push --dry-run`, conecte o CLI a este projeto dev e aplique migrations. Veja a Etapa C; não execute `db reset --linked` — isso apaga o banco remoto associado.
+6. Antes do uso por Preview, confirme que variáveis de Preview apontam para dev/staging e que não há chaves/dados de produção. Supabase Database Branching para Preview é opcional e depende do plano/disponibilidade; um projeto dev isolado é suficiente para iniciar.
+7. Crie projetos remotos de **staging** e **production** separadamente apenas quando necessários. Antes de produção, confirmar plano, região, quotas, custos, backups/PITR e proteção de deploys. Nunca compartilhar o banco entre ambientes.
 
-1. Toda alteração de schema vai como um novo arquivo SQL em `supabase/migrations/`; não editar manualmente o banco de produção pelo Dashboard como método normal de mudança.
-2. Revisar o SQL no PR. Antes de produção, aplicar e testar do zero com Supabase CLI local e em staging; verificar RLS, grants, autenticação e comportamento da aplicação.
-3. O seed atual está desabilitado (`supabase/config.toml`). Não carregar dados de demonstração ou usuários de teste em produção.
-4. A integração GitHub do Supabase, quando habilitada, deve apontar para a raiz que contém `supabase/` (neste repositório, a raiz do repo) e ter `main` como branch de produção. Configurar os Previews/checks e ativar o deploy de produção somente depois de testar o fluxo em staging.
-5. O Supabase documenta deploy automático de migrations no merge para a branch de produção. A integração também pode publicar Edge Functions e buckets declarados na configuração; outras configurações, como Auth/API, não são automaticamente aplicadas por padrão. Neste repo, URLs de redirecionamento e flags de Auth em `config.toml` ainda precisam de configuração/validação explícita nos projetos reais.
-6. Se o recurso de integração/branching não estiver disponível ou adequado ao plano, a alternativa é um workflow de CI com Supabase CLI e segredos guardados nas configurações do GitHub. Nunca colocar token, senha ou chave privada no código, no PR ou nesta conversa.
+### Etapa C — validar e publicar migrations com segurança
 
-### Etapa D — conectar as aplicações à Vercel
+1. **Preparar a máquina local:** instalar um runtime Docker compatível (Docker Desktop é a opção mais simples) e Supabase CLI pela opção oficial correspondente ao seu sistema operacional. Se escolher instalação via npm/npx, a CLI requer Node.js 20+. Esses executáveis não estão disponíveis nesta sandbox.
+2. O repositório já contém `supabase/config.toml`; **não execute `supabase init`**, pois isso tentaria criar uma configuração que já existe. Abra um terminal na raiz do clone `tower-idle-adventure/`.
+3. Iniciar a stack local e reaplicar migrations do zero:
 
-Quando os diretórios e aplicações estiverem implementados:
+   ```bash
+   supabase start
+   supabase status
+   supabase db reset
+   npm ci --prefix supabase
+   npm test --prefix supabase
+   ```
 
-1. Criar uma conta/equipe Vercel e autorizar o aplicativo GitHub da Vercel para este repositório.
-2. Importar o mesmo repositório como **dois projetos Vercel**, cada um com seu diretório raiz:
-   - projeto **Game Web** → `game-web/`;
-   - projeto **Admin Web** → `admin-web/`.
-3. Em cada projeto, conferir o framework/comando de build detectado e definir explicitamente `main` como **Production Branch**.
-4. Com a integração Git ativa, commits em branches de trabalho/PRs geram Previews; o merge/novo commit em `main` inicia um Production Deployment de cada projeto afetado. Configure o root directory e confirme isso usando um PR de teste antes de considerar pronto.
-5. Não expor o Admin Web antes de implementar e testar autorização no servidor. A proteção de Preview da Vercel é uma camada adicional; ela não substitui login, verificação de role e proteção de cada endpoint administrativo na aplicação/Supabase.
-6. Só associar os domínios definitivos (por exemplo, um domínio do jogo e outro do Admin) quando os projetos estiverem seguros e validados. Os nomes/domínios finais ainda não foram escolhidos.
+   `db reset` sem `--linked` apaga/recria somente o banco Supabase local e aplica migrations/seed; o seed está desabilitado no `config.toml`. Confirme que o CLI está usando o projeto local antes de executar. Não use `db reset --linked`.
+4. Se tudo passar, registrar no PR a saída/teste sem incluir senhas ou chaves. A stack local pode ser encerrada com `supabase stop`.
+5. Para conectar ao projeto remoto **dev**: `supabase login` (autenticação no navegador) e depois `supabase link --project-ref <PROJECT_REF>`. Informe a senha do banco somente no prompt seguro da CLI, não como argumento de comando. Confira no Dashboard que o project-ref é o projeto `tower-idle-adventure-dev`, não produção.
+6. Primeiro só simule o que será aplicado: `supabase db push --dry-run`. Revise a lista/SQL; se apontar ao projeto dev correto e for esperado, então `supabase db push` aplica as migrations pendentes **nesse banco remoto**. Não executar contra produção neste início. O comando não substitui teste de RLS/Auth/Data API.
+7. Depois da primeira prova manual, no Dashboard do projeto dev, abra a integração GitHub, autorize o app Supabase no repositório `marmitero/tower-idle-adventure` e escolha `main` como a branch que atualiza **este banco dev**. Configure `.` como Working Directory (a raiz que contém `supabase/`). Se o plano oferecer Database Branching/Preview branches, use-as somente com dados sintéticos e teste em um PR. Não conecte nem habilite deploy de um banco de produção neste onboarding.
+8. O Supabase pode executar migrations no fluxo Git conectado e também publicar itens suportados configurados, como Edge Functions/buckets; Auth/API e outros settings não são aplicados automaticamente por padrão. URLs de redirecionamento e flags de Auth em `config.toml` exigem configuração/validação explícita nos projetos reais.
+9. Se GitHub integration/branching não estiver disponível/adequada ao plano, use CI com Supabase CLI e segredos guardados no secret store do GitHub. Nunca inserir senha, token ou chave privada em código, PR, log ou conversa.
+
+### Etapa D — autorizar Vercel agora; importar os apps quando existirem
+
+**A autorização pode começar agora; criar projetos Vercel ainda não é possível**, pois `apps/game-web/` e `apps/admin-web/` não existem e não há aplicação buildável.
+
+1. Crie/acesse uma conta Vercel, ative MFA e autorize a integração GitHub para o repositório `marmitero/tower-idle-adventure`. Confirme acesso apenas ao repo necessário.
+2. **Não importe a raiz do repo como se fosse o jogo.** Aguarde a criação e validação dos shells pelos gates de arquitetura/segurança; atualmente o repo tem docs, `sprites/`, protótipo estático e `supabase/`, não apps web.
+3. Quando os diretórios estiverem implementados, no Dashboard selecione **Add New → Project**, importe o mesmo repositório duas vezes e configure:
+   - projeto **Game Web** → Root Directory `apps/game-web/`;
+   - projeto **Admin Web** → Root Directory `apps/admin-web/`.
+4. Em cada app, confira framework preset, install/build/output commands, dependências do monorepo e defina `main` como **Production Branch**. A árvore/apps e framework final ainda precisam ser criados/testados.
+5. Com integração Git ativa, branches/PRs podem gerar Vercel Previews; merge/commit em `main` inicia Production Deployment depois de build/checks. Verifique cada app via um PR de teste antes de declarar pronto; deploys são independentes.
+6. Comece os Previews usando apenas variáveis e dados Supabase dev/staging. Não publique o Admin sem autenticação e autorização server-side testadas; Vercel Deployment Protection/SSO é uma camada adicional, nunca substitui a checagem de role/API.
+7. Associar domínios definitivos somente após validar segurança e release. Nenhum nome/domínio final foi escolhido.
 
 ### Etapa E — preencher variáveis por ambiente
 
@@ -166,3 +186,5 @@ Não combinar uma remoção destrutiva de coluna com o primeiro deploy do app qu
 - [Supabase — GitHub integration/branching](https://supabase.com/docs/guides/deployment/branching/github-integration)
 - [Supabase — Database migrations](https://supabase.com/docs/guides/deployment/database-migrations)
 - [Supabase — API keys (publishable vs. secret)](https://supabase.com/docs/guides/getting-started/api-keys)
+- [Supabase — CLI e desenvolvimento local](https://supabase.com/docs/guides/local-development/cli/getting-started)
+- [Supabase — fluxo local, link e db push](https://supabase.com/docs/guides/local-development/cli-workflows)

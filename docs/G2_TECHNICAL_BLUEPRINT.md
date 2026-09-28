@@ -1,7 +1,7 @@
 # G2 — blueprint técnico do MVP
 
-**Versão:** 0.3 — pipeline de deploy documentado; evidência PGlite parcial
-**Status:** baseline técnico proposto pelo agente. A migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` foi criada e passou 9 smoke tests PostgreSQL via PGlite (RLS/grants/constraints), mas não foi aplicada/validada pelo Supabase CLI: esta sandbox não tem Supabase CLI nem Docker. Nenhum serviço, Edge Function, jogo, painel ou integração de deploy foi provisionado/implementado. G2 continua aberta.
+**Versão:** 0.4 — onboarding Supabase/Vercel solicitado; evidência PGlite parcial
+**Status:** baseline técnico proposto pelo agente. A migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` passou 9 smoke tests PostgreSQL via PGlite, mas não foi aplicada/validada pelo Supabase CLI: esta sandbox não tem CLI nem runtime Docker. O usuário pediu iniciar o processo Supabase + Vercel; nenhum serviço/projeto externo foi criado/conectado neste checkout. O pack de arte em `sprites/` foi inventariado, mas não está integrado ao app. G2 continua aberta.
 
 Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md) para o MVP de [`MVP_DECISIONS.md`](MVP_DECISIONS.md). Regras de produto do MVP não são reabertas aqui. Decisões técnicas dependentes de plano, custo e uma prova técnica ainda precisam de verificação antes de G2 ser encerrada.
 
@@ -24,7 +24,7 @@ Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`]
 | Admin Web | execução local com usuário/roles seed não produtivos | deployment protegido; sem conteúdo/segredo de produção | projeto Vercel/domínio separados; middleware exige sessão admin válida |
 | Conteúdo | fixtures versionadas e sem dados pessoais | cópia sintética do release aprovado | release imutável publicado pelo Admin autorizado |
 
-- Os projetos/aplicações `game-web` e `admin-web` continuam futuras. `supabase/` contém agora `config.toml`, a migration-base de schema e um harness PGlite somente de desenvolvimento; não há app, endpoint ou Edge Function.
+- Os projetos/aplicações `apps/game-web/` e `apps/admin-web/` continuam futuras. `supabase/` contém `config.toml`, a migration-base de schema e um harness PGlite somente de desenvolvimento; não há app, endpoint ou Edge Function. O pack `sprites/` é a fonte de arte inicial já presente; servir o subset aprovado como assets estáticos da aplicação/Vercel é a proposta inicial, não uma integração concluída.
 - `supabase/migrations/` contém SQL versionado. O seed está intencionalmente desabilitado e não há catálogo/contas de produção. Mudanças futuras passam por review, Supabase local e staging antes de production; ainda não ocorreu `supabase start`/`db reset`.
 - Vercel Preview nunca recebe segredo de produção. Por padrão, preview do Game Web usa ambiente dev/sintético; Preview do Admin Web deve ter Vercel Deployment Protection e não consegue publicar no banco de produção.
 - Produção usa variáveis separadas por projeto/environment. Segredos do Supabase ficam apenas em funções/servidor; nenhuma chave secreta ou `service_role`/`sb_secret` pode aparecer em bundle `NEXT_PUBLIC_*`, source map ou log.

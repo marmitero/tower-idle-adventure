@@ -2,7 +2,7 @@
 
 **Status:** proposta de organização; nenhum app de produção foi criado. Este documento descreve como separar responsabilidades antes de iniciar a implementação.
 
-**Sequência atual confirmada pelo usuário:** estruturar o projeto e testar primeiro os previews locais; deixar a conexão com Vercel e os projetos Supabase remotos para uma etapa posterior. Isso não muda o requisito futuro de deploy automático na Vercel quando houver merge em `main`.
+**Direção atual confirmada pelo usuário:** iniciar agora o processo Supabase + Vercel, sem confundir preparação/onboarding com serviços já configurados. A prévia local continua útil; o projeto Supabase deve começar em desenvolvimento com dados sintéticos. A importação de apps na Vercel aguarda os diretórios de aplicação. Produção continua separada e protegida até os gates de segurança. A orientação anterior de adiar todas as integrações remotas foi superada.
 
 ## 1. Estrutura alvo (proposta)
 
@@ -13,6 +13,7 @@ tower-idle-adventure/
 │   └── admin-web/            # CMS interno, build/deploy separado e protegido
 ├── packages/
 │   └── contracts/            # tipos/schemas de payload e IDs compartilhados, sem segredos
+├── sprites/                 # pack estático inicial com avisos/licença e manifesto
 ├── supabase/
 │   ├── migrations/           # SQL versionado; já existe uma migration-base
 │   ├── functions/            # Edge Functions, quando forem autorizadas/implementadas
@@ -24,7 +25,7 @@ tower-idle-adventure/
 └── README.md
 ```
 
-A árvore é uma **proposta**, não uma decisão final de framework/gerenciador de pacotes. `game-web/` e `admin-web/` ainda não existem. O G2 continua definindo/provando detalhes técnicos; não criar pastas vazias ou arquivos de build como se fossem aplicações prontas.
+A árvore de apps é uma **proposta**, não uma decisão final de framework/gerenciador de pacotes. `apps/game-web/` e `apps/admin-web/` ainda não existem. `sprites/` contém o pack inicial auditado; sheets de hero/mage/slime foram ligados ao protótipo estático como candidatos, não a um app de produção. O G2 continua definindo/provando detalhes técnicos; não criar pastas vazias ou arquivos de build como se fossem aplicações prontas.
 
 ## 2. Limites entre as partes
 
@@ -34,13 +35,15 @@ A árvore é uma **proposta**, não uma decisão final de framework/gerenciador 
 - **`supabase/`:** migrations e código confiável de backend. O cliente não recebe secret key. Funções de jogo/admin são propostas futuras, ainda não implementadas.
 - **`prototypes/`:** explorações rápidas de UX. São isoladas da aplicação de produção; dados fictícios e interações demonstrativas não significam que gameplay/APIs estejam prontas.
 
-## 3. Estratégia de preview antes da Vercel
+## 3. Sequência de prévia e onboarding de serviços
 
-1. **Agora:** usar `prototypes/g2-hud/index.html` em um servidor local estático para revisar navegação, hierarquia visual e responsividade. O preview não precisa de conta Vercel, Supabase, build de app nem chaves.
-2. **Durante G2:** concluir a revisão local e as provas técnicas que ainda faltam. A ausência de Vercel/Supabase hospedado não equivale a um deploy nem valida Auth/API real.
-3. **Depois do gate G2:** iniciar a estrutura mínima das duas aplicações, mantendo-as locais primeiro. Testar build e navegação com dados fictícios; proteger a entrada do Admin desde o primeiro shell.
-4. **Quando os shells compilarem e estiverem seguros:** criar os projetos Vercel e habilitar Preview em PRs. Quando o backend remoto for necessário, criar Supabase staging isolado e apontar os Previews para dados de teste.
-5. **Antes do alpha fechado:** provisionar produção e ativar o caminho completo de merge `main` → build/checks → Vercel Production Deployment, com domínio e monitoramento depois de validar o release.
+1. **UX local:** continuar usando `prototypes/g2-hud/index.html` em servidor estático para hierarquia visual e responsividade. A prévia não exige conta nem chaves e não equivale a um deployment.
+2. **Supabase local, em paralelo ao onboarding:** instalar Docker Desktop/runtime e Supabase CLI no ambiente do usuário; a sandbox atual não possui esses executáveis. O diretório `supabase/` e `config.toml` já existem, portanto não repetir `supabase init`. No clone, executar `supabase start` e `supabase db reset` para reaplicar a migration-base à base **local**; nunca usar `db reset --linked` como rotina.
+3. **Supabase remoto de desenvolvimento:** criar um projeto separado para dev/staging, com dados sintéticos; após a prova local, vincular o CLI ao `project-ref`, revisar com `supabase db push --dry-run` e só então aplicar migrations com `supabase db push`. Nunca ligar Previews a credenciais ou dados de produção.
+4. **GitHub/Vercel:** autorizar as integrações às contas/repositório agora, se desejado. A Vercel não pode importar/buildar os apps ainda, porque `apps/game-web/` e `apps/admin-web/` não existem. Depois que houver shells seguros e compiláveis, importar cada diretório raiz como projeto independente e testar Preview em PR.
+5. **Produção:** manter projeto Supabase de produção, chaves de produção e domínio fora do onboarding inicial. Antes do alpha fechado, provar migrations, RLS, autorização/Admin, backups, checks e rollback; só então habilitar produção e o fluxo `main` → checks → Vercel Production Deployment.
+
+Os detalhes operacionais e passos de interface estão em [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md).
 
 ## 4. O que este documento não faz
 

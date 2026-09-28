@@ -1,7 +1,7 @@
 # Roadmap — Tower Idle Adventure
 
-**Versão:** 0.5 — pipeline GitHub/Vercel/Supabase documentado; gate G2 aberto
-**Status atual:** Etapa 1/G1 concluída documentalmente; Etapa 2/G2 em andamento. Blueprints, click-through, migration-base e plano de deploy estão preparados; smoke tests PGlite passaram, mas não são prova Supabase. Gate G2 segue aberto sem validação Supabase real, revisão de segurança/infra ou estudo com 5–8 participantes. Nenhum produto jogável, gameplay, HUD real, Admin Web, serviço ou integração de deploy foi provisionado/configurado.
+**Versão:** 0.6 — pack inicial inventariado; início do onboarding Supabase/Vercel documentado; gate G2 aberto
+**Status atual:** Etapa 1/G1 concluída documentalmente; Etapa 2/G2 em andamento. Blueprints, click-through, migration-base, pack de sprites inventariado e guia de deploy estão preparados; smoke tests PGlite passaram, mas não são prova Supabase. O usuário pediu iniciar agora o processo Supabase + Vercel. Nenhum serviço/projeto externo foi criado ou conectado nesta etapa; o gate G2 segue aberto sem validação Supabase real, revisão de segurança/infra ou estudo com 5–8 participantes. Nenhum produto jogável, gameplay, HUD de produção ou Admin Web foi implementado.
 **Princípio:** cada etapa começa lendo [AI_State](AI_STATE.md), altera a documentação antes do código quando houver decisão de design e termina atualizando AI_State e evidências.
 
 ## Marcos de aprovação
@@ -38,14 +38,15 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 ### Etapa 2 — Pré-produção técnica, segurança e UX (G2, em andamento; parcial)
 
 - Detalhar a arquitetura já escolhida: Game Web e Admin Web em projetos separados da Vercel; servidor Supabase (Auth, PostgreSQL, Edge Functions, Storage e Realtime conforme uso), com ambientes dev/staging/production.
-- Documentar CI/CD: PR → Preview Vercel; merge em `main` → Production Deployment Vercel automático após build/checks; migrations Supabase em integração separada, com compatibilidade expandir→migrar→limpar. Sequência escolhida pelo usuário: estrutura e prévia UX local primeiro, depois provas restantes de G2 com Supabase CLI local; Vercel Preview após G2 e app seguro/buildável; Supabase staging quando iniciar integração backend; produção/domínio antes do alpha fechado, após hardening. Ver `DEPLOYMENT_GUIDE.md`. Nenhuma integração está ativa.
+- Documentar CI/CD: PR → Preview Vercel; merge em `main` → Production Deployment Vercel automático após build/checks; migrations Supabase em integração separada, com compatibilidade expandir→migrar→limpar. **Direção atualizada pelo usuário:** iniciar agora o onboarding Supabase + Vercel. Próximo caminho seguro: validar a migration localmente; criar/conectar Supabase de desenvolvimento com dados sintéticos; autorizar GitHub/Vercel; importar os projetos Vercel apenas quando houver app em `apps/game-web/` e `apps/admin-web/`; manter staging/prod isolados e adiar o deploy de produção até os gates de segurança. A orientação anterior para deixar as integrações remotas para depois foi superada. Ver `DEPLOYMENT_GUIDE.md`. Nenhuma integração está ativa.
 - Definir domínio autoritativo do servidor, schema/migrações, contratos API/eventos, autenticação, roles, RLS, rate limits, logs, backup, restauração e proteção da economia.
 - Desenhar o CMS no-code, isolamento do painel, provisioning de administradores, fluxo draft/validate/publish/rollback, versionamento do catálogo e threat model, conforme `ADMIN_PANEL_SPEC.md` e `TECH_ARCHITECTURE.md`.
 - Revisar e aprovar a arquitetura, os componentes, os estados e as dependências da HUD documentados em `HUD_UX_SPEC.md` antes de implementar a interface; definir UX responsiva, acessibilidade, protótipos navegáveis e teste de usabilidade.
 - Definir plano de privacidade, retenção, suporte e revisão legal antes de qualquer beta público; monetização/moderação de recursos sociais só se aplicam a fases futuras.
 - **Entregues nesta fatia documental:** `G2_TECHNICAL_BLUEPRINT.md` (modelo conceitual, contratos, grants/RLS, idempotência e operação de sessão), `THREAT_MODEL.md` e `G2_UX_BLUEPRINT.md`, além do protótipo local `prototypes/g2-hud/index.html`. Baselines/frameworks são propostas do agente para validação, não sistemas prontos.
 - **Entregues nesta fatia técnica:** migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` (17 tabelas, RLS/grants e constraints) e 9 smoke tests com PGlite, mais configuração/harness de desenvolvimento. Não inclui Edge Functions, endpoints ou gameplay.
-- **Entregáveis ainda pendentes:** aplicar migration/seed via Supabase CLI local e testar contra Supabase Auth/Data API; validar transações de gameplay/idempotência/concorrência/reconexão; rate limits/custos; isolamento real do Admin/MFA; backup/restore/revisão de segurança; usabilidade com 5–8 convidados e decisão visual final.
+- **Assets disponíveis:** o pack Fantasy Dungeon em `sprites/` foi inventariado em `sprites/ASSET_MANIFEST.md` (422 PNGs válidos; licenças/atribuição preservadas). É a base de arte inicial escolhida pelo usuário. Sheets de hero/mage/slime aparecem agora no click-through estático como candidatos; nenhum sprite foi integrado a uma aplicação de produção e os mapeamentos visuais permanecem provisórios.
+- **Entregáveis ainda pendentes:** aplicar migration via Supabase CLI local e testar contra Supabase Auth/Data API; validar transações de gameplay/idempotência/concorrência/reconexão; rate limits/custos; isolamento real do Admin/MFA; backup/restore/revisão de segurança; usabilidade com 5–8 convidados e decisão visual final.
 - **Situação:** nenhum serviço Supabase/Vercel foi provisionado; protótipo segue estático. PGlite passou os testes modelados, mas não representa Supabase. Esta sandbox não tem Supabase CLI nem Docker, portanto `supabase start`/migration/Storage/Auth reais não foram executados. Nenhuma segurança/backup de produção foi implementada/testada.
 - **Gate G2:** manter aberto até critérios de `G2_TECHNICAL_BLUEPRINT.md` executados/revistos, ameaça crítica sem lacuna, UX validada e limitações/custos aprovados. Somente então iniciar G3.
 
@@ -68,7 +69,8 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 
 ### Etapa 5 — Conteúdo, balanceamento e produção de arte (G4)
 
-- Criar guia visual, naming e manifestos. Produzir os assets originais em lotes de 10, com revisão de consistência, transparência, tamanho, atribuição/origem e QA.
+- Usar o pack Fantasy Dungeon já inventariado como base inicial. Selecionar e validar em contexto os sprites necessários, preservando autoria/licença/crédito e evitando assumir correspondências provisórias como decisão visual final.
+- Criar/adicionar assets autorais futuros em lotes de 10, com guia visual, naming/manifesto e revisão de consistência, transparência, dimensões, tamanho, atribuição/origem e QA.
 - Criar/preencher conteúdo usando o painel administrativo, sem editar código, para os tipos de dados já suportados; novos comportamentos continuam dependendo de implementação.
 - Criar e publicar pelo Admin Panel os registros de personagens/classes, skills, inimigos, andares, equipamentos, características, drops, economia e tutorial conforme baseline `MVP_DECISIONS.md`.
 - Balancear curvas de XP/nível/loot via playtests e validar que equipamento inferior pode ser útil sem tornar raridade irrelevante; qualquer alteração numérica é registrada.

@@ -74,6 +74,9 @@
   .portrait { position:relative; display:grid; place-items:center; width:38px; height:43px; flex:none; border-radius:11px 11px 13px 13px; color:#e2d4b5; background:linear-gradient(155deg,#645643,#283943); font-size:11px; font-weight:800; }
   .portrait.mage { background:linear-gradient(155deg,#4c5c81,#293540); color:#c9d9ef; }
   .portrait.rogue { background:linear-gradient(155deg,#47716d,#263a3d); color:#c2e1d9; }
+  .portrait.asset-hero, .portrait.asset-mage { background-repeat:no-repeat; background-size:400% 400%; background-position:0 0; image-rendering:pixelated; border-radius:7px; }
+  .portrait.asset-hero { background-image:url('../../sprites/characters/hero/hero_idle_sheet.png'); }
+  .portrait.asset-mage { background-image:url('../../sprites/characters/mage/mage_idle_sheet.png'); }
   .character-info { flex:1; min-width:0; }
   .character-info strong { display:block; overflow:hidden; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
   .character-info span { display:block; margin-top:4px; color:var(--muted); font-size:9px; }
@@ -142,6 +145,9 @@
   .combatant { position:relative; z-index:1; width:115px; text-align:center; }
   .mock-figure { display:grid; place-items:center; width:88px; height:120px; margin:0 auto 10px; border:1px solid rgba(215,193,145,.2); border-radius:45% 45% 18px 18px; background:radial-gradient(ellipse at 50% 28%,rgba(213,183,117,.22),transparent 29%),linear-gradient(155deg,#3e4845,#1a252a 72%); color:#d9c99f; font-size:25px; box-shadow:0 12px 30px rgba(0,0,0,.25); }
   .mock-figure.enemy { border-color:rgba(198,116,112,.24); background:radial-gradient(ellipse at 50% 28%,rgba(205,110,98,.2),transparent 30%),linear-gradient(155deg,#513d43,#201f28 72%); color:#e1a39a; }
+  .mock-figure.asset-hero, .mock-figure.asset-slime { border:0; border-radius:0; background-repeat:no-repeat; background-size:400% 400%; background-position:0 0; image-rendering:pixelated; box-shadow:none; }
+  .mock-figure.asset-hero { background-image:url('../../sprites/characters/hero/hero_idle_sheet.png'); }
+  .mock-figure.asset-slime { background-image:url('../../sprites/characters/slime/slime_idle_sheet.png'); }
   .combatant strong { display:block; font-size:10px; }
   .combatant span { display:block; margin-top:4px; color:var(--muted); font-size:8px; }
   .combatant .hp-track { margin-top:8px; }
@@ -181,6 +187,7 @@
   .log-entry { flex:none; padding:7px 9px; border:1px solid var(--line-soft); border-radius:8px; color:#bac5cb; background:rgba(255,255,255,.02); font-size:8px; white-space:nowrap; }
   .log-entry.loot { border-color:rgba(228,186,113,.24); color:var(--gold-soft); }
   .footnote { display:flex; justify-content:space-between; gap:12px; margin-top:10px; color:var(--dim); font-size:8px; }
+  .footnote a { color:var(--gold); }
   .modal-backdrop { position:fixed; z-index:20; inset:0; display:none; place-items:center; padding:18px; background:rgba(4,7,10,.73); backdrop-filter:blur(7px); }
   .modal-backdrop.open { display:grid; }
   .modal { width:min(470px,100%); padding:19px; border:1px solid #39444d; border-radius:16px; background:#121a22; box-shadow:0 25px 90px rgba(0,0,0,.5); }
@@ -235,12 +242,12 @@
     <aside class="panel team-rail" aria-label="Equipe fictícia">
       <div class="panel-heading"><div><div class="eyebrow">Sua equipe</div><h2>Preparada para a hunt</h2></div><span class="team-count">2 / 3</span></div>
       <article class="character-card">
-        <div class="character-top"><div class="portrait" aria-hidden="true">GU</div><div class="character-info"><strong>Guerreiro</strong><span>Espada · Nível 08</span></div><span class="mini-level">1★</span></div>
+        <div class="character-top"><div class="portrait asset-hero" aria-hidden="true"></div><div class="character-info"><strong>Guerreiro</strong><span>Espada · Nível 08</span></div><span class="mini-level">1★</span></div>
         <div class="hp-meta"><span>Vida</span><span>78% · 312 / 400</span></div><div class="hp-track"><i style="width:78%"></i></div>
         <div class="character-flags"><span class="tiny-pill">Golpe pronto</span><span class="tiny-pill">Espada</span></div>
       </article>
       <article class="character-card">
-        <div class="character-top"><div class="portrait mage" aria-hidden="true">AR</div><div class="character-info"><strong>Arcanista</strong><span>Cajado · Nível 08</span></div><span class="mini-level">1★</span></div>
+        <div class="character-top"><div class="portrait asset-mage" aria-hidden="true"></div><div class="character-info"><strong>Arcanista</strong><span>Cajado · Nível 08</span></div><span class="mini-level">1★</span></div>
         <div class="hp-meta"><span>Vida</span><span>64% · 198 / 310</span></div><div class="hp-track"><i style="width:64%"></i></div>
         <div class="character-flags"><span class="tiny-pill">Orbe pronto</span><span class="tiny-pill">Cajado</span></div>
       </article>
@@ -270,8 +277,8 @@
         <div class="view-heading"><div><h1>Equipe</h1><p>Monte sua formação e confira o equipamento por personagem.</p></div><span class="team-count">2 / 3 membros</span></div>
         <div class="panel section-card" style="margin-top:0"><div class="panel-heading"><div><div class="eyebrow">Formação ativa</div><h2>Slot 1–3 · até três personagens</h2></div><button class="button small" data-toast="A edição de equipe é apenas visual neste protótipo.">Editar formação</button></div>
           <div class="view-grid">
-            <article class="team-detail"><div class="portrait" aria-hidden="true">GU</div><div class="detail-body"><h3>Guerreiro · 1★ · Nv 08</h3><p>Afinidade: Espada · HP 312 / 400</p><div class="hp-track" style="margin-top:9px"><i style="width:78%"></i></div></div><span class="grade">Poder 720</span></article>
-            <article class="team-detail"><div class="portrait mage" aria-hidden="true">AR</div><div class="detail-body"><h3>Arcanista · 1★ · Nv 08</h3><p>Afinidade: Cajado · HP 198 / 310</p><div class="hp-track" style="margin-top:9px"><i style="width:64%"></i></div></div><span class="grade">Poder 520</span></article>
+            <article class="team-detail"><div class="portrait asset-hero" aria-hidden="true"></div><div class="detail-body"><h3>Guerreiro · 1★ · Nv 08</h3><p>Afinidade: Espada · HP 312 / 400</p><div class="hp-track" style="margin-top:9px"><i style="width:78%"></i></div></div><span class="grade">Poder 720</span></article>
+            <article class="team-detail"><div class="portrait asset-mage" aria-hidden="true"></div><div class="detail-body"><h3>Arcanista · 1★ · Nv 08</h3><p>Afinidade: Cajado · HP 198 / 310</p><div class="hp-track" style="margin-top:9px"><i style="width:64%"></i></div></div><span class="grade">Poder 520</span></article>
             <article class="team-detail" style="border-style:dashed"><div class="empty-member" style="width:50px;min-height:56px;margin:0">＋</div><div class="detail-body"><h3>Slot disponível</h3><p>Desbloqueie outro personagem na progressão.</p></div></article>
           </div>
         </div>
@@ -315,9 +322,9 @@
         <div class="view-heading"><div><h1>Hunt · Andar <span id="hunt-floor-title">01</span></h1><p>Visual estático de batalha. Nenhum turno ou recompensa é simulado.</p></div><div class="battle-actions"><button class="button small" data-shop>Loja rápida</button><button class="button danger small" data-end-hunt>Encerrar hunt</button></div></div>
         <div class="floor-context"><div><strong>Encontro de demonstração · 2 inimigos</strong><span>Último estado ilustrativo · HP e loot não mudam</span></div><span class="team-count">● Sessão demo</span></div>
         <div class="battle-stage" aria-label="Palco demonstrativo sem combate ativo">
-          <div class="combatant"><div class="mock-figure" aria-hidden="true">GU</div><strong>Guerreiro</strong><span>Vida 78% · Golpe pesado</span><div class="hp-track"><i style="width:78%"></i></div></div>
+          <div class="combatant"><div class="mock-figure asset-hero" aria-hidden="true"></div><strong>Guerreiro</strong><span>Vida 78% · Golpe pesado</span><div class="hp-track"><i style="width:78%"></i></div></div>
           <div class="versus" aria-hidden="true">VS</div>
-          <div class="combatant"><div class="mock-figure enemy" aria-hidden="true">SL</div><strong>Slime de Cinza</strong><span>Vida 42% · Nv. demo</span><div class="hp-track"><i style="width:42%;background:linear-gradient(90deg,#a36856,#dca47c)"></i></div></div>
+          <div class="combatant"><div class="mock-figure enemy asset-slime" aria-hidden="true"></div><strong>Slime de Cinza</strong><span>Vida 42% · Nv. demo</span><div class="hp-track"><i style="width:42%;background:linear-gradient(90deg,#a36856,#dca47c)"></i></div></div>
         </div>
         <div class="battle-foot"><span>Andar escolhido manualmente · Sem progresso offline · Dados fictícios</span><span>Encontro 01</span></div>
       </section>
@@ -338,7 +345,7 @@
       <div class="log-list"><span class="log-entry">12:04 · Hunt iniciada no andar 4</span><span class="log-entry">12:04 · Guerreiro usou Golpe Pesado</span><span class="log-entry">12:05 · Slime de Cinza recebeu dano</span><span class="log-entry loot">12:05 · Exemplo de drop · Raro</span><span class="log-entry">12:06 · +45 XP · +35 Coins (demo)</span></div>
     </section>
   </div>
-  <div class="footnote"><span>Wireframe de navegação local · nenhuma chamada de rede</span><span class="prototype-note">Não representa uma funcionalidade pronta nem assets aprovados.</span></div>
+  <div class="footnote"><span>Preview estático · sem rede · <a href="https://nikastudio.itch.io/fantasy-dungeon-top-down-pixel-rpg-asset-pack-unity-6-urp" target="_blank" rel="noopener noreferrer">Assets by Nika Studio</a></span><span class="prototype-note">Hero, mage e slime são estudos visuais provisórios; sem gameplay/API.</span></div>
 </main>
 
 <div class="modal-backdrop" id="shop-modal" role="dialog" aria-modal="true" aria-labelledby="shop-title">

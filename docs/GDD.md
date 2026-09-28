@@ -1,6 +1,6 @@
 # GDD — Tower Idle Adventure
 
-**Versão:** 0.4 — evidência técnica G2 sincronizada
+**Versão:** 0.5 — fonte visual inicial e licenciamento documentados
 **Estado:** baseline do MVP fechado para pré-produção; nenhum gameplay implementado. Regras exatas e números estão em [MVP_DECISIONS.md](MVP_DECISIONS.md). Sistemas de longo prazo explicitamente marcados como pós-MVP.
 **Data da atualização:** 2026-09-28
 
@@ -21,7 +21,11 @@
 3. **Loot com decisões reais:** raridade, qualidade de rolagem e atributos permitem que um item de nível menor seja melhor para uma build específica.
 4. **Idle sem perda de agência:** a caçada permanece no andar escolhido; derrotas retornam a equipe ao lobby. No MVP não existe autoavanço; eventual autoavanço VIP é pós-MVP.
 5. **Social sem mundo compartilhado:** chat, guildas, arena, mercados e chefes são serviços/sessões próprios; não há personagens de outros jogadores caminhando na hunt pessoal.
-6. **Arte autoral, efeitos em código:** sprites e cenários são imagens estáticas produzidas especificamente para o jogo; animações de apresentação e combate são compostas por código.
+6. **Arte estática, identidade coerente:** o início do projeto usa o pack de sprites Fantasy Dungeon, do Nika Studio, presente em `sprites/`; depois serão adicionados/criados assets conforme a direção visual, mantendo arquivos raster estáticos e efeitos/animações em código. Nada de geração procedural de arte durante a partida.
+
+### Arte inicial e proveniência
+
+O projeto adota como base inicial o pack Fantasy Dungeon de Nika Studio, já presente em [`../sprites/`](../sprites/) e inventariado em [`../sprites/ASSET_MANIFEST.md`](../sprites/ASSET_MANIFEST.md). O inventário e os mapeamentos ali listados são candidatos de avaliação; ainda não houve integração ao cliente nem aprovação visual final de cada sprite. O README incluído declara uso pessoal/comercial com crédito “Assets by Nika Studio” e proíbe revenda isolada; como o pacote também inclui um LICENSE MIT, preservar os avisos e seguir temporariamente as condições mais conservadoras até resolver a divergência. Não é parecer jurídico. Assets adicionais podem ser criados/adquiridos depois em lotes de dez; sem arte procedural em runtime.
 
 ## 3. Público, sessão e loop principal
 
@@ -121,10 +125,10 @@ Chat, amigos, guilda, market, PvP, VIP, passe, Diamonds e boss compartilhado sã
 
 ## 11. Direção de arte e áudio
 
-- Arte 2D original, coesa, legível em escala pequena e exportada como PNG com transparência quando aplicável.
-- Sprites/personagens, inimigos, ícones, equipamento, cenários, UI e efeitos estáticos são produzidos em **pacotes de 10 assets por vez**, cada pacote com manifesto, dimensão, transparência, naming, licença/origem e checklist de QA.
-- Nada de arte de jogo gerada proceduralmente em runtime. IA pode auxiliar a criação de assets próprios, sujeitos a revisão humana e consistência; cada asset aprovado vira arquivo versionado. Efeitos de movimento são código sobre esses assets.
-- Paleta, referências, tamanhos, limites de animação, pipeline e política de fontes/áudio serão fechados no guia de arte antes da produção de assets.
+- Identidade visual coesa e legível em escala pequena. A base inicial é o pack externo Fantasy Dungeon de Nika Studio, referenciado em `sprites/ASSET_MANIFEST.md`; preservar crédito/licença e verificar cada sprite no contexto do jogo.
+- Assets adicionais de personagens, inimigos, ícones, equipamento, cenários, UI e efeitos estáticos poderão ser criados/adicionados em **lotes de 10**, cada lote com manifesto, dimensões, transparência, naming, origem/licença e checklist de QA.
+- Nada de arte gerada proceduralmente em runtime. Cada imagem aprovada vira arquivo estático versionado; movimentos/efeitos podem ser código sobre esses assets. Créditos e limitações dos assets externos devem ser mantidos.
+- Paleta, referências, tamanhos, limites de animação, pipeline e política de fontes/áudio serão fechados no guia de arte antes da produção de assets adicionais.
 
 ## 12. Acessibilidade e qualidade
 

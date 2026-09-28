@@ -1,6 +1,6 @@
 # G2 — UX blueprint e protótipo de navegação
 
-**Versão:** 0.1 — baixa fidelidade visual/interativa
+**Versão:** 0.2 — sprites iniciais candidatos no click-through
 **Status:** wireframe e protótipo local sem backend foram preparados para revisão; não é a HUD do jogo nem uma implementação funcional. Usabilidade com jogadores ainda não foi testada, portanto o Gate G2 permanece aberto.
 
 Fonte de verdade de regras: [`MVP_DECISIONS.md`](MVP_DECISIONS.md). A estrutura da HUD permanece em [`HUD_UX_SPEC.md`](HUD_UX_SPEC.md). O arquivo [`../prototypes/g2-hud/index.html`](../prototypes/g2-hud/index.html) é um click-through isolado, com dados fictícios e sem Auth, combate, salvamento, compras ou chamadas de API.
@@ -120,4 +120,4 @@ Em viewport estreito, perfil detalhado, log longo e equipe completa tornam-se dr
 
 ## 8. Artefato navegável
 
-`prototypes/g2-hud/index.html` é um mockup clicável, responsivo em desktop, com dados fictícios e pequenas transições locais entre Lobby, Equipe, Inventário, Torre e Hunt. Pode abrir/fechar a Loja NPC e simular navegação. Não autentica, não salva, não calcula combate/loot, não compra itens, não usa Supabase e não inclui Admin Web. Avatares/itens são placeholders de interface, não assets de jogo aprovados; a regra de produzir assets autorais em lotes de dez continua valendo.
+`prototypes/g2-hud/index.html` é um mockup clicável, responsivo em desktop, com dados fictícios e pequenas transições locais entre Lobby, Equipe, Inventário, Torre e Hunt. Pode abrir/fechar a Loja NPC e simular navegação. Não autentica, não salva, não calcula combate/loot, não compra itens, não usa Supabase e não inclui Admin Web. O pack Fantasy Dungeon de Nika Studio, inventariado em [`../sprites/ASSET_MANIFEST.md`](../sprites/ASSET_MANIFEST.md), foi escolhido como a fonte inicial de arte. O click-through agora apresenta sheets de `hero`, `mage` e `slime` como candidatos visuais provisórios, sem aprovação final de mapeamentos nem integração numa aplicação de produção. Avatares/itens restantes continuam placeholders. Assets adicionais poderão ser criados/adicionados depois; não haverá arte procedural.

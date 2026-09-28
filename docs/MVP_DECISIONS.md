@@ -1,6 +1,6 @@
 # Escopo e decisões fechadas do MVP
 
-**Versão:** 0.2
+**Versão:** 0.3 — fonte visual inicial do MVP registrada
 **Status:** baseline de MVP decidido pelo agente a pedido do usuário e sincronizado aos documentos-fonte; serve de referência para pré-produção. Alterações futuras podem ser solicitadas pelo usuário.
 **Importante:** isto fecha decisões de design, não afirma que qualquer sistema já foi implementado ou balanceado em runtime.
 
@@ -33,7 +33,7 @@ O MVP deve comprovar:
 - Drops, XP, Coins, loja NPC somente em Coins, seis poções e três revives.
 - Hunt individual no andar escolhido, 1 boss individual recorrente no andar 10, HUD e log da última sessão (até 100 eventos confirmados).
 - Painel Administrativo isolado com CRUD sem código dos tipos de conteúdo definidos em `ADMIN_PANEL_SPEC.md`.
-- Assets 2D PNG autorais, produzidos em pacotes de dez; efeitos/animações em código.
+- Arte 2D estática: o pack Fantasy Dungeon de Nika Studio, já versionado em `sprites/`, é a base inicial. Assets adicionais poderão ser adicionados/criados posteriormente em lotes de dez; efeitos/animações em código. O inventário e a nota conservadora de licença/atribuição estão em [`../sprites/ASSET_MANIFEST.md`](../sprites/ASSET_MANIFEST.md).
 
 ## 3. Fora do MVP (roadmap pós-MVP)
 
