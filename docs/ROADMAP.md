@@ -1,7 +1,7 @@
 # Roadmap — Tower Idle Adventure
 
-**Versão:** 0.4 — prova de schema parcial e gate G2 aberto
-**Status atual:** Etapa 1/G1 concluída documentalmente; Etapa 2/G2 em andamento. Blueprints, click-through e migration-base estão preparados; smoke tests PGlite passaram, mas não são prova Supabase. Gate G2 segue aberto sem validação Supabase real, revisão de segurança/infra ou estudo com 5–8 participantes. Nenhum produto jogável, gameplay, HUD real, Admin Web ou serviço foi provisionado.
+**Versão:** 0.5 — pipeline GitHub/Vercel/Supabase documentado; gate G2 aberto
+**Status atual:** Etapa 1/G1 concluída documentalmente; Etapa 2/G2 em andamento. Blueprints, click-through, migration-base e plano de deploy estão preparados; smoke tests PGlite passaram, mas não são prova Supabase. Gate G2 segue aberto sem validação Supabase real, revisão de segurança/infra ou estudo com 5–8 participantes. Nenhum produto jogável, gameplay, HUD real, Admin Web, serviço ou integração de deploy foi provisionado/configurado.
 **Princípio:** cada etapa começa lendo [AI_State](AI_STATE.md), altera a documentação antes do código quando houver decisão de design e termina atualizando AI_State e evidências.
 
 ## Marcos de aprovação
@@ -38,6 +38,7 @@ Não avançar de marco por calendário apenas; cada gate depende de critérios d
 ### Etapa 2 — Pré-produção técnica, segurança e UX (G2, em andamento; parcial)
 
 - Detalhar a arquitetura já escolhida: Game Web e Admin Web em projetos separados da Vercel; servidor Supabase (Auth, PostgreSQL, Edge Functions, Storage e Realtime conforme uso), com ambientes dev/staging/production.
+- Documentar CI/CD: PR → Preview Vercel; merge em `main` → Production Deployment Vercel automático após build/checks; migrations Supabase em integração separada, com compatibilidade expandir→migrar→limpar. Ver `DEPLOYMENT_GUIDE.md`. Isto é desenho aprovado, não pipeline já ativo.
 - Definir domínio autoritativo do servidor, schema/migrações, contratos API/eventos, autenticação, roles, RLS, rate limits, logs, backup, restauração e proteção da economia.
 - Desenhar o CMS no-code, isolamento do painel, provisioning de administradores, fluxo draft/validate/publish/rollback, versionamento do catálogo e threat model, conforme `ADMIN_PANEL_SPEC.md` e `TECH_ARCHITECTURE.md`.
 - Revisar e aprovar a arquitetura, os componentes, os estados e as dependências da HUD documentados em `HUD_UX_SPEC.md` antes de implementar a interface; definir UX responsiva, acessibilidade, protótipos navegáveis e teste de usabilidade.

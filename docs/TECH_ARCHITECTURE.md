@@ -1,6 +1,6 @@
 # Arquitetura técnica — Vercel + Supabase
 
-**Versão:** 0.4 — foundation schema G2 e limites de validação
+**Versão:** 0.5 — fluxo de deploy GitHub/Vercel/Supabase documentado
 **Decisão confirmada pelo usuário:** usar **Vercel + Supabase**, separando o cliente do jogo do servidor.
 **Estado:** infraestrutura e aplicações ainda não existem. A migration-base de schema foi criada e tem smoke tests PostgreSQL/PGlite limitados; não foi aplicada/testada pelo Supabase CLI nem contra Auth/Data API reais. Ver [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md) para evidências/limites e [`THREAT_MODEL.md`](THREAT_MODEL.md) para riscos. G2 permanece aberta.
 
@@ -84,3 +84,11 @@ Eventos de servidor devem gerar logs sem expor segredos ou dados pessoais excess
 - Domínios finais, identidade visual, fluxo MFA/admin e política de preview deployment.
 
 A escolha Vercel + Supabase e a separação client/server estão aprovadas. O baseline de schemas/contratos foi detalhado em [`G2_TECHNICAL_BLUEPRINT.md`](G2_TECHNICAL_BLUEPRINT.md), as ameaças em [`THREAT_MODEL.md`](THREAT_MODEL.md) e o click-through de UX em [`G2_UX_BLUEPRINT.md`](G2_UX_BLUEPRINT.md). Os detalhes de implantação/limites, testes reais, protótipo com usuários, provisionamento e revisão de segurança ainda são critérios do G2; nenhum serviço ou aplicação existe.
+
+## 8. Deploy contínuo planejado (ainda não configurado)
+
+O requisito confirmado é que PRs recebam Preview e que merge/commit em `main` inicie deploy de produção da Vercel automaticamente, após build e checks. Game Web e Admin Web serão projetos Vercel separados apontando para seus diretórios raiz; nenhum dos dois apps existe ainda. A publicação também exige configuração de variáveis por ambiente, proteção server-side do Admin, integração do repositório e eventual domínio. O roteiro passo a passo, rollback e checklist estão em [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md).
+
+O deploy Git da Vercel não executa migrations Supabase. Configurar separadamente a integração GitHub/branching do Supabase ou um workflow com Supabase CLI. Se os dois fluxos iniciam no mesmo merge, não há garantia de ordem entre eles: preferir migrations aditivas e compatíveis (`expandir → migrar aplicação → limpar em alteração posterior`). A integração do Supabase aplica migrations/itens suportados, mas Auth/API e outras configurações não são automaticamente atualizadas por padrão; verificar cada projeto real antes de produção.
+
+**Estado em 2026-09-28:** nenhum app `game-web`/`admin-web`, projeto Vercel/Supabase, domínio, secret ou integração existe. Logo o auto-deploy é um requisito planejado, não uma automação ativa; G2 permanece aberta.

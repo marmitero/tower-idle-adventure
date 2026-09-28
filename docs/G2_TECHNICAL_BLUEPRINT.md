@@ -1,7 +1,7 @@
 # G2 — blueprint técnico do MVP
 
-**Versão:** 0.2 — migration-base e evidência PGlite parcial
-**Status:** baseline técnico proposto pelo agente. A migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` foi criada e passou 9 smoke tests PostgreSQL via PGlite (RLS/grants/constraints), mas não foi aplicada/validada pelo Supabase CLI: esta sandbox não tem Supabase CLI nem Docker. Nenhum serviço, Edge Function, jogo ou painel foi provisionado/implementado. G2 continua aberta.
+**Versão:** 0.3 — pipeline de deploy documentado; evidência PGlite parcial
+**Status:** baseline técnico proposto pelo agente. A migration-base `supabase/migrations/20260928000000_g2_core_schema.sql` foi criada e passou 9 smoke tests PostgreSQL via PGlite (RLS/grants/constraints), mas não foi aplicada/validada pelo Supabase CLI: esta sandbox não tem Supabase CLI nem Docker. Nenhum serviço, Edge Function, jogo, painel ou integração de deploy foi provisionado/implementado. G2 continua aberta.
 
 Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`](TECH_ARCHITECTURE.md) para o MVP de [`MVP_DECISIONS.md`](MVP_DECISIONS.md). Regras de produto do MVP não são reabertas aqui. Decisões técnicas dependentes de plano, custo e uma prova técnica ainda precisam de verificação antes de G2 ser encerrada.
 
@@ -29,6 +29,12 @@ Este documento detalha a direção Vercel + Supabase de [`TECH_ARCHITECTURE.md`]
 - Vercel Preview nunca recebe segredo de produção. Por padrão, preview do Game Web usa ambiente dev/sintético; Preview do Admin Web deve ter Vercel Deployment Protection e não consegue publicar no banco de produção.
 - Produção usa variáveis separadas por projeto/environment. Segredos do Supabase ficam apenas em funções/servidor; nenhuma chave secreta ou `service_role`/`sb_secret` pode aparecer em bundle `NEXT_PUBLIC_*`, source map ou log.
 - Habilitar verificação de migration status e backup antes de qualquer release de schema; não executar reset destrutivo contra staging/production.
+
+### Deploy contínuo planejado
+
+- O requisito confirmado é: PRs recebem Vercel Preview; merge em `main` inicia Production Deployment da Vercel após build/checks. O Admin permanece separado e protegido no próprio app/servidor.
+- Supabase migrations têm pipeline separado: integração GitHub/branching do Supabase ou CI com Supabase CLI; a Vercel não as aplica. Se ambos forem disparados pelo mesmo merge, a ordem não é atômica, portanto migrations devem ser compatíveis com app antigo/novo (expandir → migrar app → limpar).
+- Não configurado: ainda não há apps `game-web`/`admin-web`, projetos Vercel/Supabase, secrets, domínio, CI ou integração GitHub. O roteiro detalhado está em [`DEPLOYMENT_GUIDE.md`](DEPLOYMENT_GUIDE.md). A ausência de deploy não fecha nem reabre sozinha o gate G2.
 
 ## 3. Domínios de dados MVP
 
