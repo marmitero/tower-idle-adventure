@@ -9,7 +9,7 @@
 ## 1. Regras obrigatórias para quem continuar
 
 1. No início: ler este arquivo, conferir `git status`, branch e `git log`; depois abrir os documentos-fonte relevantes. Não presumir que uma anotação antiga prevalece sobre o estado mais recente.
-2. Trabalhar sempre na branch `arena/01a0e8b8-tower-idle-adventure`. **Nunca trocar de branch, criar outra branch para esta sessão, nem enviar alterações para outra branch.** O repositório canônico deste checkout é `marmitero/tower-idle-adventure`.
+2. Na sessão que originou este handoff, a branch foi `arena/01a0e8b8-tower-idle-adventure`. **Em uma nova conversa, obedecer à branch fixa indicada pelo Agent Mode para aquela sessão; nunca trocar/criar outra branch nem enviar alterações para outra branch.** O repositório canônico é `marmitero/tower-idle-adventure`.
 3. Ao final de toda etapa, mesmo parcial/pausada: atualizar este AI_State e os documentos afetados; executar verificações pertinentes; criar commit e fazer push somente para `origin arena/01a0e8b8-tower-idle-adventure`; confirmar sucesso e informar o hash. Não deixar trabalho concluído sem checkpoint.
 4. Não afirmar que algo foi testado, implantado, aprovado ou configurado em um serviço externo sem evidência. Separar sempre **estado verificado no repositório**, **relato do usuário** e **proposta/recomendação**.
 5. O usuário prefere fluxo browser-first para GitHub, Supabase e Vercel e não quer instalar CLI, Docker ou outras ferramentas no próprio computador. O agente deve fazer primeiro tudo que for possível no repositório e pelas integrações disponíveis; só pedir ajuda ao usuário para login/OAuth/consentimento, ações que exijam Dashboard autenticado, permissões, billing ou algo que o agente não possa acessar. Nunca solicitar senha, token, service-role key, código MFA ou outro segredo; ensinar o clique necessário pelo navegador e pedir apenas confirmação/dados não secretos.
@@ -21,7 +21,7 @@
 
 **Tower Idle Adventure** é um RPG idle automático 2D para navegador, centrado em uma torre, progressão de equipe, equipamentos e batalhas PvE automáticas. O MVP é individual, desktop-first e PT-BR; o jogo não está implementado. A conta escolhe um personagem, monta uma equipe de até três, faz hunts pessoais por andares, ganha XP/Coins/loot e retorna ao lobby. Detalhes de produto, números e critérios de aceite estão em [`MVP_DECISIONS.md`](MVP_DECISIONS.md), [`GDD.md`](GDD.md) e [`SYSTEMS_SPEC.md`](SYSTEMS_SPEC.md).
 
-O projeto encontra-se em **pré-produção**: especificações, threat model, protótipo UX estático, fundação SQL e inventário de arte existem; não há gameplay, backend funcional, app Game Web, Admin Web, deployment Vercel ou validação Supabase hospedada confirmada. O projeto Supabase dev e sua configuração GitHub são relatados pelo usuário, conforme §4.
+O projeto encontra-se em **pré-produção**: especificações, threat model, protótipo UX estático, fundação SQL e inventário de arte existem; não há gameplay, backend funcional, app Game Web, Admin Web ou deployment Vercel. Há evidência relatada pelo usuário de aplicação da migration-base ao Supabase dev; Auth/Data API/RLS e controles operacionais ainda não foram validados diretamente no Supabase hospedado. O projeto dev e sua configuração GitHub são relatados pelo usuário, conforme §4.
 
 ## 3. Produto, decisões e limites de escopo
 
@@ -87,7 +87,7 @@ O usuário forneceu os seguintes dados da configuração no Dashboard. **O agent
 - Nenhum Game Web ou Admin Web em `apps/`; nenhum deployment Vercel.
 - Nenhum fluxo de gameplay, cliente autoritativo, Edge Function, Auth, Storage, API, CMS ou transação de economia.
 - O usuário relata migration registrada e tabelas no Supabase dev, forte evidência de aplicação do schema. PGlite não testa Supabase Auth, PostgREST/Data API, Edge Functions, Storage, concorrência real, custos, backup ou configuração do provedor.
-- Nenhum preview Supabase por PR; nenhum teste de migration hospedado confirmado. Supabase dev/configuração GitHub são relato do usuário, não observação autenticada do agente.
+- Nenhum preview Supabase por PR. A migration-base e as tabelas correspondentes foram confirmadas pelo usuário no projeto dev; os smoke tests PGlite também passaram no GitHub Actions. Ainda não há testes hospedados de Auth/Data API/RLS ou outras integrações Supabase. O agente não tem sessão autenticada do Dashboard.
 - Não há teste de segurança/backup/restore em ambiente real, nem estudo UX com os 5–8 participantes planejados.
 - Nenhum app foi implantado, nenhum domínio final foi escolhido, e nenhuma produção Supabase/Vercel foi liberada.
 
@@ -109,11 +109,12 @@ Não usar a ausência de Preview Branch como motivo para instalar ferramentas ou
 
 1. Ler novamente este AI_State; conferir branch, `git status`, `git log` e estado do remote. Continuar exclusivamente em `arena/01a0e8b8-tower-idle-adventure`.
 2. Não pedir novamente os dados informados: projeto Supabase dev `tower-idle-adventure-dev`, repo `marmitero/tower-idle-adventure`, Working Directory `.`, Deploy to production ON, Production branch `main`, Automatic Preview OFF; migration consta como inserida e tabelas aparecem em `public`, conforme relato do usuário. Ainda sem projeto Supabase de produção ou Vercel.
-3. O workflow `.github/workflows/supabase-schema-checks.yml` executa `npm ci --prefix supabase`, `npm test --prefix supabase` e `npm audit --prefix supabase --audit-level=low` em PRs com mudanças Supabase, pushes em `main` com mudanças Supabase e execução manual. Foi validado no GitHub Actions pelo PR #2: os 9 testes e o audit passaram. O workflow não substitui teste Supabase real. PR #2 permanece aberto, sem merge ou deploy.
-4. Não fazer merge automático em `main` nem provocar migrations externas sem revisar PR/diff e destino dev. O deploy está ligado somente no Supabase dev reportado; produção ainda não existe.
-5. A aplicação da migration-base tem evidência reportada no Supabase dev. Para qualquer nova verificação, pedir apenas status/schema não secreto; nunca pedir senha, token, service-role key ou credenciais.
-6. Depois do gate G2, e só então, iniciar a vertical slice G3 conforme `ROADMAP.md`; implementar Game Web/Admin Web com limites de segurança documentados. Quando apps existirem, ajudar a configurar Vercel pelo navegador, pois o agente não tem sessão autenticada de Vercel.
-7. Ao final da etapa, sincronizar AI_State e os docs que mudaram, executar testes/document checks, commitar e dar push para a branch fixa, registrar hash no retorno.
+3. O workflow `.github/workflows/supabase-schema-checks.yml` executa `npm ci --prefix supabase`, `npm test --prefix supabase` e `npm audit --prefix supabase --audit-level=low` em PRs com mudanças Supabase, pushes em `main` com mudanças Supabase e execução manual. Foi validado no GitHub Actions pelo PR #2: os 9 testes e o audit passaram; o check Supabase Preview foi skipped porque Preview Branch está desligado. O workflow não testa Auth/Data API do Supabase.
+4. **Próximo passo após o PR #2:** continuar G2 com prova de Auth/Data API/RLS no projeto dev. Primeiro, o agente deve revisar os grants/policies da migration e criar no repositório uma matriz/runbook reproduzível de testes para `anon`, dois usuários sintéticos isolados e acesso direto via Data API; executar localmente tudo que não dependa de credenciais. Não pedir segredo nem token ao usuário. Só depois, se o Dashboard/sessões de usuário forem indispensáveis, explicar em passos claros como criar contas sintéticas/rodar os testes no projeto `tower-idle-adventure-dev` e pedir somente resultados não sensíveis. Não criar/alterar usuários reais nem rodar scripts destrutivos.
+5. O PR #2 contém documentação e workflow, sem mudança de migration SQL; sua integração não deve ser tratada como deploy de schema novo. O usuário autorizou o merge nesta etapa; após integrar, verificar o resultado do PR e dos checks via `gh`, sem fazer merge de outros PRs sem autorização/revisão.
+6. Nunca apontar o deploy para produção: Supabase de produção ainda não existe e Vercel não foi configurada. O deploy automático Supabase ativo está ligado ao projeto dev e a Preview Branch continua desligada.
+7. Após as provas Auth/Data API/RLS, seguir os demais critérios pendentes de G2 em `G2_TECHNICAL_BLUEPRINT.md`, `THREAT_MODEL.md` e `G2_UX_BLUEPRINT.md`. Não iniciar G3 até fechar/aprovar o gate G2.
+8. Ao final de cada etapa, atualizar AI_State e docs afetados, executar verificações, commitar e fazer push somente para a branch Arena autorizada da sessão corrente; em conversas futuras, obedecer à branch fixa informada pelo Agent Mode em vez de assumir que esta branch permanece obrigatória.
 
 ## 8. Mapa de documentos-fonte
 
