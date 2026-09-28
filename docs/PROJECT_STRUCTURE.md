@@ -2,7 +2,7 @@
 
 **Status:** proposta de organização; nenhum app de produção foi criado. Este documento descreve como separar responsabilidades antes de iniciar a implementação.
 
-**Direção atual confirmada pelo usuário:** iniciar Supabase + Vercel sem instalar ferramentas; toda a configuração das plataformas deve ocorrer nos navegadores do GitHub, Supabase e Vercel. Usar Supabase Dashboard + GitHub Integration/Preview Branches para validar migrations hospedadas; não exigir CLI/Docker locais. Criar apenas Supabase dev com dados sintéticos. A Vercel pode ser autorizada agora, mas importar Game Web/Admin aguarda os diretórios de aplicação. Produção continua separada e protegida. As sequências anteriores de CLI/Docker local foram superadas.
+**Direção atual confirmada pelo usuário:** operar Supabase + Vercel pelo navegador, sem instalar ferramentas. O usuário relata que criou `tower-idle-adventure-dev` e conectou-o ao GitHub na branch `main`; Automatic Branching/Preview Branch está desligado por limitação do plano. Ainda não confirmamos o repo completo nem a aplicação de migrations. Vercel segue sem configuração; importar Game Web/Admin aguarda os diretórios de aplicação. Produção continua separada e protegida. As sequências anteriores de CLI/Docker local foram superadas.
 
 ## 1. Estrutura alvo (proposta)
 
@@ -38,9 +38,9 @@ A árvore de apps é uma **proposta**, não uma decisão final de framework/gere
 ## 3. Sequência browser-first de onboarding
 
 1. **Prévia atual:** abrir o preview estático disponível no Arena; não instalar servidor local, Vercel CLI ou dependências para consultar esse mockup. Ele não é uma aplicação de produção.
-2. **Supabase dev:** pelo Dashboard web, criar um projeto isolado com dados sintéticos; ativar MFA e guardar senha no gerenciador de senhas.
-3. **GitHub ↔ Supabase:** no Dashboard Supabase autorizar a GitHub Integration, conectar o repositório e usar `.` como Working Directory. Se disponível e dentro do plano, habilitar Automatic Branching para que PRs gerem Supabase Preview Branches e executem migrations da branch. Não é preciso instalar Supabase CLI/Docker localmente.
-4. **Prova de migration:** acompanhar no navegador do GitHub o status do PR e no Dashboard da Preview Branch o schema aplicado. Dados do projeto-base não são copiados; usar seed sintético. Habilitar o deploy da branch principal somente para o projeto Supabase dev, nunca para produção nesta fase.
+2. **Supabase dev:** usuário relata projeto isolado `tower-idle-adventure-dev` já criado, com dados sintéticos; conferir no Dashboard que esse é o ambiente dev e manter a senha no gerenciador de senhas.
+3. **GitHub ↔ Supabase:** conferir no Dashboard a GitHub Integration, branch `main` e Working Directory `.`. O nome informado pelo usuário `idle-tower-adventure` parece divergir do remoto desta sessão `marmitero/tower-idle-adventure`; validar owner/repo antes de deploy. Automatic Branching/Preview Branch fica desabilitado no plano atual. Verificar o toggle de aplicação ao projeto-base somente no projeto dev.
+4. **Prova de migration:** sem Preview Branch por PR, revisar SQL no GitHub antes do merge em `main`; após merge, conferir migration status/schema no Dashboard do projeto dev. É um banco compartilhado, não teste isolado. Usar apenas dados sintéticos e habilitar aplicação automática somente após confirmar o repositório e o projeto corretos.
 5. **Vercel ↔ GitHub:** autorizar o repositório pela Vercel agora. Não importar o repositório na raiz: `apps/game-web/` e `apps/admin-web/` ainda não existem. Depois de implementar shells seguros/buildáveis, importar cada diretório raiz como projeto Vercel independente e revisar Previews de PR pelo browser.
 6. **GitHub Actions (opcional):** para smoke tests que ainda precisem ser executados automaticamente, configurar workflow em runner hospedado; qualquer instalação de dependência ocorre no runner efêmero, não na máquina do usuário. Esse workflow não está configurado.
 7. **Produção:** manter projeto Supabase de produção, segredos de produção e domínio fora do onboarding inicial. Antes do alpha fechado, provar migrations, RLS, autorização/Admin, backups, checks e rollback; só então habilitar produção e o fluxo `main` → checks → Vercel Production Deployment.

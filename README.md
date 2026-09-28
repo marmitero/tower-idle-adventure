@@ -2,7 +2,7 @@
 
 **Tower Idle Adventure** é um RPG idle automático 2D para navegador, centrado em uma torre de andares, progressão de equipe e batalhas PvE automáticas.
 
-> **Fase atual: G2 em andamento.** Há documentação técnica, click-through UX sem backend com três sprites candidatos, migration-base testada apenas com PGlite e o pack inicial inventariado; nenhum sprite foi integrado a uma aplicação de produção. Nenhum projeto Supabase/Vercel ou aplicativo de produção está configurado/implementado. O usuário pediu iniciar agora o processo Supabase + Vercel; veja o guia passo a passo. O baseline de MVP foi decidido pelo agente sob autorização explícita do usuário e pode ser ajustado por ele; os números ainda não foram validados em playtest.
+> **Fase atual: G2 em andamento.** Há documentação técnica, click-through UX sem backend com três sprites candidatos, migration-base testada apenas com PGlite e pack inicial inventariado; nenhum sprite foi integrado a uma aplicação de produção. O usuário relata que criou o Supabase `tower-idle-adventure-dev` e o conectou ao GitHub na branch `main`; Automatic Branching/Preview Branch está desligado por limitação do plano e ainda não foi confirmada a aplicação da migration. A Vercel não foi configurada e não há apps de produção. O onboarding é browser-only; veja o guia passo a passo. O baseline de MVP foi decidido pelo agente sob autorização explícita do usuário e pode ser ajustado por ele; os números ainda não foram validados em playtest.
 
 ## Documentação do projeto
 
@@ -12,7 +12,7 @@
 - [Proposta de combate e balanceamento das armas](docs/COMBAT_DESIGN.md)
 - [Arquitetura visual da HUD e UX](docs/HUD_UX_SPEC.md)
 - [Arquitetura técnica Vercel + Supabase](docs/TECH_ARCHITECTURE.md)
-- [Guia de deploy GitHub → Vercel + Supabase](docs/DEPLOYMENT_GUIDE.md) — fluxo planejado e onboarding inicial solicitado; nenhum serviço externo está conectado.
+- [Guia de deploy GitHub → Vercel + Supabase](docs/DEPLOYMENT_GUIDE.md) — onboarding browser-first; Supabase dev foi criado segundo o usuário, Auto Preview fica desligado e Vercel ainda não foi configurada.
 - [Estrutura proposta do projeto](docs/PROJECT_STRUCTURE.md) — separação planejada de apps, contratos, backend e protótipos; não são pastas/apps prontos.
 - [Blueprint técnico detalhado do G2](docs/G2_TECHNICAL_BLUEPRINT.md)
 - [Migration-base e smoke tests PostgreSQL/PGlite](supabase/migrations/20260928000000_g2_core_schema.sql) — 9 smoke tests PGlite; não equivale à validação em Supabase hospedado. Veja também [`supabase/README.md`](supabase/README.md) para limites e procedimento browser-first.
@@ -36,4 +36,4 @@
 
 ## Próximos passos
 
-G2 segue em andamento: a migration-base passou somente no harness PGlite; falta validá-la via Supabase GitHub Integration/Preview Branch e testar Data API/Auth, transações, rate limits, reconexão, segurança/Admin, backup e usabilidade com testers. O usuário decidiu evitar instalações e fazer onboarding pelos navegadores das plataformas; não requerer CLI/Docker locais. Próximo passo: criar Supabase dev sintético pelo Dashboard e conectar o repositório via GitHub Integration. Vercel pode ser autorizada pelo navegador, mas a importação aguarda `apps/game-web/` e `apps/admin-web/`. Não há serviço ou interface de produção. A vertical slice (G3) começa somente após o gate G2 do [Roadmap](docs/ROADMAP.md).
+G2 segue em andamento: a migration-base passou somente no harness PGlite; falta confirmar a migration no projeto dev após merge em `main`, e testar Data API/Auth, transações, rate limits, reconexão, segurança/Admin, backup e usabilidade com testers. O usuário decidiu evitar instalações e fazer onboarding pelos navegadores. O próximo passo é confirmar no Dashboard o owner/repo conectado (o nome informado parece divergir do remoto desta sessão) e o toggle que aplica migrations no projeto dev. Auto Preview Supabase está desligado pelo plano atual. A Vercel não foi configurada; a importação aguarda `apps/game-web/` e `apps/admin-web/`. Não há serviço ou interface de produção. A vertical slice (G3) começa somente após o gate G2 do [Roadmap](docs/ROADMAP.md).
